@@ -30,6 +30,7 @@
         <mockito.core.version>5.1.1</mockito.core.version>
         <mockito.junit.jupiter.version>5.1.1</mockito.junit.jupiter.version>
         <jackson.databind.version>2.14.2</jackson.databind.version>
+        <h2.version>2.1.214</h2.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -91,6 +92,12 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.databind.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -132,7 +139,7 @@
                             <sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
                             <configLocation>checkstyle/checkstyle.xml</configLocation>
                             <consoleOutput>true</consoleOutput>
-                            <encoding>${project.build.sourceEncoding}</encoding>
+<!--                            <encoding>${project.build.sourceEncoding}</encoding>-->
                         </configuration>
                         <goals>
                             <goal>check</goal>
