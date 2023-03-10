@@ -38,5 +38,5 @@ Example
 You are ready to create a PR for your ticket if the following criteria are met:
 * Local ```mvn verify``` is passing without the errors
 * Ticket`s acceptance criteria are met
-* Your code is covered by tests
+* Public methods should be covered by tests
 * Your code is covered by JavaDocs on the main methods
