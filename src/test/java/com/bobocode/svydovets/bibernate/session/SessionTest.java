@@ -26,7 +26,7 @@ public class SessionTest {
     @BeforeEach
     void setUp() {
         selectAction = mock(SelectAction.class);
-        session = new Session(selectAction);
+        session = new SessionImpl(selectAction);
     }
 
     @Test
