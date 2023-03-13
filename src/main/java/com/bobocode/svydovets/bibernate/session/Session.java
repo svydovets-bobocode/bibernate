@@ -1,19 +1,26 @@
 package com.bobocode.svydovets.bibernate.session;
 
-import com.bobocode.svydovets.bibernate.action.SelectAction;
-import com.bobocode.svydovets.bibernate.action.key.EntityKey;
-import lombok.RequiredArgsConstructor;
-
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-@RequiredArgsConstructor
-public class Session {
-    private final SelectAction selectAction;
-    private final Map<EntityKey<?>, Object> cache = new ConcurrentHashMap<>();
+public interface Session {
 
-    public <T> T find(Class<T> type, Object id) {
-        EntityKey<T> entityKey = new EntityKey<>(type, id);
-        return type.cast(cache.computeIfAbsent(entityKey, selectAction::execute));
-    }
+    <T> T find(Class<T> type, Object id);
+
+    <T> T save(T entity);
+
+    <T> void delete(T id);
+
+    <T> List<T> findAll(Class<T> type);
+
+    <T> List<T> findAll(Class<T> type, Map<String, Object> properties);
+
+    void close();
+
+    <T> T merge(T entity);
+
+    void detach(Object entity);
+
+    void flush();
+
 }

@@ -1,18 +1,7 @@
 package com.bobocode.svydovets.bibernate.session;
 
-import com.bobocode.svydovets.bibernate.action.SelectAction;
-import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
-import lombok.RequiredArgsConstructor;
+public interface SessionFactory {
 
-import javax.sql.DataSource;
+    Session openSession();
 
-@RequiredArgsConstructor
-public class SessionFactory {
-    private final DataSource dataSource;
-    private final SqlQueryBuilder sqlQueryBuilder;
-
-    public Session openSession() {
-        SelectAction selectAction = new SelectAction(dataSource, sqlQueryBuilder);
-        return new Session(selectAction);
-    }
 }
