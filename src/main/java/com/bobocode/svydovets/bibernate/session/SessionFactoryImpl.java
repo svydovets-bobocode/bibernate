@@ -2,9 +2,8 @@ package com.bobocode.svydovets.bibernate.session;
 
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
-import lombok.RequiredArgsConstructor;
-
 import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class SessionFactoryImpl implements SessionFactory {

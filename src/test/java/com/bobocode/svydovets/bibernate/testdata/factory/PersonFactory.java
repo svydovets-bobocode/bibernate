@@ -8,7 +8,8 @@ public class PersonFactory {
     public static final String DEFAULT_FIRST_NAME = "John";
     public static final String DEFAULT_LAST_NAME = "Doe";
 
-    public static final EntityKey<Person> DEFAULT_ENTITY_KEY = new EntityKey<>(Person.class, DEFAULT_ID);
+    public static final EntityKey<Person> DEFAULT_ENTITY_KEY =
+            new EntityKey<>(Person.class, DEFAULT_ID);
 
     public static Person newDefaultPerson() {
         Person person = new Person();

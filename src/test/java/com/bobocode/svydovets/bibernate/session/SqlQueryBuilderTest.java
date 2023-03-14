@@ -15,21 +15,20 @@ class SqlQueryBuilderTest {
     @Test
     @DisplayName("Create Select by Id Query")
     void createSelectByIdQuery() {
-        //given
-        //when
+        // given
+        // when
         var selectByIdQuery = sqlBuilder.createSelectByIdQuery(User.class);
-        //then
+        // then
         Assertions.assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ?;");
     }
 
     @Test
     @DisplayName("Create Select by id query when table name is Explicitly Specified")
     void createSelectByIdQueryWhenTableNameIsExplicitlySpecified() {
-        //given
-        //when
+        // given
+        // when
         var selectByIdQuery = sqlBuilder.createSelectByIdQuery(Person.class);
-        //then
+        // then
         Assertions.assertThat(selectByIdQuery).isEqualTo("SELECT * FROM person WHERE id = ?;");
     }
-
 }

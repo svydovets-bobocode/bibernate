@@ -22,5 +22,4 @@ public interface Session {
     void detach(Object entity);
 
     void flush();
-
 }
