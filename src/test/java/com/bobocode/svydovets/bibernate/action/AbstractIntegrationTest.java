@@ -1,13 +1,12 @@
 package com.bobocode.svydovets.bibernate.action;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 @Tag("integration")
 abstract class AbstractIntegrationTest {
@@ -33,7 +32,8 @@ abstract class AbstractIntegrationTest {
     }
 
     private void createTable() throws SQLException {
-        String createTableQuery = "CREATE TABLE person (id BIGINT, firstName VARCHAR(255), lastName VARCHAR(255))";
+        String createTableQuery =
+                "CREATE TABLE person (id BIGINT, firstName VARCHAR(255), lastName VARCHAR(255))";
         PreparedStatement statement = connection.prepareStatement(createTableQuery);
         statement.executeUpdate();
     }

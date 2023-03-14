@@ -4,7 +4,9 @@ import com.bobocode.svydovets.bibernate.annotation.Table;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SqlQueryBuilder { // Todo: transform it to a abstract class or interface to cover different dialects
+public
+class SqlQueryBuilder { // Todo: transform it to a abstract class or interface to cover different
+    // dialects
     // Todo: id can have different name
     // Todo: mb create enum to store queries
     private static final String SELECT_FROM_TABLE_BY_ID_PARAM = "SELECT * FROM %s WHERE id = ?;";

@@ -1,11 +1,11 @@
 package com.bobocode.svydovets.bibernate.action;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class SelectActionIntegrationTest extends AbstractIntegrationTest {
 
@@ -20,4 +20,3 @@ class SelectActionIntegrationTest extends AbstractIntegrationTest {
         assertThat(entity.getLastName()).isEqualTo("Doe");
     }
 }
-

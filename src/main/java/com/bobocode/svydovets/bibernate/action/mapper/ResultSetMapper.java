@@ -1,9 +1,8 @@
 package com.bobocode.svydovets.bibernate.action.mapper;
 
-import lombok.SneakyThrows;
-
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
+import lombok.SneakyThrows;
 
 public class ResultSetMapper {
 
