@@ -2,11 +2,10 @@ package com.bobocode.svydovets.bibernate.session;
 
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class SessionImpl implements Session {
@@ -25,9 +24,7 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public <T> void delete(T id) {
-
-    }
+    public <T> void delete(T id) {}
 
     @Override
     public <T> List<T> findAll(Class<T> type) {
@@ -40,9 +37,7 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public void close() {
-
-    }
+    public void close() {}
 
     @Override
     public <T> T merge(T entity) {
@@ -50,13 +45,8 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public void detach(Object entity) {
-
-    }
+    public void detach(Object entity) {}
 
     @Override
-    public void flush() {
-
-    }
-
+    public void flush() {}
 }
