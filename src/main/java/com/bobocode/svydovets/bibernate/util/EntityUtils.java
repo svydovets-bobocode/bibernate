@@ -12,14 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 public class EntityUtils {
     private EntityUtils() {}
 
-    public static <T> void validateEntity(Class<T> type) {
+    public static void validateEntity(Class<?> type) {
         log.info("Validation {}", type.getName());
-        isEntity(type);
+        checkIsEntity(type);
         //        todo: check that the class entity has at least one @Id
-        hasNoArgConstructor(type);
+        checkHasNoArgConstructor(type);
     }
 
-    private static <T> void isEntity(Class<T> type) {
+    private static void checkIsEntity(Class<?> type) {
         if (!type.isAnnotationPresent(Entity.class)) {
             log.error("{} has no @Entity annotation", type.getName());
             throw new EntityValidationException(
@@ -27,7 +27,7 @@ public class EntityUtils {
         }
     }
 
-    private static <T> void hasNoArgConstructor(Class<T> type) {
+    private static void checkHasNoArgConstructor(Class<?> type) {
         Arrays.stream(type.getConstructors())
                 .filter(constructor -> constructor.getParameterCount() == 0)
                 .findAny()
