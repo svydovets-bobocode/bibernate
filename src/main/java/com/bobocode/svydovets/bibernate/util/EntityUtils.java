@@ -31,7 +31,8 @@ public class EntityUtils {
                 .filter(constructor -> constructor.getParameterCount() == 0)
                 .findAny()
                 .orElseThrow(
-                        () -> new EntityValidationException(
-                                String.format(CLASS_HAS_NO_ARG_CONSTRUCTOR, type.getName())));
+                        () ->
+                                new EntityValidationException(
+                                        String.format(CLASS_HAS_NO_ARG_CONSTRUCTOR, type.getName())));
     }
 }
