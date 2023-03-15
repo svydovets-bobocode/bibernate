@@ -2,6 +2,7 @@ package com.bobocode.svydovets.bibernate.session;
 
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
+import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +15,7 @@ public class SessionImpl implements Session {
 
     @Override
     public <T> T find(Class<T> type, Object id) {
+        EntityUtils.validateEntity(type);
         EntityKey<T> entityKey = new EntityKey<>(type, id);
         return type.cast(cache.computeIfAbsent(entityKey, selectAction::execute));
     }
