@@ -1,0 +1,10 @@
+package com.bobocode.svydovets.bibernate.util;
+
+public final class Constants {
+    private Constants() {}
+
+    public static final String CLASS_HAS_NO_ENTITY_ANNOTATION =
+            "Class '%s' has no @Entity annotation (every entity class must be annotated with '@Entity')";
+    public static final String CLASS_HAS_NO_ARG_CONSTRUCTOR =
+            "Entity '%s' has no 'no-arg constructor' (every '@Entity' class must declare 'no-arg constructor')";
+}
