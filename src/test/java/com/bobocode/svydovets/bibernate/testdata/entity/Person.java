@@ -1,6 +1,8 @@
 package com.bobocode.svydovets.bibernate.testdata.entity;
 
+import com.bobocode.svydovets.bibernate.annotation.Column;
 import com.bobocode.svydovets.bibernate.annotation.Entity;
+import com.bobocode.svydovets.bibernate.annotation.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public final class Person {
-    private Long id;
+    @Id private Long id;
+
+    @Column(updatable = false)
     private String firstName;
+
+    @Column(name = "last_name", insertable = false)
     private String lastName;
 }
