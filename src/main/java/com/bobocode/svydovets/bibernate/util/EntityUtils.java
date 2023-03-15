@@ -21,7 +21,6 @@ public class EntityUtils {
 
     private static void checkIsEntity(Class<?> type) {
         if (!type.isAnnotationPresent(Entity.class)) {
-            log.error("{} has no @Entity annotation", type.getName());
             throw new EntityValidationException(
                     String.format(CLASS_HAS_NO_ENTITY_ANNOTATION, type.getName()));
         }
@@ -32,10 +31,7 @@ public class EntityUtils {
                 .filter(constructor -> constructor.getParameterCount() == 0)
                 .findAny()
                 .orElseThrow(
-                        () -> {
-                            log.error("{} has no 'no-arg constructor'", type.getName());
-                            return new EntityValidationException(
-                                    String.format(CLASS_HAS_NO_ARG_CONSTRUCTOR, type.getName()));
-                        });
+                        () -> new EntityValidationException(
+                                String.format(CLASS_HAS_NO_ARG_CONSTRUCTOR, type.getName())));
     }
 }
