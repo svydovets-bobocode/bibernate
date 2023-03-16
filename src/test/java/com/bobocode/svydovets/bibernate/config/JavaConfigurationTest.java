@@ -8,7 +8,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class HashMapConfigurationTest {
+public class JavaConfigurationTest {
 
     private ConfigurationSource source;
 
@@ -20,7 +20,7 @@ public class HashMapConfigurationTest {
         properties.put("svydovets.bibernate.db.username", "postgres");
         properties.put("svydovets.bibernate.db.password", "postgres");
 
-        source = new HashMapConfiguration(properties);
+        source = new JavaConfiguration(properties);
     }
 
     @Test

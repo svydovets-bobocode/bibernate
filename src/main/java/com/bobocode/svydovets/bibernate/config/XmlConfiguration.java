@@ -18,10 +18,9 @@ public class XmlConfiguration implements ConfigurationSource {
     private final Map<String, String> properties = new HashMap<>();
 
     public XmlConfiguration(String fileName) {
-        try {
+        try (InputStream inputStream  = getClass().getClassLoader().getResourceAsStream(fileName)) {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+            DocumentBuilder builder = factory.newDocumentBuilder();;
             Document document = builder.parse(inputStream);
 
             NodeList propertyNodes = document.getElementsByTagName("property");
