@@ -31,6 +31,7 @@
     <h2.version>2.1.214</h2.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spotless.version>2.22.8</spotless.version>
+    <hikari.version>5.0.1</hikari.version>
   </properties>
 
   <dependencies>
@@ -96,6 +97,11 @@
       <artifactId>h2</artifactId>
       <version>${h2.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <version>${hikari.version}</version>
     </dependency>
   </dependencies>
 
