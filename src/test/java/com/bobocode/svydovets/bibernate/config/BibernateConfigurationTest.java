@@ -1,17 +1,17 @@
 package com.bobocode.svydovets.bibernate.config;
 
-import static com.bobocode.svydovets.bibernate.config.MapHelper.properties;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.session.SessionFactoryImpl;
-import com.bobocode.svydovets.bibernate.testdata.entity.User;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class BibernateConfigurationTest {
         SessionFactoryImpl sessionFactory = config.buildSessionFactory();
         Session session = sessionFactory.openSession();
 
-        var testRecord = session.find(User.class, 1);
+        var testRecord = session.find(TestEntity.class, 1);
         assertNotNull(testRecord);
         assertEquals(1, testRecord.getId());
     }
@@ -66,8 +66,13 @@ public class BibernateConfigurationTest {
 
     @Test
     public void testConfigureWithHashMapConfiguration() {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("svydovets.bibernate.driverClassName", "org.postgresql.Driver");
+        properties.put("svydovets.bibernate.db.url", "jdbc:postgresql://localhost:5432/postgres");
+        properties.put("svydovets.bibernate.db.username", "postgres");
+        properties.put("svydovets.bibernate.db.password", "postgres");
 
-        ConfigurationSource source = new JavaConfiguration(properties);
+        ConfigurationSource source = new HashMapConfiguration(properties);
         BibernateConfiguration config = new BibernateConfiguration(dataSource, sqlQueryBuilder);
         config.configure(source);
         SessionFactoryImpl sessionFactory = config.buildSessionFactory();
@@ -96,8 +101,8 @@ public class BibernateConfigurationTest {
         try (Connection connection = dataSource.getConnection();
                 Statement statement = connection.createStatement()) {
 
-            String createTableSql = "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR)";
-            String insertDataSql = "INSERT INTO users (id, name) VALUES (1, 'Mykhailo')";
+            String createTableSql = "CREATE TABLE test_table (id INT PRIMARY KEY)";
+            String insertDataSql = "INSERT INTO test_table (id) VALUES (1)";
 
             statement.execute(createTableSql);
             statement.execute(insertDataSql);

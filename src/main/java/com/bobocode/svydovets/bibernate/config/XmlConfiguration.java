@@ -1,6 +1,5 @@
 package com.bobocode.svydovets.bibernate.config;
 
-import com.bobocode.svydovets.bibernate.exception.ConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -19,9 +18,10 @@ public class XmlConfiguration implements ConfigurationSource {
     private final Map<String, String> properties = new HashMap<>();
 
     public XmlConfiguration(String fileName) {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
+        try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
             Document document = builder.parse(inputStream);
 
             NodeList propertyNodes = document.getElementsByTagName("property");
@@ -37,7 +37,7 @@ public class XmlConfiguration implements ConfigurationSource {
                                 properties.put(name, value);
                             });
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw new ConfigurationException("Failed to load configuration properties from XML file", e);
+            throw new RuntimeException("Failed to load configuration properties from XML file", e);
         }
     }
 

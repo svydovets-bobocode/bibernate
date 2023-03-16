@@ -10,7 +10,8 @@ public class PropertyFileConfiguration implements ConfigurationSource {
 
     public PropertyFileConfiguration(String fileName) {
         properties = new Properties();
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+        try {
             properties.load(inputStream);
         } catch (IOException e) {
             throw new ConfigurationException("Failed to load configuration properties from file", e);
