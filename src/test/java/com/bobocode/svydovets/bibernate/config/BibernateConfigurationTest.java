@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.config;
 
+import static com.bobocode.svydovets.bibernate.config.MapHelper.properties;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
@@ -11,8 +12,6 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,11 +66,6 @@ public class BibernateConfigurationTest {
 
     @Test
     public void testConfigureWithHashMapConfiguration() {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("svydovets.bibernate.driverClassName", "org.postgresql.Driver");
-        properties.put("svydovets.bibernate.db.url", "jdbc:postgresql://localhost:5432/postgres");
-        properties.put("svydovets.bibernate.db.username", "postgres");
-        properties.put("svydovets.bibernate.db.password", "postgres");
 
         ConfigurationSource source = new JavaConfiguration(properties);
         BibernateConfiguration config = new BibernateConfiguration(dataSource, sqlQueryBuilder);
