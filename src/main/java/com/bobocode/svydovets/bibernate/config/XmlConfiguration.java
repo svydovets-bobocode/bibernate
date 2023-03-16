@@ -8,6 +8,8 @@ import java.util.stream.IntStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import com.bobocode.svydovets.bibernate.exception.ConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -36,7 +38,7 @@ public class XmlConfiguration implements ConfigurationSource {
                                 properties.put(name, value);
                             });
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw new RuntimeException("Failed to load configuration properties from XML file", e);
+            throw new ConfigurationException("Failed to load configuration properties from XML file", e);
         }
     }
 
