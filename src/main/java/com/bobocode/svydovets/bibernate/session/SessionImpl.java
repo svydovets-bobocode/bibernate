@@ -11,13 +11,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SessionImpl implements Session {
     private final SelectAction selectAction;
-    private final Map<EntityKey<?>, Object> cache = new ConcurrentHashMap<>();
+    private final Map<EntityKey<?>, Object> persistenceContext = new ConcurrentHashMap<>();
+    private final Map<EntityKey<?>, Object> entitiesSnapshotMap = new ConcurrentHashMap<>();
 
     @Override
     public <T> T find(Class<T> type, Object id) {
         EntityUtils.validateEntity(type);
         EntityKey<T> entityKey = new EntityKey<>(type, id);
-        return type.cast(cache.computeIfAbsent(entityKey, selectAction::execute));
+        return type.cast(persistenceContext.computeIfAbsent(entityKey, selectAction::execute));
     }
 
     @Override
