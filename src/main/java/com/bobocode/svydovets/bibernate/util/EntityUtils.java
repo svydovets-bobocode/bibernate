@@ -55,8 +55,11 @@ public class EntityUtils {
     }
 
     private static boolean isInsertableField(Field field) {
-        return (!isIdField(field) && isInsertable(field))
-                || (!isIdField(field) && !field.isAnnotationPresent(Column.class));
+        return isInsertableNonId(field) || isNonColumnAnnotatedNonIdField(field);
+    }
+
+    private static boolean isInsertableNonId(Field field) {
+        return isInsertable(field) && !isIdField(field);
     }
 
     private static boolean isInsertable(Field field) {
@@ -71,12 +74,19 @@ public class EntityUtils {
     }
 
     private static boolean isUpdatableField(Field field) {
-        return (!isIdField(field) && isUpdatable(field))
-                || (!isIdField(field) && !field.isAnnotationPresent(Column.class));
+        return isUpdatableNonId(field) || isNonColumnAnnotatedNonIdField(field);
+    }
+
+    private static boolean isUpdatableNonId(Field field) {
+        return isUpdatable(field) && !isIdField(field);
     }
 
     private static boolean isUpdatable(Field field) {
         return field.isAnnotationPresent(Column.class) && field.getAnnotation(Column.class).updatable();
+    }
+
+    private static boolean isNonColumnAnnotatedNonIdField(Field field) {
+        return !field.isAnnotationPresent(Column.class) && !isIdField(field);
     }
 
     private static boolean isIdField(Field field) {
