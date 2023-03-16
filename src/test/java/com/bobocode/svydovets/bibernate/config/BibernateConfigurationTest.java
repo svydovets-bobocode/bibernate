@@ -96,8 +96,9 @@ public class BibernateConfigurationTest {
         try (Connection connection = dataSource.getConnection();
                 Statement statement = connection.createStatement()) {
 
-            String createTableSql = "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR)";
-            String insertDataSql = "INSERT INTO users (id, name) VALUES (1, 'Mykhailo')";
+            String createTableSql =
+                    "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR, creationTime TIME, phone VARCHAR)";
+            String insertDataSql = "INSERT INTO users (id, name) VALUES (1, 'Test')";
 
             statement.execute(createTableSql);
             statement.execute(insertDataSql);
