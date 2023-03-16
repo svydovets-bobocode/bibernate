@@ -1,4 +1,4 @@
-package com.bobocode.svydovets.bibernate.config;
+package com.bobocode.svydovets.bibernate.testdata.entity;
 
 import com.bobocode.svydovets.bibernate.annotation.Entity;
 import com.bobocode.svydovets.bibernate.annotation.Table;

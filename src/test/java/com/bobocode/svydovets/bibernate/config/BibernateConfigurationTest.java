@@ -13,6 +13,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
+
+import com.bobocode.svydovets.bibernate.testdata.entity.TestEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +74,7 @@ public class BibernateConfigurationTest {
         properties.put("svydovets.bibernate.db.username", "postgres");
         properties.put("svydovets.bibernate.db.password", "postgres");
 
-        ConfigurationSource source = new HashMapConfiguration(properties);
+        ConfigurationSource source = new JavaConfiguration(properties);
         BibernateConfiguration config = new BibernateConfiguration(dataSource, sqlQueryBuilder);
         config.configure(source);
         SessionFactoryImpl sessionFactory = config.buildSessionFactory();
