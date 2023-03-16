@@ -1,15 +1,23 @@
 package com.bobocode.svydovets.bibernate.util;
 
+import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_MORE_THAN_ONE_ID;
 import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ARG_CONSTRUCTOR;
 import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ENTITY_ANNOTATION;
+import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ID;
+import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_UNSUPPORTED_ID_TYPE;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
+import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithTwoId;
+import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithoutId;
 import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithoutNonArgConstructor;
 import com.bobocode.svydovets.bibernate.testdata.entity.NonEntityClass;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
+import com.bobocode.svydovets.bibernate.testdata.entity.SupportedIdTypes;
+import com.bobocode.svydovets.bibernate.testdata.entity.UnsupportedIdTypes;
 import com.bobocode.svydovets.bibernate.testdata.entity.User;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
@@ -102,6 +110,96 @@ class EntityUtilsTest {
                             new Field[] {
                                 User.class.getDeclaredField("name"), User.class.getDeclaredField("phone")
                             }));
+        }
+    }
+
+    @Nested
+    @Order(3)
+    @DisplayName("3. @Id test")
+    class IdAnnotationTest {
+        @Test
+        @DisplayName("Entity with valid @Id field should be processed")
+        void entityWithValidIdShouldBeProcessed() {
+            assertThatNoException().isThrownBy(() -> EntityUtils.validateEntity(Person.class));
+        }
+
+        @Test
+        @DisplayName("No fields annotated with @Id")
+        void noFieldsAnnotatedWithId() {
+            assertThatExceptionOfType(EntityValidationException.class)
+                    .isThrownBy(() -> EntityUtils.validateEntity(EntityWithoutId.class))
+                    .withMessage(String.format(CLASS_HAS_NO_ID, EntityWithoutId.class.getName()));
+        }
+
+        @Test
+        @DisplayName("More than one field annotated with @Id")
+        void moreThanOneFieldsAnnotatedWithId() {
+            assertThatExceptionOfType(EntityValidationException.class)
+                    .isThrownBy(() -> EntityUtils.validateEntity(EntityWithTwoId.class))
+                    .withMessage(
+                            String.format(CLASS_HAS_MORE_THAN_ONE_ID, EntityWithTwoId.class.getName(), 2));
+        }
+
+        @Test
+        @DisplayName("Entity with supported type for @Id field should be processed")
+        void entityWithSupportedIdTypeShouldBeProcessed() {
+            assertThatNoException()
+                    .isThrownBy(
+                            () -> EntityUtils.validateEntity(SupportedIdTypes.IntegerId.class)); // Integer
+            assertThatNoException()
+                    .isThrownBy(() -> EntityUtils.validateEntity(SupportedIdTypes.LongId.class)); // Long
+            assertThatNoException()
+                    .isThrownBy(() -> EntityUtils.validateEntity(SupportedIdTypes.UuidId.class)); // UUID
+            assertThatNoException()
+                    .isThrownBy(() -> EntityUtils.validateEntity(SupportedIdTypes.StringId.class)); // String
+            assertThatNoException()
+                    .isThrownBy(
+                            () -> EntityUtils.validateEntity(SupportedIdTypes.BigDecimalId.class)); // BigDecimal
+            assertThatNoException()
+                    .isThrownBy(
+                            () -> EntityUtils.validateEntity(SupportedIdTypes.BigIntegerId.class)); // BigInteger
+            assertThatNoException()
+                    .isThrownBy(
+                            () ->
+                                    EntityUtils.validateEntity(SupportedIdTypes.DateUtilId.class)); // java.util.Date
+            assertThatNoException()
+                    .isThrownBy(
+                            () -> EntityUtils.validateEntity(SupportedIdTypes.DateSqlId.class)); // java.sql.Date
+            assertThatNoException()
+                    .isThrownBy(
+                            () -> EntityUtils.validateEntity(SupportedIdTypes.PrimitiveIntId.class)); // int
+            assertThatNoException()
+                    .isThrownBy(
+                            () -> EntityUtils.validateEntity(SupportedIdTypes.PrimitiveLongId.class)); // long
+        }
+
+        @Test
+        @DisplayName("Unsupported data type of @Id column")
+        void entityWithUnsupportedIdTypeShouldNotBeProcessed() {
+            assertThrowUnsupportedId(UnsupportedIdTypes.ObjectId.class, Object.class); // Object
+            assertThrowUnsupportedId(UnsupportedIdTypes.ByteId.class, Byte.class); // Byte
+            assertThrowUnsupportedId(UnsupportedIdTypes.ShortId.class, Short.class); // Short
+            assertThrowUnsupportedId(UnsupportedIdTypes.FloatId.class, Float.class); // Float
+            assertThrowUnsupportedId(UnsupportedIdTypes.DoubleId.class, Double.class); // Double
+            assertThrowUnsupportedId(UnsupportedIdTypes.CharacterId.class, Character.class); // Character
+            assertThrowUnsupportedId(UnsupportedIdTypes.BooleanId.class, Boolean.class); // Boolean
+            assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveByteId.class, byte.class); // byte
+            assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveShortId.class, short.class); // short
+            assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveFloatId.class, float.class); // float
+            assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveDoubleId.class, double.class); // double
+            assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveCharId.class, char.class); // char
+            assertThrowUnsupportedId(
+                    UnsupportedIdTypes.PrimitiveBooleanId.class, boolean.class); // boolean
+            assertThrowUnsupportedId(
+                    UnsupportedIdTypes.CustomClassId.class,
+                    UnsupportedIdTypes.CustomClass.class); // CustomClass
+        }
+
+        private void assertThrowUnsupportedId(Class<?> entityType, Class<?> idType) {
+            assertThatExceptionOfType(EntityValidationException.class)
+                    .isThrownBy(() -> EntityUtils.validateEntity(entityType))
+                    .withMessage(
+                            String.format(CLASS_HAS_UNSUPPORTED_ID_TYPE, entityType.getName(), idType.getName()));
         }
     }
 }

@@ -1,7 +1,10 @@
 package com.bobocode.svydovets.bibernate.util;
 
+import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_MORE_THAN_ONE_ID;
 import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ARG_CONSTRUCTOR;
 import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ENTITY_ANNOTATION;
+import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ID;
+import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_UNSUPPORTED_ID_TYPE;
 import static java.util.function.Predicate.not;
 
 import com.bobocode.svydovets.bibernate.annotation.Column;
@@ -10,6 +13,7 @@ import com.bobocode.svydovets.bibernate.annotation.Id;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +24,7 @@ public class EntityUtils {
     public static void validateEntity(Class<?> type) {
         log.info("Validation {}", type.getName());
         checkIsEntity(type);
-        //        todo: check that the class entity has at least one @Id
+        checkHasValidId(type);
         checkHasNoArgConstructor(type);
     }
 
@@ -28,6 +32,27 @@ public class EntityUtils {
         if (!type.isAnnotationPresent(Entity.class)) {
             throw new EntityValidationException(
                     String.format(CLASS_HAS_NO_ENTITY_ANNOTATION, type.getName()));
+        }
+    }
+
+    private static void checkHasValidId(Class<?> type) {
+        List<Field> idFields =
+                Arrays.stream(type.getDeclaredFields())
+                        .filter(field -> field.isAnnotationPresent(Id.class))
+                        .toList();
+
+        if (idFields.size() == 0) {
+            throw new EntityValidationException(String.format(CLASS_HAS_NO_ID, type.getName()));
+        }
+        if (idFields.size() > 1) {
+            throw new EntityValidationException(
+                    String.format(CLASS_HAS_MORE_THAN_ONE_ID, type.getName(), idFields.size()));
+        }
+
+        Class<?> idType = idFields.get(0).getType();
+        if (!Id.SUPPORTED_OBJECT_TYPES.contains(idType)) {
+            throw new EntityValidationException(
+                    String.format(CLASS_HAS_UNSUPPORTED_ID_TYPE, type.getName(), idType.getName()));
         }
     }
 
