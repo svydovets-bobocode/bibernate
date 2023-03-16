@@ -6,6 +6,7 @@ import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.session.SessionFactoryImpl;
+import com.bobocode.svydovets.bibernate.testdata.entity.TestEntity;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -13,8 +14,6 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
-
-import com.bobocode.svydovets.bibernate.testdata.entity.TestEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
