@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
+import java.sql.Connection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +27,8 @@ public class SessionTest {
     @BeforeEach
     void setUp() {
         selectAction = mock(SelectAction.class);
-        session = new SessionImpl(selectAction);
+        Connection connection = mock(Connection.class);
+        session = new SessionImpl(selectAction, connection);
     }
 
     @Test

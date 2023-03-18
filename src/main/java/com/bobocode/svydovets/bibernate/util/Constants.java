@@ -9,4 +9,13 @@ public final class Constants {
             "Entity '%s' has no 'no-arg constructor' (every '@Entity' class must declare 'no-arg constructor')";
     public static final String CAN_NOT_CREATE_A_SNAPSHOT_OF_ENTITY =
             "Can not create a snapshot object for entity";
+    public static final String TRANSACTION_NOT_STARTED_OR_ALREADY_COMMITTED =
+            "Transaction not started or already committed";
+    public static final String TRANSACTION_IS_ALREADY_STARTED = "Transaction is already started";
+    public static final String ERROR_WHILE_BEGINNING_TRANSACTION =
+            "An error occurred while beginning transaction";
+    public static final String ERROR_WHILE_COMMITTING_TRANSACTION =
+            "An error occurred while committing transaction";
+    public static final String ERROR_WHILE_ROLLING_BACK_TRANSACTION =
+            "An error occurred while rolling back transaction";
 }
