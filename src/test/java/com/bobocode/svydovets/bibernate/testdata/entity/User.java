@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class User {
-    @Id private int id;
+    @Id private Integer id;
     private String name;
 
     @Column(insertable = false, updatable = false)
