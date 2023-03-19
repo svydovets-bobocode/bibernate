@@ -48,6 +48,17 @@ public class EntityUtils {
                 .orElseGet(field::getName);
     }
 
+    public static String resolveIdColumnName(Class<?> type) {
+        return Arrays.stream(type.getDeclaredFields())
+                .filter(EntityUtils::isIdField)
+                .findAny()
+                .map(EntityUtils::resolveColumnName)
+                .orElseThrow(
+                        () ->
+                                new EntityValidationException(
+                                        String.format(CLASS_HAS_NO_ARG_CONSTRUCTOR, type.getName())));
+    }
+
     public static Field[] getInsertableFields(Class<?> entityType) {
         return Arrays.stream(entityType.getDeclaredFields())
                 .filter(EntityUtils::isInsertableField)
