@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class EntityUtils {
@@ -44,7 +45,7 @@ public class EntityUtils {
     public static String resolveColumnName(Field field) {
         return Optional.ofNullable(field.getAnnotation(Column.class))
                 .map(Column::name)
-                .filter(not(String::isEmpty))
+                .filter(StringUtils::isNotBlank)
                 .orElseGet(field::getName);
     }
 
