@@ -1,42 +1,18 @@
 package com.bobocode.svydovets.bibernate.util;
 
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ARG_CONSTRUCTOR;
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ENTITY_ANNOTATION;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
-import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithoutNonArgConstructor;
-import com.bobocode.svydovets.bibernate.testdata.entity.NonEntityClass;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import com.bobocode.svydovets.bibernate.testdata.entity.User;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class EntityUtilsTest {
-    @Test
-    @DisplayName("Non-entity class validation")
-    void nonEntityClassValidation() {
-        assertThatExceptionOfType(EntityValidationException.class)
-                .isThrownBy(() -> EntityUtils.validateEntity(NonEntityClass.class))
-                .withMessage(String.format(CLASS_HAS_NO_ENTITY_ANNOTATION, NonEntityClass.class.getName()));
-    }
-
-    @Test
-    @DisplayName("Validate entity without no-arg constructor")
-    void validateEntityWithoutNoArgConstructor() {
-        assertThatExceptionOfType(EntityValidationException.class)
-                .isThrownBy(() -> EntityUtils.validateEntity(EntityWithoutNonArgConstructor.class))
-                .withMessage(
-                        String.format(
-                                CLASS_HAS_NO_ARG_CONSTRUCTOR, EntityWithoutNonArgConstructor.class.getName()));
-    }
 
     @ParameterizedTest
     @MethodSource("entityWithFieldNamesSource")

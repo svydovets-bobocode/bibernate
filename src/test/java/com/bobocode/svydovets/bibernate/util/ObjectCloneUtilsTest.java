@@ -1,6 +1,6 @@
 package com.bobocode.svydovets.bibernate.util;
 
-import static com.bobocode.svydovets.bibernate.util.Constants.CAN_NOT_CREATE_A_SNAPSHOT_OF_ENTITY;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CAN_NOT_CREATE_A_SNAPSHOT_OF_ENTITY;
 import static net.bytebuddy.matcher.ElementMatchers.any;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
