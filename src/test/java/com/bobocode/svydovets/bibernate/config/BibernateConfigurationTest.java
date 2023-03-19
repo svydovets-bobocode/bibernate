@@ -97,7 +97,15 @@ public class BibernateConfigurationTest {
                 Statement statement = connection.createStatement()) {
 
             String createTableSql =
-                    "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR, creationTime TIME, phone VARCHAR)";
+                    """
+                    CREATE TABLE users
+                    (
+                        id           INT PRIMARY KEY,
+                        name         VARCHAR,
+                        creationTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+                        phone_number VARCHAR
+                    )
+                    """;
             String insertDataSql = "INSERT INTO users (id, name) VALUES (1, 'Test')";
 
             statement.execute(createTableSql);

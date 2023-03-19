@@ -92,4 +92,12 @@ public class EntityUtils {
     private static boolean isIdField(Field field) {
         return field.isAnnotationPresent(Id.class);
     }
+
+    public static <T> T createEmptyInstance(Class<T> type) {
+        try {
+            return type.getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create an instance using the default constructor", e);
+        }
+    }
 }

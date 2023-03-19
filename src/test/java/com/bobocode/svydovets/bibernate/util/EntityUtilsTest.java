@@ -49,7 +49,7 @@ class EntityUtilsTest {
 
     private static Stream<Arguments> entityWithFieldNamesSource() {
         return Stream.of(
-                Arguments.of(Person.class, "firstName", "firstName"),
+                Arguments.of(Person.class, "firstName", "first_name"),
                 Arguments.of(Person.class, "lastName", "last_name"));
     }
 
