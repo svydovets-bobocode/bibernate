@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 public class SessionImpl implements Session {
     private final SelectAction selectAction;
     private final Map<EntityKey<?>, Object> persistenceContext = new ConcurrentHashMap<>();
-    private final Map<EntityKey<?>, Object> entitiesSnapshotMap = new ConcurrentHashMap<>();
+    private final Map<EntityKey<?>, Object[]> entitiesSnapshotMap = new ConcurrentHashMap<>();
 
     @Override
     public <T> T find(Class<T> type, Object id) {
