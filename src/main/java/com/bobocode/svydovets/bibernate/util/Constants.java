@@ -7,6 +7,8 @@ public final class Constants {
             "Class '%s' has no @Entity annotation (every entity class must be annotated with '@Entity')";
     public static final String CLASS_HAS_NO_ARG_CONSTRUCTOR =
             "Entity '%s' has no 'no-arg constructor' (every '@Entity' class must declare 'no-arg constructor')";
+    public static final String CLASS_HAS_NO_ID_FIELD =
+            "Entity '%s' has no '@Id' marked fields (every '@Entity' class must have @Id field)";
     public static final String CAN_NOT_CREATE_A_SNAPSHOT_OF_ENTITY =
             "Can not create a snapshot object for entity";
 }
