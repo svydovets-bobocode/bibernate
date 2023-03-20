@@ -17,6 +17,7 @@ import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import com.bobocode.svydovets.bibernate.util.Constants;
 import java.util.HashMap;
 import javax.sql.DataSource;
+import java.sql.Connection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,8 @@ public class SessionTest {
                 new PropertyFileConfiguration("test_svydovets_bibernate.properties");
         DataSource dataSource = new HikariConnectionPool().getDataSource(source);
         selectAction = mock(SelectAction.class);
-        session = new SessionImpl(dataSource, selectAction);
+        Connection connection = mock(Connection.class);
+        session = new SessionImpl(selectAction, connection);
     }
 
     @Test

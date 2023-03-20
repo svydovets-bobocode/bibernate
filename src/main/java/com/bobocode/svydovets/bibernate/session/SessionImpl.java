@@ -7,6 +7,11 @@ import com.bobocode.svydovets.bibernate.util.Constants;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.sql.Connection;
 import java.sql.SQLException;
+import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.transaction.Transaction;
+import com.bobocode.svydovets.bibernate.transaction.TransactionImpl;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,17 +21,24 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class SessionImpl implements Session {
-    private final DataSource dataSource;
-    private final SelectAction selectAction;
+    private SelectAction selectAction;
+    private final Connection connection;
+    private Transaction transaction;
     private final Map<EntityKey<?>, Object> persistenceContext = new ConcurrentHashMap<>();
     private final Map<EntityKey<?>, Object[]> entitiesSnapshotMap = new ConcurrentHashMap<>();
 
     private AtomicBoolean opened = new AtomicBoolean(true);
 
+    public SessionImpl(SelectAction selectAction, Connection connection) {
+        this.selectAction = selectAction;
+        this.connection = connection;
+        this.transaction = new TransactionImpl(connection);
+        this.isOpen = true;
+    }
+
     @Override
     public <T> T find(Class<T> type, Object id) {
         verifySessionIsOpened();
-        EntityUtils.validateEntity(type);
         EntityKey<T> entityKey = new EntityKey<>(type, id);
         return type.cast(persistenceContext.computeIfAbsent(entityKey, selectAction::execute));
     }
@@ -59,7 +71,6 @@ public class SessionImpl implements Session {
         try {
             persistenceContext.clear();
             entitiesSnapshotMap.clear();
-            Connection connection = dataSource.getConnection();
             if (connection != null && !connection.isClosed()) {
                 connection.close();
             }
@@ -83,6 +94,25 @@ public class SessionImpl implements Session {
     @Override
     public void flush() {
         verifySessionIsOpened();
+    }
+
+    @Override
+    public void begin() {
+        checkIsOpen();
+        transaction.begin();
+    }
+
+    @Override
+    public void commit() {
+        checkIsOpen();
+        // todo: flush()???
+        transaction.commit();
+    }
+
+    @Override
+    public void rollback() {
+        checkIsOpen();
+        transaction.rollback();
     }
 
     private void verifySessionIsOpened() {

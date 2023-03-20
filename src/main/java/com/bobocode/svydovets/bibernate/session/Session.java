@@ -22,4 +22,10 @@ public interface Session {
     void detach(Object entity);
 
     void flush();
+
+    void begin();
+
+    void commit();
+
+    void rollback();
 }

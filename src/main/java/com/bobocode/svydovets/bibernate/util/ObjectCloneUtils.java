@@ -1,6 +1,6 @@
 package com.bobocode.svydovets.bibernate.util;
 
-import static com.bobocode.svydovets.bibernate.util.Constants.CAN_NOT_CREATE_A_SNAPSHOT_OF_ENTITY;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CAN_NOT_CREATE_A_SNAPSHOT_OF_ENTITY;
 
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
