@@ -21,7 +21,7 @@ public class ResultSetMapper {
         }
     }
 
-    public static <T> T mapResultSetToObject(Class<T> type, ResultSet resultSet) throws Exception {
+    private static <T> T mapResultSetToObject(Class<T> type, ResultSet resultSet) throws Exception {
         T instance = EntityUtils.createEmptyInstance(type);
         while (resultSet.next()) {
             Field[] fields = type.getDeclaredFields();
