@@ -10,5 +10,13 @@ public final class ErrorMessage {
     public static final String CAN_NOT_CREATE_A_SNAPSHOT_OF_ENTITY =
             "Can not create a snapshot object for entity";
     public static final String CLASS_HAS_NO_ID =
-            "Entity %s has no identifier (every '@Entity' class must declare or inherit at least one '@Id'";
+            "Entity '%s' does not have a field annotated with @Id "
+                    + "(every '@Entity' class must have a field annotated with @Id')";
+    public static final String CLASS_HAS_MORE_THAN_ONE_ID =
+            "Entity '%s' has %d fields annotated with @Id "
+                    + "(every '@Entity' class must have only one field annotated with @Id')";
+    public static final String CLASS_HAS_UNSUPPORTED_ID_TYPE =
+            "Entity '%s' has unsupported @Id type %s "
+                    + "('@Id' field in '@Entity' must have one of the supported types. "
+                    + "See supported types in '@Id' documentation')";
 }
