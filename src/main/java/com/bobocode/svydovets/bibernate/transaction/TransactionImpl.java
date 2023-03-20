@@ -1,10 +1,10 @@
 package com.bobocode.svydovets.bibernate.transaction;
 
-import static com.bobocode.svydovets.bibernate.util.Constants.ERROR_WHILE_BEGINNING_TRANSACTION;
-import static com.bobocode.svydovets.bibernate.util.Constants.ERROR_WHILE_COMMITTING_TRANSACTION;
-import static com.bobocode.svydovets.bibernate.util.Constants.ERROR_WHILE_ROLLING_BACK_TRANSACTION;
-import static com.bobocode.svydovets.bibernate.util.Constants.TRANSACTION_IS_ALREADY_STARTED;
-import static com.bobocode.svydovets.bibernate.util.Constants.TRANSACTION_NOT_STARTED_OR_ALREADY_COMMITTED;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_WHILE_BEGINNING_TRANSACTION;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_WHILE_COMMITTING_TRANSACTION;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_WHILE_ROLLING_BACK_TRANSACTION;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.TRANSACTION_IS_ALREADY_STARTED;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.TRANSACTION_NOT_STARTED_OR_ALREADY_COMMITTED;
 
 import com.bobocode.svydovets.bibernate.exception.TransactionException;
 import java.sql.Connection;

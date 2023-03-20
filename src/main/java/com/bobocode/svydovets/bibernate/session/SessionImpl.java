@@ -5,7 +5,6 @@ import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
 import com.bobocode.svydovets.bibernate.transaction.TransactionImpl;
-import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;

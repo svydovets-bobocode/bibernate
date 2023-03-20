@@ -1,7 +1,7 @@
 package com.bobocode.svydovets.bibernate.transaction;
 
-import static com.bobocode.svydovets.bibernate.util.Constants.TRANSACTION_IS_ALREADY_STARTED;
-import static com.bobocode.svydovets.bibernate.util.Constants.TRANSACTION_NOT_STARTED_OR_ALREADY_COMMITTED;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.TRANSACTION_IS_ALREADY_STARTED;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.TRANSACTION_NOT_STARTED_OR_ALREADY_COMMITTED;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 
