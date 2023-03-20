@@ -12,12 +12,12 @@ import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
+import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
-import com.bobocode.svydovets.bibernate.util.Constants;
+import java.sql.Connection;
 import java.util.HashMap;
 import javax.sql.DataSource;
-import java.sql.Connection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,28 +90,28 @@ public class SessionTest {
         // then
         assertThatThrownBy(() -> session.find(Person.class, 123L))
                 .isInstanceOf(BibernateException.class)
-                .hasMessage(Constants.SESSION_IS_CLOSED);
+                .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.save(new Person()))
                 .isInstanceOf(BibernateException.class)
-                .hasMessage(Constants.SESSION_IS_CLOSED);
+                .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.delete(123L))
                 .isInstanceOf(BibernateException.class)
-                .hasMessage(Constants.SESSION_IS_CLOSED);
+                .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.findAll(Person.class))
                 .isInstanceOf(BibernateException.class)
-                .hasMessage(Constants.SESSION_IS_CLOSED);
+                .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.findAll(Person.class, new HashMap<>()))
                 .isInstanceOf(BibernateException.class)
-                .hasMessage(Constants.SESSION_IS_CLOSED);
+                .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.merge(Person.class))
                 .isInstanceOf(BibernateException.class)
-                .hasMessage(Constants.SESSION_IS_CLOSED);
+                .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.detach(Person.class))
                 .isInstanceOf(BibernateException.class)
-                .hasMessage(Constants.SESSION_IS_CLOSED);
+                .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.flush())
                 .isInstanceOf(BibernateException.class)
-                .hasMessage(Constants.SESSION_IS_CLOSED);
+                .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
     }
 
     @AfterEach

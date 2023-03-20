@@ -29,4 +29,7 @@ public final class ErrorMessage {
             "An error occurred while committing transaction";
     public static final String ERROR_WHILE_ROLLING_BACK_TRANSACTION =
             "An error occurred while rolling back transaction";
+
+    public static final String SESSION_IS_CLOSED =
+            "Session is closed (session must be in the opened state to perform any operation in the database)";
 }
