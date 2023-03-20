@@ -20,7 +20,7 @@ public class SessionImpl implements Session {
     private Transaction transaction;
     private boolean isOpen;
     private final Map<EntityKey<?>, Object> persistenceContext = new ConcurrentHashMap<>();
-    private final Map<EntityKey<?>, Object> entitiesSnapshotMap = new ConcurrentHashMap<>();
+    private final Map<EntityKey<?>, Object[]> entitiesSnapshotMap = new ConcurrentHashMap<>();
 
     public SessionImpl(SelectAction selectAction, Connection connection) {
         this.selectAction = selectAction;
@@ -31,7 +31,6 @@ public class SessionImpl implements Session {
 
     @Override
     public <T> T find(Class<T> type, Object id) {
-        EntityUtils.validateEntity(type);
         EntityKey<T> entityKey = new EntityKey<>(type, id);
         return type.cast(persistenceContext.computeIfAbsent(entityKey, selectAction::execute));
     }
