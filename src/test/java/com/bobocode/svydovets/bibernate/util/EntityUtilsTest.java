@@ -1,20 +1,8 @@
 package com.bobocode.svydovets.bibernate.util;
 
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_MORE_THAN_ONE_ID;
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ARG_CONSTRUCTOR;
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ENTITY_ANNOTATION;
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ID;
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_UNSUPPORTED_ID_TYPE;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
-import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithTwoId;
-import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithoutId;
-import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithoutNonArgConstructor;
-import com.bobocode.svydovets.bibernate.testdata.entity.NonEntityClass;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import com.bobocode.svydovets.bibernate.testdata.entity.SupportedIdTypes;
 import com.bobocode.svydovets.bibernate.testdata.entity.UnsupportedIdTypes;
@@ -23,10 +11,6 @@ import java.lang.reflect.Field;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;

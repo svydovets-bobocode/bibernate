@@ -1,7 +1,7 @@
-package com.bobocode.svydovets.bibernate.util;
+package com.bobocode.svydovets.bibernate.constant;
 
-public final class Constants {
-    private Constants() {}
+public final class ErrorMessage {
+    private ErrorMessage() {}
 
     public static final String CLASS_HAS_NO_ENTITY_ANNOTATION =
             "Class '%s' has no @Entity annotation (every entity class must be annotated with '@Entity')";

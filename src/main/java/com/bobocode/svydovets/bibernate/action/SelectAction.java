@@ -4,19 +4,28 @@ import com.bobocode.svydovets.bibernate.action.executor.JdbcExecutor;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
+import com.bobocode.svydovets.bibernate.constant.Operation;
+import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
+import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
 public class SelectAction implements Action {
     private final DataSource dataSource;
     private final SqlQueryBuilder sqlQueryBuilder;
+    private final RequiredAnnotationValidatorProcessor validatorProcessor;
+
+    public SelectAction(DataSource dataSource, SqlQueryBuilder sqlQueryBuilder) {
+        this.dataSource = dataSource;
+        this.sqlQueryBuilder = sqlQueryBuilder;
+        this.validatorProcessor = new RequiredAnnotationValidatorProcessorImpl();
+    }
 
     @Override
     public <T> T execute(EntityKey<T> key) {
+        validatorProcessor.validate(key.type(), Operation.SELECT);
         String selectByIdQuery = sqlQueryBuilder.createSelectByIdQuery(key.type());
         return processExecutingQuery(key, selectByIdQuery);
     }
