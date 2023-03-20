@@ -6,6 +6,7 @@ import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ENTIT
 import com.bobocode.svydovets.bibernate.annotation.Column;
 import com.bobocode.svydovets.bibernate.annotation.Entity;
 import com.bobocode.svydovets.bibernate.annotation.Id;
+import com.bobocode.svydovets.bibernate.annotation.Table;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -110,5 +111,19 @@ public class EntityUtils {
         } catch (Exception e) {
             throw new RuntimeException("Cannot create an instance using the default constructor", e);
         }
+    }
+
+    public static String resolveTableName(Class<?> entityType) {
+        log.trace("Resolving table name for entity {}", entityType);
+        if (entityType.isAnnotationPresent(Table.class)) {
+            String explicitName = entityType.getDeclaredAnnotation(Table.class).value();
+            if (StringUtils.isNotBlank(explicitName)) {
+                log.trace("Table is specified explicitly as {}", explicitName);
+                return explicitName;
+            }
+        }
+        String tableName = entityType.getSimpleName().toLowerCase();
+        log.trace("Table is explicitly specified, falling back to call name {}", tableName);
+        return tableName;
     }
 }
