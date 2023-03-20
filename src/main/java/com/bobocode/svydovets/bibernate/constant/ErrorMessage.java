@@ -19,4 +19,14 @@ public final class ErrorMessage {
             "Entity '%s' has unsupported @Id type %s "
                     + "('@Id' field in '@Entity' must have one of the supported types. "
                     + "See supported types in '@Id' documentation')";
+
+    public static final String TRANSACTION_NOT_STARTED_OR_ALREADY_COMMITTED =
+            "Transaction not started or already committed";
+    public static final String TRANSACTION_IS_ALREADY_STARTED = "Transaction is already started";
+    public static final String ERROR_WHILE_BEGINNING_TRANSACTION =
+            "An error occurred while beginning transaction";
+    public static final String ERROR_WHILE_COMMITTING_TRANSACTION =
+            "An error occurred while committing transaction";
+    public static final String ERROR_WHILE_ROLLING_BACK_TRANSACTION =
+            "An error occurred while rolling back transaction";
 }
