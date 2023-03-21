@@ -23,11 +23,11 @@ class EntityUtilsTest {
         assertEquals(expected, result);
     }
 
-        private static Stream<Arguments> entityWithFieldNamesSource() {
-            return Stream.of(
-                    Arguments.of(Person.class, "firstName", "first_name"),
-                    Arguments.of(Person.class, "lastName", "last_name"));
-        }
+    private static Stream<Arguments> entityWithFieldNamesSource() {
+        return Stream.of(
+                Arguments.of(Person.class, "firstName", "first_name"),
+                Arguments.of(Person.class, "lastName", "last_name"));
+    }
 
     @ParameterizedTest
     @MethodSource("entityWithInsertableFieldSource")
