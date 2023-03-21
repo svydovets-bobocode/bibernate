@@ -13,4 +13,7 @@ public final class Constants {
             "Can not create a snapshot object for entity";
     public static final String ERROR_MAPPING_RESULT_SET_TO_OBJECT =
             "Error while mapping result set to object of type '%s'";
+    public static final String ERROR_RETRIEVING_VALUE_FROM_FIELD =
+            "Error while retrieving the value from field '%s' in type '%s'";
+
 }

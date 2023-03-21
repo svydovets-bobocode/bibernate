@@ -1,18 +1,22 @@
 package com.bobocode.svydovets.bibernate.util;
 
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ARG_CONSTRUCTOR;
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ENTITY_ANNOTATION;
-
 import com.bobocode.svydovets.bibernate.annotation.Column;
 import com.bobocode.svydovets.bibernate.annotation.Entity;
 import com.bobocode.svydovets.bibernate.annotation.Id;
 import com.bobocode.svydovets.bibernate.annotation.Table;
+import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+
+import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ARG_CONSTRUCTOR;
+import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ENTITY_ANNOTATION;
+import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ID_FIELD;
+import static com.bobocode.svydovets.bibernate.util.Constants.ERROR_RETRIEVING_VALUE_FROM_FIELD;
 
 @Slf4j
 public class EntityUtils {
@@ -126,4 +130,31 @@ public class EntityUtils {
         log.trace("Table is explicitly specified, falling back to call name {}", tableName);
         return tableName;
     }
+
+    public static <T> Object retrieveIdValue(T entity) {
+        return Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(EntityUtils::isIdField)
+                .findAny()
+                .map(field -> retrieveValueFromField(entity, field))
+                .orElseThrow(() -> new EntityValidationException(CLASS_HAS_NO_ID_FIELD));
+    }
+
+    public static <T> Object retrieveValueFromField(T entity, Field field) {
+        try {
+            field.setAccessible(true);
+            return field.get(entity);
+        } catch (Exception e) {
+            throw new BibernateException(String.format(ERROR_RETRIEVING_VALUE_FROM_FIELD, field.getName(), entity.getClass().getName()), e);
+        }
+    }
+
+    public static <T> void setValueToField(T instance, Field field, Object value) {
+        try {
+            field.setAccessible(true);
+            field.set(instance, value);
+        } catch (Exception e) {
+            throw new BibernateException(String.format("", instance.getClass().getName(), field.getType(), value), e);
+        }
+    }
+
 }

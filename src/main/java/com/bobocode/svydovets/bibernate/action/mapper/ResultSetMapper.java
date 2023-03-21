@@ -7,6 +7,7 @@ import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.lang.reflect.Field;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,16 +22,15 @@ public class ResultSetMapper {
         }
     }
 
-    private static <T> T mapResultSetToObject(Class<T> type, ResultSet resultSet) throws Exception {
+    private static <T> T mapResultSetToObject(Class<T> type, ResultSet resultSet) throws SQLException {
         T instance = EntityUtils.createEmptyInstance(type);
         while (resultSet.next()) {
             Field[] fields = type.getDeclaredFields();
             for (Field field : fields) {
-                field.setAccessible(true);
                 String columnName = EntityUtils.resolveColumnName(field);
                 Object compatibleObject =
                         convertObjectToCompatibleType(resultSet.getObject(columnName), field);
-                field.set(instance, compatibleObject);
+                EntityUtils.setValueToField(instance, field, compatibleObject);
             }
         }
         return instance;

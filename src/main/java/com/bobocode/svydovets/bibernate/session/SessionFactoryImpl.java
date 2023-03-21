@@ -13,6 +13,6 @@ public class SessionFactoryImpl implements SessionFactory {
     @Override
     public Session openSession() {
         SelectAction selectAction = new SelectAction(dataSource, sqlQueryBuilder);
-        return new SessionImpl(selectAction);
+        return new SessionImpl(dataSource, selectAction);
     }
 }

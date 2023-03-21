@@ -16,17 +16,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import javax.sql.DataSource;
+
 @Tag("unit")
 public class SessionTest {
 
     private SelectAction selectAction;
+    private DataSource dataSource;
 
     private Session session;
 
     @BeforeEach
     void setUp() {
         selectAction = mock(SelectAction.class);
-        session = new SessionImpl(selectAction);
+        session = new SessionImpl(dataSource, selectAction);
     }
 
     @Test
