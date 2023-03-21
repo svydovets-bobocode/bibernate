@@ -51,47 +51,42 @@ class IdValidatorImplTest {
     @DisplayName("Entity with supported type for @Id field should be processed")
     void entityWithSupportedIdTypeShouldBeProcessed() {
         assertThatNoException()
-                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.IntegerId.class)); // Integer
+                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.IntegerId.class));
+        assertThatNoException().isThrownBy(() -> idValidator.validate(SupportedIdTypes.LongId.class));
+        assertThatNoException().isThrownBy(() -> idValidator.validate(SupportedIdTypes.UuidId.class));
+        assertThatNoException().isThrownBy(() -> idValidator.validate(SupportedIdTypes.StringId.class));
         assertThatNoException()
-                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.LongId.class)); // Long
+                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.BigDecimalId.class));
         assertThatNoException()
-                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.UuidId.class)); // UUID
+                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.BigIntegerId.class));
         assertThatNoException()
-                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.StringId.class)); // String
+                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.DateUtilId.class));
         assertThatNoException()
-                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.BigDecimalId.class)); // BigDecimal
+                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.DateSqlId.class));
         assertThatNoException()
-                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.BigIntegerId.class)); // BigInteger
+                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.PrimitiveIntId.class));
         assertThatNoException()
-                .isThrownBy(
-                        () -> idValidator.validate(SupportedIdTypes.DateUtilId.class)); // java.util.Date
-        assertThatNoException()
-                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.DateSqlId.class)); // java.sql.Date
-        assertThatNoException()
-                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.PrimitiveIntId.class)); // int
-        assertThatNoException()
-                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.PrimitiveLongId.class)); // long
+                .isThrownBy(() -> idValidator.validate(SupportedIdTypes.PrimitiveLongId.class));
     }
 
     @Test
     @DisplayName("Unsupported data type of @Id column")
     void entityWithUnsupportedIdTypeShouldNotBeProcessed() {
-        assertThrowUnsupportedId(UnsupportedIdTypes.ObjectId.class, Object.class); // Object
-        assertThrowUnsupportedId(UnsupportedIdTypes.ByteId.class, Byte.class); // Byte
-        assertThrowUnsupportedId(UnsupportedIdTypes.ShortId.class, Short.class); // Short
-        assertThrowUnsupportedId(UnsupportedIdTypes.FloatId.class, Float.class); // Float
-        assertThrowUnsupportedId(UnsupportedIdTypes.DoubleId.class, Double.class); // Double
-        assertThrowUnsupportedId(UnsupportedIdTypes.CharacterId.class, Character.class); // Character
-        assertThrowUnsupportedId(UnsupportedIdTypes.BooleanId.class, Boolean.class); // Boolean
-        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveByteId.class, byte.class); // byte
-        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveShortId.class, short.class); // short
-        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveFloatId.class, float.class); // float
-        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveDoubleId.class, double.class); // double
-        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveCharId.class, char.class); // char
-        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveBooleanId.class, boolean.class); // boolean
+        assertThrowUnsupportedId(UnsupportedIdTypes.ObjectId.class, Object.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.ByteId.class, Byte.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.ShortId.class, Short.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.FloatId.class, Float.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.DoubleId.class, Double.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.CharacterId.class, Character.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.BooleanId.class, Boolean.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveByteId.class, byte.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveShortId.class, short.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveFloatId.class, float.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveDoubleId.class, double.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveCharId.class, char.class);
+        assertThrowUnsupportedId(UnsupportedIdTypes.PrimitiveBooleanId.class, boolean.class);
         assertThrowUnsupportedId(
-                UnsupportedIdTypes.CustomClassId.class,
-                UnsupportedIdTypes.CustomClass.class); // CustomClass
+                UnsupportedIdTypes.CustomClassId.class, UnsupportedIdTypes.CustomClass.class);
     }
 
     private void assertThrowUnsupportedId(Class<?> entityType, Class<?> idType) {
