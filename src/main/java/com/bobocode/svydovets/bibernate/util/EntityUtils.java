@@ -2,7 +2,9 @@ package com.bobocode.svydovets.bibernate.util;
 
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ARG_CONSTRUCTOR;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ENTITY_ANNOTATION;
-import static java.util.function.Predicate.not;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ID;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_RETRIEVING_VALUE_FROM_FIELD;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_SETTING_VALUE_TO_FIELD;
 
 import com.bobocode.svydovets.bibernate.annotation.Column;
 import com.bobocode.svydovets.bibernate.annotation.Entity;
@@ -10,17 +12,11 @@ import com.bobocode.svydovets.bibernate.annotation.Id;
 import com.bobocode.svydovets.bibernate.annotation.Table;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
-
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ARG_CONSTRUCTOR;
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ENTITY_ANNOTATION;
-import static com.bobocode.svydovets.bibernate.util.Constants.CLASS_HAS_NO_ID_FIELD;
-import static com.bobocode.svydovets.bibernate.util.Constants.ERROR_RETRIEVING_VALUE_FROM_FIELD;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class EntityUtils {
@@ -106,10 +102,6 @@ public class EntityUtils {
         return !field.isAnnotationPresent(Column.class) && !isIdField(field);
     }
 
-    private static boolean isIdField(Field field) {
-        return field.isAnnotationPresent(Id.class);
-    }
-
     public static <T> T createEmptyInstance(Class<T> type) {
         try {
             return type.getConstructor().newInstance();
@@ -137,7 +129,7 @@ public class EntityUtils {
                 .filter(EntityUtils::isIdField)
                 .findAny()
                 .map(field -> retrieveValueFromField(entity, field))
-                .orElseThrow(() -> new EntityValidationException(CLASS_HAS_NO_ID_FIELD));
+                .orElseThrow(() -> new EntityValidationException(CLASS_HAS_NO_ID));
     }
 
     public static <T> Object retrieveValueFromField(T entity, Field field) {
@@ -145,7 +137,10 @@ public class EntityUtils {
             field.setAccessible(true);
             return field.get(entity);
         } catch (Exception e) {
-            throw new BibernateException(String.format(ERROR_RETRIEVING_VALUE_FROM_FIELD, field.getName(), entity.getClass().getName()), e);
+            throw new BibernateException(
+                    String.format(
+                            ERROR_RETRIEVING_VALUE_FROM_FIELD, field.getName(), entity.getClass().getName()),
+                    e);
         }
     }
 
@@ -154,8 +149,10 @@ public class EntityUtils {
             field.setAccessible(true);
             field.set(instance, value);
         } catch (Exception e) {
-            throw new BibernateException(String.format("", instance.getClass().getName(), field.getType(), value), e);
+            throw new BibernateException(
+                    String.format(
+                            ERROR_SETTING_VALUE_TO_FIELD, value, field.getType(), instance.getClass().getName()),
+                    e);
         }
     }
-
 }

@@ -1,6 +1,6 @@
 package com.bobocode.svydovets.bibernate.action.mapper;
 
-import static com.bobocode.svydovets.bibernate.util.Constants.ERROR_MAPPING_RESULT_SET_TO_OBJECT;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_MAPPING_RESULT_SET_TO_OBJECT;
 
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
@@ -22,7 +22,8 @@ public class ResultSetMapper {
         }
     }
 
-    private static <T> T mapResultSetToObject(Class<T> type, ResultSet resultSet) throws SQLException {
+    private static <T> T mapResultSetToObject(Class<T> type, ResultSet resultSet)
+            throws SQLException {
         T instance = EntityUtils.createEmptyInstance(type);
         while (resultSet.next()) {
             Field[] fields = type.getDeclaredFields();
