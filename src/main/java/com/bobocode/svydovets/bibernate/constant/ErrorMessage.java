@@ -20,6 +20,13 @@ public final class ErrorMessage {
                     + "('@Id' field in '@Entity' must have one of the supported types. "
                     + "See supported types in '@Id' documentation')";
 
+    public static final String ERROR_MAPPING_RESULT_SET_TO_OBJECT =
+            "Error while mapping result set to object of type '%s'";
+    public static final String ERROR_RETRIEVING_VALUE_FROM_FIELD =
+            "Error while retrieving the value from field '%s' in type '%s'";
+    public static final String ERROR_SETTING_VALUE_TO_FIELD =
+            "Error while setting the value `%s` to field '%s' in type '%s'";
+
     public static final String TRANSACTION_NOT_STARTED_OR_ALREADY_COMMITTED =
             "Transaction not started or already committed";
     public static final String TRANSACTION_IS_ALREADY_STARTED = "Transaction is already started";
