@@ -70,7 +70,7 @@ public class SessionImpl implements Session {
         List<T> retrievedEntities = new ArrayList<>();
         try (ResultSet resultSet =
                 JdbcExecutor.executeQueryAndRetrieveResultSet(selectAllQuery, connection)) {
-            while (resultSet.next()) {
+            while (ResultSetMapper.moveCursorToNextRow(resultSet)) {
                 T loadedEntity = ResultSetMapper.mapToObject(type, resultSet);
                 Object id = EntityUtils.retrieveIdValue(loadedEntity);
                 EntityKey<T> entityKey = new EntityKey<>(type, id);

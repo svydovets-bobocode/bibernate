@@ -45,7 +45,7 @@ public abstract class AbstractIntegrationTest {
     }
 
     private void insertIntoTable() throws SQLException {
-        String insertQuery = "INSERT INTO person VALUES (1, 'John', 'Doe')";
+        String insertQuery = "INSERT INTO person VALUES (1, 'John', 'Doe'), (2, 'Martin', 'Fowler')";
         PreparedStatement statement = connection.prepareStatement(insertQuery);
         statement.executeUpdate();
     }

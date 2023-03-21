@@ -28,7 +28,8 @@ public class JdbcExecutor {
     }
 
     public static ResultSet executeQueryAndRetrieveResultSet(String query, Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
             return statement.executeQuery();
         } catch (Exception e) {
             throw new ConnectionException(

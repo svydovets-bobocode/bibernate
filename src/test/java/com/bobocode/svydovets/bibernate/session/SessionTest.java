@@ -29,8 +29,6 @@ import org.junit.jupiter.api.Test;
 public class SessionTest {
 
     private SelectAction selectAction;
-    private DataSource dataSource;
-
     private Session session;
 
     @BeforeEach
