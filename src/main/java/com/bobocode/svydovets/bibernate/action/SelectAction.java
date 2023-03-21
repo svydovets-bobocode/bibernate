@@ -45,6 +45,7 @@ public class SelectAction implements Action {
                     }
                 },
                 resultSet -> {
+                    ResultSetMapper.moveCursorToNextRow(resultSet);
                     T result = ResultSetMapper.mapToObject(key.type(), resultSet);
                     log.debug("Mapped result set to object: {}", result);
                     return result;
