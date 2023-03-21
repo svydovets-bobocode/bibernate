@@ -48,36 +48,36 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @DisplayName("Begin and commit")
     void beginAndCommit() throws SQLException {
         List<Person> personsFromDb = getPersonsFromDb();
-        assertEquals(1, personsFromDb.size());
+        assertEquals(2, personsFromDb.size());
 
         session.begin();
 
         saveDefaultPersonIntoDb();
         personsFromDb = getPersonsFromDb();
-        assertEquals(2, personsFromDb.size());
+        assertEquals(3, personsFromDb.size());
 
         session.commit();
 
         personsFromDb = getPersonsFromDb();
-        assertEquals(2, personsFromDb.size());
+        assertEquals(3, personsFromDb.size());
     }
 
     @Test
     @DisplayName("Begin and rollback")
     void beginAndRollback() throws SQLException {
         List<Person> personsFromDb = getPersonsFromDb();
-        assertEquals(1, personsFromDb.size());
+        assertEquals(2, personsFromDb.size());
 
         session.begin();
 
         saveDefaultPersonIntoDb();
         personsFromDb = getPersonsFromDb();
-        assertEquals(2, personsFromDb.size());
+        assertEquals(3, personsFromDb.size());
 
         session.rollback();
 
         personsFromDb = getPersonsFromDb();
-        assertEquals(1, personsFromDb.size());
+        assertEquals(2, personsFromDb.size());
     }
 
     private void saveDefaultPersonIntoDb() throws SQLException {

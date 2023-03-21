@@ -1,24 +1,33 @@
 package com.bobocode.svydovets.bibernate.session;
 
 import com.bobocode.svydovets.bibernate.action.SelectAction;
+import com.bobocode.svydovets.bibernate.action.executor.JdbcExecutor;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
+import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
+import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
 import com.bobocode.svydovets.bibernate.transaction.TransactionImpl;
+import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SessionImpl implements Session {
+
+    // todo: replace with Queue<Action>
     private final SelectAction selectAction;
     private final Connection connection;
     private final Transaction transaction;
+    private final SqlQueryBuilder sqlQueryBuilder;
 
-    private final Map<EntityKey<?>, Object> entititiesCacheMap = new ConcurrentHashMap<>();
+    private final Map<EntityKey<?>, Object> entitiesCacheMap = new ConcurrentHashMap<>();
     private final Map<EntityKey<?>, Object[]> entitiesSnapshotMap = new ConcurrentHashMap<>();
 
     private final AtomicBoolean isOpen = new AtomicBoolean(true);
@@ -27,13 +36,14 @@ public class SessionImpl implements Session {
         this.selectAction = selectAction;
         this.connection = connection;
         this.transaction = new TransactionImpl(connection);
+        this.sqlQueryBuilder = new SqlQueryBuilder();
     }
 
     @Override
     public <T> T find(Class<T> type, Object id) {
         verifySessionIsOpened();
         EntityKey<T> entityKey = new EntityKey<>(type, id);
-        return type.cast(entititiesCacheMap.computeIfAbsent(entityKey, selectAction::execute));
+        return type.cast(entitiesCacheMap.computeIfAbsent(entityKey, selectAction::execute));
     }
 
     @Override
@@ -48,9 +58,35 @@ public class SessionImpl implements Session {
     }
 
     @Override
+    // todo: integrate with validation
     public <T> List<T> findAll(Class<T> type) {
         verifySessionIsOpened();
-        return null;
+        String selectAllQuery = sqlQueryBuilder.createSelectAllQuery(type);
+        return retrieveAllFromDb(type, selectAllQuery);
+    }
+
+    // todo: move it to the action. Action API must be redesigned
+    private <T> List<T> retrieveAllFromDb(Class<T> type, String selectAllQuery) {
+        List<T> retrievedEntities = new ArrayList<>();
+        try (ResultSet resultSet =
+                JdbcExecutor.executeQueryAndRetrieveResultSet(selectAllQuery, connection)) {
+            while (ResultSetMapper.moveCursorToNextRow(resultSet)) {
+                T loadedEntity = ResultSetMapper.mapToObject(type, resultSet);
+                Object id = EntityUtils.retrieveIdValue(loadedEntity);
+                EntityKey<T> entityKey = new EntityKey<>(type, id);
+
+                if (entitiesCacheMap.containsKey(entityKey)) {
+                    retrievedEntities.add(type.cast(entitiesCacheMap.get(entityKey)));
+                } else {
+                    entitiesCacheMap.put(entityKey, loadedEntity);
+                    // todo: put it to the snapshot map
+                    retrievedEntities.add(loadedEntity);
+                }
+            }
+        } catch (SQLException e) {
+            throw new BibernateException("", e);
+        }
+        return retrievedEntities;
     }
 
     @Override
@@ -63,7 +99,7 @@ public class SessionImpl implements Session {
     public void close() {
         try {
             flush();
-            entititiesCacheMap.clear();
+            entitiesCacheMap.clear();
             entitiesSnapshotMap.clear();
             if (connection != null && !connection.isClosed()) {
                 connection.close();

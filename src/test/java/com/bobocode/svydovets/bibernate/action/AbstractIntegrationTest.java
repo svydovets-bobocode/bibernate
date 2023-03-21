@@ -39,13 +39,13 @@ public abstract class AbstractIntegrationTest {
 
     private void createTable() throws SQLException {
         String createTableQuery =
-                "CREATE TABLE person (id BIGINT, firstName VARCHAR(255), lastName VARCHAR(255))";
+                "CREATE TABLE person (id BIGINT, first_name VARCHAR(255), last_name VARCHAR(255))";
         PreparedStatement statement = connection.prepareStatement(createTableQuery);
         statement.executeUpdate();
     }
 
     private void insertIntoTable() throws SQLException {
-        String insertQuery = "INSERT INTO person VALUES (1, 'John', 'Doe')";
+        String insertQuery = "INSERT INTO person VALUES (1, 'John', 'Doe'), (2, 'Martin', 'Fowler')";
         PreparedStatement statement = connection.prepareStatement(insertQuery);
         statement.executeUpdate();
     }

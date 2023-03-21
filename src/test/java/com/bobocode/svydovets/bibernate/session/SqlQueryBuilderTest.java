@@ -31,4 +31,24 @@ class SqlQueryBuilderTest {
         // then
         Assertions.assertThat(selectByIdQuery).isEqualTo("SELECT * FROM person WHERE id = ?;");
     }
+
+    @Test
+    @DisplayName("Create Select All Query")
+    void createSelectAllQuery() {
+        // given
+        // when
+        var selectAllQuery = sqlBuilder.createSelectAllQuery(User.class);
+        // then
+        Assertions.assertThat(selectAllQuery).isEqualTo("SELECT * FROM users;");
+    }
+
+    @Test
+    @DisplayName("Create Select All query when table name is Explicitly Specified")
+    void createSelectAllQueryWhenTableNameIsExplicitlySpecified() {
+        // given
+        // when
+        var selectByAllQuery = sqlBuilder.createSelectAllQuery(Person.class);
+        // then
+        Assertions.assertThat(selectByAllQuery).isEqualTo("SELECT * FROM person;");
+    }
 }
