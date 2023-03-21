@@ -2,6 +2,8 @@ package com.bobocode.svydovets.bibernate.session;
 
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
+import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import java.sql.SQLException;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 
@@ -12,7 +14,11 @@ public class SessionFactoryImpl implements SessionFactory {
 
     @Override
     public Session openSession() {
-        SelectAction selectAction = new SelectAction(dataSource, sqlQueryBuilder);
-        return new SessionImpl(dataSource, selectAction);
+        try {
+            SelectAction selectAction = new SelectAction(dataSource, sqlQueryBuilder);
+            return new SessionImpl(selectAction, dataSource.getConnection());
+        } catch (SQLException e) {
+            throw new BibernateException("An error occurred while opening session", e);
+        }
     }
 }

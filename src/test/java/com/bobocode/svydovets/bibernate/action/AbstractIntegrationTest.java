@@ -1,25 +1,31 @@
 package com.bobocode.svydovets.bibernate.action;
 
+import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
+import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
+import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import org.h2.jdbcx.JdbcDataSource;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 
 @Tag("integration")
-abstract class AbstractIntegrationTest {
-    protected JdbcDataSource dataSource;
-    private Connection connection;
+public abstract class AbstractIntegrationTest {
+    protected static DataSource dataSource;
+    protected Connection connection;
+
+    @BeforeAll
+    static void beforeAll() {
+        ConfigurationSource source =
+                new PropertyFileConfiguration("test_svydovets_bibernate.properties");
+        dataSource = new HikariConnectionPool().getDataSource(source);
+    }
 
     @BeforeEach
     void setUp() throws SQLException {
-        dataSource = new JdbcDataSource();
-        dataSource.setURL("jdbc:h2:mem:testdb");
-        dataSource.setUser("sa");
-        dataSource.setPassword("");
-
         connection = dataSource.getConnection();
         createTable();
         insertIntoTable();
