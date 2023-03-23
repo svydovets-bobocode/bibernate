@@ -167,7 +167,10 @@ public class EntityUtils {
         } catch (IllegalAccessException e) {
             throw new BibernateException(
                     String.format(
-                            ERROR_SETTING_VALUE_TO_FIELD, detachedValue, field.getType(), managedEntity.getClass().getName()),
+                            ERROR_SETTING_VALUE_TO_FIELD,
+                            detachedValue,
+                            field.getType(),
+                            managedEntity.getClass().getName()),
                     e);
         }
     }
