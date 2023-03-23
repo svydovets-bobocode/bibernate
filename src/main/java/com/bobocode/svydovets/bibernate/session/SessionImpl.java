@@ -10,15 +10,22 @@ import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
 import com.bobocode.svydovets.bibernate.transaction.TransactionImpl;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
+import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
+import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
+import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Slf4j
 public class SessionImpl implements Session {
 
     // todo: replace with Queue<Action>
@@ -29,6 +36,9 @@ public class SessionImpl implements Session {
 
     private final Map<EntityKey<?>, Object> entitiesCacheMap = new ConcurrentHashMap<>();
     private final Map<EntityKey<?>, Object[]> entitiesSnapshotMap = new ConcurrentHashMap<>();
+
+    private final RequiredAnnotationValidatorProcessor validatorProcessor =
+            new RequiredAnnotationValidatorProcessorImpl();
 
     private final AtomicBoolean isOpen = new AtomicBoolean(true);
 
@@ -72,8 +82,8 @@ public class SessionImpl implements Session {
                 JdbcExecutor.executeQueryAndRetrieveResultSet(selectAllQuery, connection)) {
             while (ResultSetMapper.moveCursorToNextRow(resultSet)) {
                 T loadedEntity = ResultSetMapper.mapToObject(type, resultSet);
-                Object id = EntityUtils.retrieveIdValue(loadedEntity);
-                EntityKey<T> entityKey = new EntityKey<>(type, id);
+                Optional<?> id = EntityUtils.retrieveIdValue(loadedEntity);
+                EntityKey<T> entityKey = new EntityKey<>(type, id.orElse(null));
 
                 if (entitiesCacheMap.containsKey(entityKey)) {
                     retrievedEntities.add(type.cast(entitiesCacheMap.get(entityKey)));
@@ -111,9 +121,40 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public <T> T merge(T entity) {
+    public <T> T merge(T detachedEntity) {
         verifySessionIsOpened();
-        return null;
+
+        if (detachedEntity == null) {
+            throw new IllegalArgumentException("Entity cannot be null.");
+        }
+
+        Optional<?> id = EntityUtils.retrieveIdValue(detachedEntity);
+
+        // Handling transient entities
+        if (id.isEmpty()) {
+            return save(detachedEntity);
+        }
+
+        Class<T> entityType = (Class<T>) detachedEntity.getClass();
+        validatorProcessor.validate(entityType);
+
+        EntityKey<T> entityKey = new EntityKey<>(entityType, id.get());
+        T managedEntity = entityType.cast(entitiesCacheMap.get(entityKey));
+
+        // If the entity is not in the cache, retrieve it from the database
+        if (managedEntity == null) {
+            managedEntity = selectAction.execute(entityKey);
+        }
+
+        // Merge the states of the detached and managed entities
+        for (Field field : entityType.getDeclaredFields()) {
+            EntityUtils.updateManagedEntityField(detachedEntity, managedEntity, field);
+        }
+
+        // Add the merged entity to the cache
+        entitiesCacheMap.put(entityKey, managedEntity);
+
+        return managedEntity;
     }
 
     @Override
