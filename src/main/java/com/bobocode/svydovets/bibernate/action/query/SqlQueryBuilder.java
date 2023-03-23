@@ -10,17 +10,24 @@ public
 class SqlQueryBuilder { // Todo: transform it to a abstract class or interface to cover different
     // dialects
     // Todo: mb create enum to store queries
-    private static final String SELECT_FROM_TABLE_BY_ID_PARAM = "SELECT * FROM %s WHERE %s = ?;";
+    private static final String SELECT_FROM_TABLE_BY_ID = "SELECT * FROM %s WHERE %s = ?;";
     private static final String SELECT_ALL_FROM_TABLE = "SELECT * FROM %s;";
+    private static final String DELETE_FROM_TABLE_BY_ID = "DELETE FROM %s WHERE %s = ?;";
 
     public String createSelectByIdQuery(Class<?> entityType) {
         String tableName = resolveTableName(entityType);
         String idColumnName = resolveIdColumnName(entityType);
-        return String.format(SELECT_FROM_TABLE_BY_ID_PARAM, tableName, idColumnName);
+        return String.format(SELECT_FROM_TABLE_BY_ID, tableName, idColumnName);
     }
 
     public String createSelectAllQuery(Class<?> entityType) {
         String tableName = resolveTableName(entityType);
         return String.format(SELECT_ALL_FROM_TABLE, tableName);
+    }
+
+    public String createDeleteByIdQuery(Class<?> entityType) {
+        String tableName = resolveTableName(entityType);
+        String idColumnName = resolveIdColumnName(entityType);
+        return String.format(DELETE_FROM_TABLE_BY_ID, tableName, idColumnName);
     }
 }

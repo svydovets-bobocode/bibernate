@@ -1,46 +1,36 @@
 package com.bobocode.svydovets.bibernate.action;
 
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
-import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.constant.Operation;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-public class SelectAction implements Action {
-    private final Connection connection;
+public class DeleteAction {
     private final SqlQueryBuilder sqlQueryBuilder;
     private final RequiredAnnotationValidatorProcessor validatorProcessor;
+    private final Connection connection;
 
-    public SelectAction(Connection connection, SqlQueryBuilder sqlQueryBuilder) {
+    public DeleteAction(Connection connection, SqlQueryBuilder sqlQueryBuilder) {
         this.connection = connection;
         this.sqlQueryBuilder = sqlQueryBuilder;
         this.validatorProcessor = new RequiredAnnotationValidatorProcessorImpl();
     }
 
-    @Override
-    public <T> T execute(EntityKey<T> key) {
-        var type = key.type();
-        var id = key.id();
-        validatorProcessor.validate(type, Operation.SELECT);
-        String selectByIdQuery = sqlQueryBuilder.createSelectByIdQuery(type);
-
-        try (var statement = connection.prepareStatement(selectByIdQuery)) {
+    public <T> void execute(EntityKey<T> entityKey) {
+        var type = entityKey.type();
+        var id = entityKey.id();
+        validatorProcessor.validate(type, Operation.DELETE);
+        String deleteByIdQuery = sqlQueryBuilder.createDeleteByIdQuery(type);
+        try (var statement = connection.prepareStatement(deleteByIdQuery)) {
             statement.setObject(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            ResultSetMapper.moveCursorToNextRow(resultSet);
-            T result = ResultSetMapper.mapToObject(type, resultSet);
-            log.debug("Mapped result set to object: {}", result);
-            return result;
+            statement.executeUpdate();
         } catch (SQLException e) {
             throw new BibernateException(
-                    String.format("Unable to find entity: %s by id: %s:", type, id), e);
+                    String.format("Unable to delete entity: %s by id: %s:", type, id), e);
         }
     }
 }
