@@ -15,16 +15,16 @@ class SelectActionIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void testLoad() {
-        SelectAction dao = new SelectAction(dataSource, new SqlQueryBuilder());
+        SelectAction selectAction = new SelectAction(connection, new SqlQueryBuilder());
         EntityKey<Person> key = new EntityKey<>(Person.class, 1L);
-        Person entity = dao.execute(key);
+        Person entity = selectAction.execute(key);
         assertPerson(entity, 1L, "John", "Doe");
     }
 
     @Test
     void testFindAll() {
-        SelectAction dao = new SelectAction(dataSource, new SqlQueryBuilder());
-        Session session = new SessionImpl(dao, connection);
+        SelectAction selectAction = new SelectAction(connection, new SqlQueryBuilder());
+        Session session = new SessionImpl(selectAction, connection);
 
         List<Person> retrievedPersons = session.findAll(Person.class);
 
