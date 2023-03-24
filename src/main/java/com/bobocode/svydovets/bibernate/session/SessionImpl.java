@@ -22,9 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class SessionImpl implements Session {
 
     // todo: replace with Queue<Action>
