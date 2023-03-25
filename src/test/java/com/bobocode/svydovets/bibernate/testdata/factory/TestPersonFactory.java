@@ -3,7 +3,7 @@ package com.bobocode.svydovets.bibernate.testdata.factory;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 
-public class PersonFactory {
+public class TestPersonFactory {
     public static final Long DEFAULT_ID = 123L;
     public static final String DEFAULT_FIRST_NAME = "John";
     public static final String DEFAULT_LAST_NAME = "Doe";

@@ -1,7 +1,7 @@
 package com.bobocode.svydovets.bibernate.session;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.DEFAULT_ENTITY_KEY;
-import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.newDefaultPerson;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ENTITY_KEY;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.newDefaultPerson;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.mock;

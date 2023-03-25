@@ -1,6 +1,6 @@
 package com.bobocode.svydovets.bibernate.session;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.*;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 

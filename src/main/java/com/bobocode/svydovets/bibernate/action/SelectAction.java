@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SelectAction  {
+public class SelectAction {
     private final DataSource dataSource;
     private final SqlQueryBuilder sqlQueryBuilder;
     private final RequiredAnnotationValidatorProcessor validatorProcessor;
@@ -22,7 +22,6 @@ public class SelectAction  {
         this.sqlQueryBuilder = sqlQueryBuilder;
         this.validatorProcessor = new RequiredAnnotationValidatorProcessorImpl();
     }
-
 
     public <T> T execute(EntityKey<T> key) {
         validatorProcessor.validate(key.type(), Operation.SELECT);

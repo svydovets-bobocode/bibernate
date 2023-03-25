@@ -1,15 +1,14 @@
 package com.bobocode.svydovets.bibernate.action.query;
 
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.getInsertableFields;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveColumnName;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveIdColumnName;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveTableName;
 
-import com.bobocode.svydovets.bibernate.util.EntityUtils;
-import lombok.extern.slf4j.Slf4j;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public
@@ -35,15 +34,17 @@ class SqlQueryBuilder { // Todo: transform it to a abstract class or interface t
         var tableName = resolveTableName(entityType);
         List<String> columnNames = new ArrayList<>();
         List<String> valuePlaceholder = new ArrayList<>();
-        for (Field declaredField : entityType.getDeclaredFields()) {
-            if (EntityUtils.isIdField(declaredField)) {
-                continue;
-            }
+        Field[] insertableFields = getInsertableFields(entityType);
+        for (Field declaredField : insertableFields) {
             var columnName = resolveColumnName(declaredField);
             columnNames.add(columnName);
             valuePlaceholder.add("?");
         }
 
-        return String.format(INSERT_INTO_TABLE, tableName, String.join(",", columnNames), String.join(",", valuePlaceholder));
+        return String.format(
+                INSERT_INTO_TABLE,
+                tableName,
+                String.join(",", columnNames),
+                String.join(",", valuePlaceholder));
     }
 }

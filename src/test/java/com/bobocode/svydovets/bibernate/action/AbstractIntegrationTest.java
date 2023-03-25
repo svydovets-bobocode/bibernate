@@ -41,17 +41,17 @@ public abstract class AbstractIntegrationTest {
         String createTableQuery =
                 "CREATE TABLE person"
                         + "("
-                        + "    id         BIGINT not null auto_increment,"
+                        + "    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
                         + "    first_name VARCHAR(255),"
-                        + "    last_name  VARCHAR(255),"
-                        + "    constraint PK_person primary key (id)"
+                        + "    last_name  VARCHAR(255)"
                         + ");";
         PreparedStatement statement = connection.prepareStatement(createTableQuery);
         statement.executeUpdate();
     }
 
     private void insertIntoTable() throws SQLException {
-        String insertQuery = "INSERT INTO person VALUES (1, 'John', 'Doe'), (2, 'Martin', 'Fowler')";
+        String insertQuery =
+                "INSERT INTO person(first_name, last_name) VALUES ('John', 'Doe'), ('Martin', 'Fowler')";
         PreparedStatement statement = connection.prepareStatement(insertQuery);
         statement.executeUpdate();
     }
