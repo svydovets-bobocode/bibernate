@@ -4,7 +4,7 @@ import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactor
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import com.bobocode.svydovets.bibernate.action.AbstractIntegrationTest;
+import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.sql.PreparedStatement;

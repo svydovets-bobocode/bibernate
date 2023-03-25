@@ -63,6 +63,9 @@ public class SessionImpl implements Session {
         // Or we need to remove that entity on dirty checking?
         // Todo: push it to Query action
         deleteAction.execute(entityKey);
+
+        entitiesCacheMap.remove(entityKey);
+        entitiesSnapshotMap.remove(entityKey);
     }
 
     @Override

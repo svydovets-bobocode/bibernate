@@ -1,10 +1,11 @@
 package com.bobocode.svydovets.bibernate.action;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.DEFAULT_ENTITY_KEY;
-import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.INVALID_ENTITY_KEY;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ENTITY_KEY;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.INVALID_ENTITY_KEY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import org.junit.jupiter.api.Test;

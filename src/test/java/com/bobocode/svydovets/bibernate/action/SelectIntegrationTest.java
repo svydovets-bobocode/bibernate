@@ -1,10 +1,11 @@
 package com.bobocode.svydovets.bibernate.action;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.*;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.session.SessionImpl;
