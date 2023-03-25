@@ -93,10 +93,10 @@ class SessionTransactionTest extends AbstractIntegrationTest {
         ArrayList<Person> persons = new ArrayList<>();
         ResultSet rs = connection.prepareStatement("select * from person").executeQuery();
         while (rs.next()) {
-            long id = rs.getLong(1);
-            String fN = rs.getString(2);
-            String sN = rs.getString(3);
-            persons.add(new Person(id, fN, sN));
+            var id = rs.getLong(1);
+            var firstName = rs.getString(2);
+            var secondName = rs.getString(3);
+            persons.add(new Person(id, firstName, secondName));
         }
         return persons;
     }
