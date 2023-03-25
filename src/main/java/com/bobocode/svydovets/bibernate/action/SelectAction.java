@@ -5,11 +5,11 @@ import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.constant.Operation;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.exception.ConnectionException;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,17 +29,20 @@ public class SelectAction {
         var id = key.id();
         validatorProcessor.validate(type, Operation.SELECT);
         String selectByIdQuery = sqlQueryBuilder.createSelectByIdQuery(type);
-
         try (var statement = connection.prepareStatement(selectByIdQuery)) {
             statement.setObject(1, id);
             ResultSet resultSet = statement.executeQuery();
-            ResultSetMapper.moveCursorToNextRow(resultSet);
-            T result = ResultSetMapper.mapToObject(type, resultSet);
-            log.debug("Mapped result set to object: {}", result);
-            return result;
-        } catch (SQLException e) {
-            throw new BibernateException(
-                    String.format("Unable to find entity: %s by id: %s:", type, id), e);
+            if (ResultSetMapper.moveCursorToNextRow(resultSet)) {
+                T result = ResultSetMapper.mapToObject(type, resultSet);
+                log.debug("Mapped result set to object: {}", result);
+                return result;
+            } else {
+                // Todo: add Entity not found exception
+                throw new BibernateException(
+                        "Unable to find entity: %s by id: %s".formatted(type.getSimpleName(), id));
+            }
+        } catch (Exception e) {
+            throw new ConnectionException("Error while executing query %s".formatted(selectByIdQuery), e);
         }
     }
 }

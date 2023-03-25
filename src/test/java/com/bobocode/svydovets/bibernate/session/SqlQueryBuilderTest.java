@@ -1,9 +1,10 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import static org.assertj.core.api.Assertions.*;
+
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import com.bobocode.svydovets.bibernate.testdata.entity.User;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ class SqlQueryBuilderTest {
         // when
         var selectByIdQuery = sqlBuilder.createSelectByIdQuery(User.class);
         // then
-        Assertions.assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ?;");
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ?;");
     }
 
     @Test
@@ -29,7 +30,7 @@ class SqlQueryBuilderTest {
         // when
         var selectByIdQuery = sqlBuilder.createSelectByIdQuery(Person.class);
         // then
-        Assertions.assertThat(selectByIdQuery).isEqualTo("SELECT * FROM person WHERE id = ?;");
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM person WHERE id = ?;");
     }
 
     @Test
@@ -39,7 +40,7 @@ class SqlQueryBuilderTest {
         // when
         var selectAllQuery = sqlBuilder.createSelectAllQuery(User.class);
         // then
-        Assertions.assertThat(selectAllQuery).isEqualTo("SELECT * FROM users;");
+        assertThat(selectAllQuery).isEqualTo("SELECT * FROM users;");
     }
 
     @Test
@@ -49,6 +50,6 @@ class SqlQueryBuilderTest {
         // when
         var selectByAllQuery = sqlBuilder.createSelectAllQuery(Person.class);
         // then
-        Assertions.assertThat(selectByAllQuery).isEqualTo("SELECT * FROM person;");
+        assertThat(selectByAllQuery).isEqualTo("SELECT * FROM person;");
     }
 }

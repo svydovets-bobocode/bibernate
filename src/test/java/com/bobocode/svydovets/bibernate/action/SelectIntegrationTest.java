@@ -1,36 +1,42 @@
 package com.bobocode.svydovets.bibernate.action;
 
+import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.bobocode.svydovets.bibernate.action.key.EntityKey;
-import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
+import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.session.SessionImpl;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class SelectActionIntegrationTest extends AbstractIntegrationTest {
+class SelectIntegrationTest extends AbstractIntegrationTest {
 
     @Test
-    void testLoad() {
-        SelectAction selectAction = new SelectAction(connection, new SqlQueryBuilder());
-        EntityKey<Person> key = new EntityKey<>(Person.class, 1L);
-        Person entity = selectAction.execute(key);
-        assertPerson(entity, 1L, "John", "Doe");
+    void testFindById() {
+        Person entity = selectAction.execute(DEFAULT_ENTITY_KEY);
+        assertPerson(entity, DEFAULT_ID, DEFAULT_FIRST_NAME, DEFAULT_LAST_NAME);
+    }
+
+    @Test
+    void testFindByIdShouldThrowNotFoundException() {
+        assertThrows(
+                BibernateException.class,
+                () -> selectAction.execute(INVALID_ENTITY_KEY),
+                "Unable to find entity: Person by id: -1");
     }
 
     @Test
     void testFindAll() {
-        SelectAction selectAction = new SelectAction(connection, new SqlQueryBuilder());
         Session session = new SessionImpl(selectAction, connection);
 
         List<Person> retrievedPersons = session.findAll(Person.class);
 
         assertEquals(2, retrievedPersons.size());
-        assertPerson(retrievedPersons.get(0), 1L, "John", "Doe");
-        assertPerson(retrievedPersons.get(1), 2L, "Martin", "Fowler");
+        assertPerson(retrievedPersons.get(0), DEFAULT_ID, DEFAULT_FIRST_NAME, DEFAULT_LAST_NAME);
+        assertPerson(retrievedPersons.get(1), OTHER_ID, OTHER_FIRST_NAME, OTHER_LAST_NAME);
     }
 
     private static void assertPerson(Person entity, Long id, String firstName, String lastName) {
