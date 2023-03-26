@@ -156,13 +156,13 @@ public class EntityUtils {
         }
     }
 
-    public static <T> void updateManagedEntityField(T detachedEntity, T managedEntity, Field field) {
+    public static <T> void updateManagedEntityField(T fromEntity, T toEntity, Field field) {
         Object detachedValue = null;
         try {
             field.setAccessible(true);
-            detachedValue = field.get(detachedEntity);
+            detachedValue = field.get(fromEntity);
             if (detachedValue != null) {
-                field.set(managedEntity, detachedValue);
+                field.set(toEntity, detachedValue);
             }
         } catch (IllegalAccessException e) {
             throw new BibernateException(
@@ -170,7 +170,7 @@ public class EntityUtils {
                             ERROR_SETTING_VALUE_TO_FIELD,
                             detachedValue,
                             field.getType(),
-                            managedEntity.getClass().getName()),
+                            toEntity.getClass().getName()),
                     e);
         }
     }

@@ -118,21 +118,21 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public <T> T merge(T detachedEntity) {
+    public <T> T merge(T entity) {
         verifySessionIsOpened();
 
-        if (detachedEntity == null) {
+        if (entity == null) {
             throw new IllegalArgumentException("Entity cannot be null.");
         }
 
-        Optional<?> id = EntityUtils.retrieveIdValue(detachedEntity);
+        Optional<?> id = EntityUtils.retrieveIdValue(entity);
 
         // Handling transient entities
         if (id.isEmpty()) {
-            return save(detachedEntity);
+            return save(entity);
         }
 
-        Class<T> entityType = (Class<T>) detachedEntity.getClass();
+        Class<T> entityType = (Class<T>) entity.getClass();
         validatorProcessor.validate(entityType);
 
         EntityKey<T> entityKey = new EntityKey<>(entityType, id.get());
@@ -145,7 +145,7 @@ public class SessionImpl implements Session {
 
         // Merge the states of the detached and managed entities
         for (Field field : entityType.getDeclaredFields()) {
-            EntityUtils.updateManagedEntityField(detachedEntity, managedEntity, field);
+            EntityUtils.updateManagedEntityField(entity, managedEntity, field);
         }
 
         // Add the merged entity to the cache
