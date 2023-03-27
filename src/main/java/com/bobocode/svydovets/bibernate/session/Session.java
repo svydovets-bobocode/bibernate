@@ -9,7 +9,7 @@ public interface Session {
 
     <T> T save(T entity);
 
-    <T> void delete(T id);
+    void delete(Object object);
 
     <T> List<T> findAll(Class<T> type);
 

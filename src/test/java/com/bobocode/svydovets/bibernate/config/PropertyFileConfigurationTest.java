@@ -1,5 +1,9 @@
 package com.bobocode.svydovets.bibernate.config;
 
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.H2_DB_PASSWORD;
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.H2_DB_URL;
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.H2_DB_USERNAME;
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.H2_DRIVER_CLASS_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -12,16 +16,15 @@ public class PropertyFileConfigurationTest {
 
     @BeforeEach
     public void setUp() {
-        source = new PropertyFileConfiguration("test_svydovets_bibernate.properties");
+        source = new PropertyFileConfiguration("test_svydovets_bibernate_h2.properties");
     }
 
     @Test
-    public void shouldReturnNullForNonExistingProperty() {
-        assertEquals("org.h2.Driver", source.getProperty("svydovets.bibernate.driverClassName"));
-        assertEquals(
-                "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1", source.getProperty("svydovets.bibernate.db.url"));
-        assertEquals("sa", source.getProperty("svydovets.bibernate.db.username"));
-        assertEquals("", source.getProperty("svydovets.bibernate.db.password"));
+    public void shouldGetProperties() {
+        assertEquals(H2_DRIVER_CLASS_NAME, source.getProperty("svydovets.bibernate.driverClassName"));
+        assertEquals(H2_DB_URL, source.getProperty("svydovets.bibernate.db.url"));
+        assertEquals(H2_DB_USERNAME, source.getProperty("svydovets.bibernate.db.username"));
+        assertEquals(H2_DB_PASSWORD, source.getProperty("svydovets.bibernate.db.password"));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import com.bobocode.svydovets.bibernate.action.DeleteAction;
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.action.executor.JdbcExecutor;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
@@ -27,6 +28,7 @@ public class SessionImpl implements Session {
 
     // todo: replace with Queue<Action>
     private final SelectAction selectAction;
+    private final DeleteAction deleteAction;
     private final Connection connection;
     private final Transaction transaction;
     private final SqlQueryBuilder sqlQueryBuilder;
@@ -44,13 +46,14 @@ public class SessionImpl implements Session {
         this.connection = connection;
         this.transaction = new TransactionImpl(connection);
         this.sqlQueryBuilder = new SqlQueryBuilder();
+        this.deleteAction = new DeleteAction(this.connection, this.sqlQueryBuilder);
     }
 
     @Override
     public <T> T find(Class<T> type, Object id) {
         verifySessionIsOpened();
-        EntityKey<T> entityKey = new EntityKey<>(type, id);
-        return type.cast(entitiesCacheMap.computeIfAbsent(entityKey, selectAction::execute));
+        return type.cast(
+                entitiesCacheMap.computeIfAbsent(EntityKey.of(type, id), selectAction::execute));
     }
 
     @Override
@@ -60,8 +63,16 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public <T> void delete(T id) {
+    public void delete(Object object) {
         verifySessionIsOpened();
+        EntityKey<?> entityKey = EntityKey.valueOf(object);
+        // Do we need to check cache and remove that entity on that step?
+        // Or we need to remove that entity on dirty checking?
+        // Todo: push it to Query action
+        deleteAction.execute(entityKey);
+
+        entitiesCacheMap.remove(entityKey);
+        entitiesSnapshotMap.remove(entityKey);
     }
 
     @Override

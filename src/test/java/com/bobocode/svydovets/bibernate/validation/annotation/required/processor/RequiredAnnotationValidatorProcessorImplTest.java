@@ -7,9 +7,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.bobocode.svydovets.bibernate.constant.Operation;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
-import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithoutIdAnnotation;
-import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithoutNonArgConstructor;
-import com.bobocode.svydovets.bibernate.testdata.entity.NonEntityClass;
+import com.bobocode.svydovets.bibernate.testdata.entity.validation.EntityWithoutIdAnnotation;
+import com.bobocode.svydovets.bibernate.testdata.entity.validation.EntityWithoutNonArgConstructor;
+import com.bobocode.svydovets.bibernate.testdata.entity.validation.NonEntityClass;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

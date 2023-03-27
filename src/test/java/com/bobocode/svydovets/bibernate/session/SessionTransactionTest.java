@@ -1,10 +1,10 @@
 package com.bobocode.svydovets.bibernate.session;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.*;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import com.bobocode.svydovets.bibernate.action.AbstractIntegrationTest;
+import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.sql.PreparedStatement;
@@ -93,10 +93,10 @@ class SessionTransactionTest extends AbstractIntegrationTest {
         ArrayList<Person> persons = new ArrayList<>();
         ResultSet rs = connection.prepareStatement("select * from person").executeQuery();
         while (rs.next()) {
-            long id = rs.getLong(1);
-            String fN = rs.getString(2);
-            String sN = rs.getString(3);
-            persons.add(new Person(id, fN, sN));
+            var id = rs.getLong(1);
+            var firstName = rs.getString(2);
+            var secondName = rs.getString(3);
+            persons.add(new Person(id, firstName, secondName));
         }
         return persons;
     }
