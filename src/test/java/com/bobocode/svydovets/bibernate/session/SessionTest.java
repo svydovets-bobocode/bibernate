@@ -1,7 +1,8 @@
 package com.bobocode.svydovets.bibernate.session;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.DEFAULT_ENTITY_KEY;
-import static com.bobocode.svydovets.bibernate.testdata.factory.PersonFactory.newDefaultPerson;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ENTITY_KEY;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ID;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.newDefaultPerson;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.mock;
@@ -34,7 +35,7 @@ public class SessionTest {
     @BeforeEach
     void setUp() {
         ConfigurationSource source =
-                new PropertyFileConfiguration("test_svydovets_bibernate.properties");
+                new PropertyFileConfiguration("test_svydovets_bibernate_h2.properties");
         DataSource dataSource = new HikariConnectionPool().getDataSource(source);
         selectAction = mock(SelectAction.class);
         Connection connection = mock(Connection.class);
@@ -48,7 +49,7 @@ public class SessionTest {
         var person = newDefaultPerson();
         when(selectAction.execute(DEFAULT_ENTITY_KEY)).thenReturn(person);
         // when
-        var foundPerson = session.find(Person.class, 123L);
+        var foundPerson = session.find(Person.class, DEFAULT_ID);
         // then
         Assertions.assertEquals(person, foundPerson);
     }
@@ -59,8 +60,8 @@ public class SessionTest {
         // given
         when(selectAction.execute(DEFAULT_ENTITY_KEY)).thenAnswer(in -> newDefaultPerson());
         // when
-        var person1 = session.find(Person.class, 123L);
-        var person2 = session.find(Person.class, 123L);
+        var person1 = session.find(Person.class, DEFAULT_ID);
+        var person2 = session.find(Person.class, DEFAULT_ID);
         // then
         Assertions.assertSame(person1, person2);
     }
@@ -72,8 +73,8 @@ public class SessionTest {
         when(selectAction.execute(DEFAULT_ENTITY_KEY))
                 .thenAnswer(invocationOnMock -> newDefaultPerson());
         // when
-        session.find(Person.class, 123L);
-        session.find(Person.class, 123L);
+        session.find(Person.class, DEFAULT_ID);
+        session.find(Person.class, DEFAULT_ID);
         // then
         verify(selectAction, atMostOnce()).execute(DEFAULT_ENTITY_KEY);
     }
@@ -87,13 +88,13 @@ public class SessionTest {
         session.close();
         // when
         // then
-        assertThatThrownBy(() -> session.find(Person.class, 123L))
+        assertThatThrownBy(() -> session.find(Person.class, DEFAULT_ID))
                 .isInstanceOf(BibernateException.class)
                 .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.save(new Person()))
                 .isInstanceOf(BibernateException.class)
                 .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
-        assertThatThrownBy(() -> session.delete(123L))
+        assertThatThrownBy(() -> session.delete(person))
                 .isInstanceOf(BibernateException.class)
                 .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.findAll(Person.class))
