@@ -6,12 +6,28 @@ import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class SessionFactoryImpl implements SessionFactory {
     private final DataSource dataSource;
     private final SqlQueryBuilder sqlQueryBuilder;
+
+    private static volatile SessionFactoryImpl instance;
+
+    public static SessionFactoryImpl getInstance(DataSource dataSource, SqlQueryBuilder sqlQueryBuilder) {
+        if (instance == null) {
+            synchronized (SessionFactoryImpl.class) {
+                if (instance == null) {
+                    instance = new SessionFactoryImpl(dataSource, sqlQueryBuilder);
+                }
+            }
+        }
+        return instance;
+    }
 
     @Override
     public Session openSession() {
@@ -24,3 +40,4 @@ public class SessionFactoryImpl implements SessionFactory {
         }
     }
 }
+
