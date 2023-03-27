@@ -24,6 +24,8 @@ public final class ErrorMessage {
             "Error while mapping result set to object of type '%s'";
     public static final String ERROR_RETRIEVING_VALUE_FROM_FIELD =
             "Error while retrieving the value from field '%s' in type '%s'";
+    public static final String ERROR_GETTING_FIELD_VALUES_FROM_ENTITY =
+            "Error while retrieving values from entity '%s'";
     public static final String ERROR_SETTING_VALUE_TO_FIELD =
             "Error while setting the value `%s` to field '%s' in type '%s'";
 

@@ -1,6 +1,5 @@
 package com.bobocode.svydovets.bibernate.session;
 
-import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import java.sql.Connection;
@@ -17,8 +16,8 @@ public class SessionFactoryImpl implements SessionFactory {
     public Session openSession() {
         try {
             Connection connection = dataSource.getConnection();
-            SelectAction selectAction = new SelectAction(connection, sqlQueryBuilder);
-            return new SessionImpl(selectAction, connection);
+            SearchService searchService = new SearchService(connection);
+            return new SessionImpl(connection, searchService);
         } catch (SQLException e) {
             throw new BibernateException("An error occurred while opening session", e);
         }

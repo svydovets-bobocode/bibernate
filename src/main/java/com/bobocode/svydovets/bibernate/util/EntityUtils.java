@@ -3,6 +3,7 @@ package com.bobocode.svydovets.bibernate.util;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ARG_CONSTRUCTOR;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ENTITY_ANNOTATION;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ID;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_GETTING_FIELD_VALUES_FROM_ENTITY;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_RETRIEVING_VALUE_FROM_FIELD;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_SETTING_VALUE_TO_FIELD;
 
@@ -172,6 +173,19 @@ public class EntityUtils {
                             field.getType(),
                             toEntity.getClass().getName()),
                     e);
+        }
+    }
+
+    public static <T> Object[] getFieldValuesFromEntity(T entity) {
+        try {
+            Field[] fields = entity.getClass().getDeclaredFields();
+            return Arrays.stream(fields)
+                    .map(field -> retrieveValueFromField(entity, field))
+                    .map(Optional::orElseThrow)
+                    .toArray();
+        } catch (Exception e) {
+            throw new BibernateException(
+                    String.format(ERROR_GETTING_FIELD_VALUES_FROM_ENTITY, entity.getClass().getName()), e);
         }
     }
 }

@@ -2,10 +2,8 @@ package com.bobocode.svydovets.bibernate.session;
 
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
-import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,8 +38,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void beforeEach() {
-        SelectAction selectAction = mock(SelectAction.class);
-        session = new SessionImpl(selectAction, connection);
+        session = new SessionImpl(connection, searchService);
     }
 
     @Test
