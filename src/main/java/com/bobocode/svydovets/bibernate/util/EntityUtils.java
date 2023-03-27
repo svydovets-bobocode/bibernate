@@ -124,7 +124,7 @@ public class EntityUtils {
         return tableName;
     }
 
-    public static <T> Object retrieveIdValue(T entity) {
+    public static <T> Optional<Object> retrieveIdValue(T entity) {
         return Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(EntityUtils::isIdField)
                 .findAny()
@@ -132,10 +132,10 @@ public class EntityUtils {
                 .orElseThrow(() -> new EntityValidationException(CLASS_HAS_NO_ID));
     }
 
-    public static <T> Object retrieveValueFromField(T entity, Field field) {
+    public static <T> Optional<Object> retrieveValueFromField(T entity, Field field) {
         try {
             field.setAccessible(true);
-            return field.get(entity);
+            return Optional.ofNullable(field.get(entity));
         } catch (Exception e) {
             throw new BibernateException(
                     String.format(
@@ -152,6 +152,25 @@ public class EntityUtils {
             throw new BibernateException(
                     String.format(
                             ERROR_SETTING_VALUE_TO_FIELD, value, field.getType(), instance.getClass().getName()),
+                    e);
+        }
+    }
+
+    public static <T> void updateManagedEntityField(T fromEntity, T toEntity, Field field) {
+        Object detachedValue = null;
+        try {
+            field.setAccessible(true);
+            detachedValue = field.get(fromEntity);
+            if (detachedValue != null) {
+                field.set(toEntity, detachedValue);
+            }
+        } catch (IllegalAccessException e) {
+            throw new BibernateException(
+                    String.format(
+                            ERROR_SETTING_VALUE_TO_FIELD,
+                            detachedValue,
+                            field.getType(),
+                            toEntity.getClass().getName()),
                     e);
         }
     }

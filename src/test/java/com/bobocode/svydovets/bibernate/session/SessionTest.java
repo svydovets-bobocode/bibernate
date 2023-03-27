@@ -1,13 +1,9 @@
 package com.bobocode.svydovets.bibernate.session;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ENTITY_KEY;
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ID;
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.newDefaultPerson;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.atMostOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
@@ -19,12 +15,8 @@ import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.sql.Connection;
 import java.util.HashMap;
 import javax.sql.DataSource;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 
 @Tag("unit")
 public class SessionTest {
@@ -112,6 +104,60 @@ public class SessionTest {
         assertThatThrownBy(() -> session.flush())
                 .isInstanceOf(BibernateException.class)
                 .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
+    }
+
+    @Test
+    @DisplayName("Merge Detached Entity When Entity Not In Cache")
+    void mergeDetachedEntityWhenEntityNotInCache() {
+        // given
+        Person detachedPerson = newDefaultPerson();
+        Person managedPerson = newDefaultPerson();
+        when(selectAction.execute(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
+
+        // when
+        Person mergedPerson = session.merge(detachedPerson);
+
+        // then
+        assertThat(mergedPerson).isNotSameAs(detachedPerson);
+        assertThat(mergedPerson).isEqualTo(detachedPerson);
+    }
+
+    @Test
+    @DisplayName("Merge Detached Entity When Entity In Cache")
+    void mergeDetachedEntityWhenEntityInCache() {
+        // given
+        Person detachedPerson = newDefaultPerson();
+        Person managedPerson = newDefaultPerson();
+        when(selectAction.execute(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
+        session.find(Person.class, 123L); // Put entity into cache
+
+        // when
+        Person mergedPerson = session.merge(detachedPerson);
+
+        // then
+        assertThat(mergedPerson).isNotSameAs(detachedPerson);
+        assertThat(mergedPerson).isEqualTo(detachedPerson);
+    }
+
+    @Test
+    @DisplayName("Merge saves transient entity and returns a managed instance with identifier")
+    void mergeSavesTransientEntityAndReturnsManagedInstanceWithId() {
+        // given
+        Person transientPerson = new Person();
+        transientPerson.setFirstName("John");
+        transientPerson.setLastName("Doe");
+
+        session = Mockito.spy(session);
+        when(session.save(transientPerson)).thenReturn(newDefaultPerson());
+
+        // when
+        Person managedPerson = session.merge(transientPerson);
+
+        // then
+        assertThat(managedPerson).isNotNull();
+        assertThat(managedPerson.getId()).isNotNull();
+        assertThat(managedPerson.getFirstName()).isEqualTo(transientPerson.getFirstName());
+        assertThat(managedPerson.getLastName()).isEqualTo(transientPerson.getLastName());
     }
 
     @AfterEach
