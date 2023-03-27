@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.action;
 
+import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
@@ -16,17 +17,25 @@ import org.junit.jupiter.api.Tag;
 public abstract class AbstractIntegrationTest {
     protected static DataSource dataSource;
     protected Connection connection;
+    protected DeleteAction deleteAction;
+    protected SelectAction selectAction;
+    protected SqlQueryBuilder sqlQueryBuilder;
 
     @BeforeAll
     static void beforeAll() {
+        // to switch between DBs, use different property files FE
+        // bibernate.properties
         ConfigurationSource source =
-                new PropertyFileConfiguration("test_svydovets_bibernate.properties");
+                new PropertyFileConfiguration("test_svydovets_bibernate_h2.properties");
         dataSource = new HikariConnectionPool().getDataSource(source);
     }
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
+        sqlQueryBuilder = new SqlQueryBuilder();
+        deleteAction = new DeleteAction(connection, sqlQueryBuilder);
+        selectAction = new SelectAction(connection, sqlQueryBuilder);
         createTable();
         insertIntoTable();
     }
@@ -37,6 +46,7 @@ public abstract class AbstractIntegrationTest {
         connection.close();
     }
 
+    // Todo: move that to schema or different place
     private void createTable() throws SQLException {
         String createTableQuery =
                 "CREATE TABLE person (id BIGINT, first_name VARCHAR(255), last_name VARCHAR(255))";

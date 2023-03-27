@@ -8,11 +8,11 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
-import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithTwoId;
-import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithoutIdAnnotation;
-import com.bobocode.svydovets.bibernate.testdata.entity.EntityWithoutNonArgConstructor;
-import com.bobocode.svydovets.bibernate.testdata.entity.SupportedIdTypes;
-import com.bobocode.svydovets.bibernate.testdata.entity.UnsupportedIdTypes;
+import com.bobocode.svydovets.bibernate.testdata.entity.validation.EntityWithTwoId;
+import com.bobocode.svydovets.bibernate.testdata.entity.validation.EntityWithoutIdAnnotation;
+import com.bobocode.svydovets.bibernate.testdata.entity.validation.EntityWithoutNonArgConstructor;
+import com.bobocode.svydovets.bibernate.testdata.entity.validation.SupportedIdTypes;
+import com.bobocode.svydovets.bibernate.testdata.entity.validation.UnsupportedIdTypes;
 import com.bobocode.svydovets.bibernate.validation.Validator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

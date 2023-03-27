@@ -1,5 +1,9 @@
 package com.bobocode.svydovets.bibernate.config;
 
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.POSTGRES_DRIVER_CLASS_NAME;
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.POSTGRES_TEST_DB_PASSWORD;
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.POSTGRES_TEST_DB_URL;
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.POSTGRES_TEST_DB_USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -18,12 +22,10 @@ public class XmlConfigurationTest {
     @Test
     public void shouldGetProperties() {
         assertEquals(
-                "org.postgresql.Driver", source.getProperty("svydovets.bibernate.driverClassName"));
-        assertEquals(
-                "jdbc:postgresql://localhost:5432/testdatabase",
-                source.getProperty("svydovets.bibernate.db.url"));
-        assertEquals("testuser", source.getProperty("svydovets.bibernate.db.username"));
-        assertEquals("testpassword", source.getProperty("svydovets.bibernate.db.password"));
+                POSTGRES_DRIVER_CLASS_NAME, source.getProperty("svydovets.bibernate.driverClassName"));
+        assertEquals(POSTGRES_TEST_DB_URL, source.getProperty("svydovets.bibernate.db.url"));
+        assertEquals(POSTGRES_TEST_DB_USERNAME, source.getProperty("svydovets.bibernate.db.username"));
+        assertEquals(POSTGRES_TEST_DB_PASSWORD, source.getProperty("svydovets.bibernate.db.password"));
     }
 
     @Test
