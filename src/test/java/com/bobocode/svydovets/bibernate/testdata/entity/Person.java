@@ -3,16 +3,14 @@ package com.bobocode.svydovets.bibernate.testdata.entity;
 import com.bobocode.svydovets.bibernate.annotation.Column;
 import com.bobocode.svydovets.bibernate.annotation.Entity;
 import com.bobocode.svydovets.bibernate.annotation.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public final class Person {
     @Id private Long id;
 
