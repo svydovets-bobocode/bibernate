@@ -6,10 +6,8 @@ import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class SessionFactoryImpl implements SessionFactory {
@@ -18,7 +16,8 @@ public class SessionFactoryImpl implements SessionFactory {
 
     private static volatile SessionFactoryImpl instance;
 
-    public static SessionFactoryImpl getInstance(DataSource dataSource, SqlQueryBuilder sqlQueryBuilder) {
+    public static SessionFactoryImpl getInstance(
+            DataSource dataSource, SqlQueryBuilder sqlQueryBuilder) {
         if (instance == null) {
             synchronized (SessionFactoryImpl.class) {
                 if (instance == null) {
@@ -40,4 +39,3 @@ public class SessionFactoryImpl implements SessionFactory {
         }
     }
 }
-

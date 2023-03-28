@@ -7,11 +7,10 @@ import com.bobocode.svydovets.bibernate.session.SessionFactoryImpl;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 
-
 /**
- * BibernateConfiguration is the main configuration class for the Bibernate framework.
- * It provides methods for configuring the framework with different configuration sources,
- * and building a SessionFactory.
+ * BibernateConfiguration is the main configuration class for the Bibernate framework. It provides
+ * methods for configuring the framework with different configuration sources, and building a
+ * SessionFactory.
  */
 @Slf4j
 public class BibernateConfiguration {
@@ -20,8 +19,8 @@ public class BibernateConfiguration {
     private final SqlQueryBuilder sqlQueryBuilder = new SqlQueryBuilder();
 
     /**
-     * Configures Bibernate with default configuration settings.
-     * Default configuration is read from the "bibernate.properties" file.
+     * Configures Bibernate with default configuration settings. Default configuration is read from
+     * the "bibernate.properties" file.
      *
      * @return the configured BibernateConfiguration instance
      */
@@ -43,8 +42,8 @@ public class BibernateConfiguration {
     }
 
     /**
-     * Builds and returns a SessionFactory instance.
-     * The method throws an IllegalStateException if the configuration source is not set.
+     * Builds and returns a SessionFactory instance. The method throws an IllegalStateException if the
+     * configuration source is not set.
      *
      * @return the SessionFactory instance
      * @throws IllegalStateException if the configuration source is not set
