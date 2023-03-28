@@ -41,4 +41,6 @@ public interface Session {
     void commit();
 
     void rollback();
+
+    boolean isOpen();
 }

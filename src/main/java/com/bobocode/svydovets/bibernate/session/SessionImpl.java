@@ -183,4 +183,8 @@ public class SessionImpl implements Session {
             throw new BibernateException(ErrorMessage.SESSION_IS_CLOSED);
         }
     }
+
+    public boolean isOpen() {
+        return isOpen.get();
+    }
 }
