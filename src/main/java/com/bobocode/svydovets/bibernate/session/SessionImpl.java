@@ -1,11 +1,7 @@
 package com.bobocode.svydovets.bibernate.session;
 
 import com.bobocode.svydovets.bibernate.action.DeleteAction;
-import com.bobocode.svydovets.bibernate.action.SelectAction;
-import com.bobocode.svydovets.bibernate.action.executor.JdbcExecutor;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
-import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
-import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
@@ -15,9 +11,8 @@ import com.bobocode.svydovets.bibernate.validation.annotation.required.processor
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,11 +22,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SessionImpl implements Session {
 
     // todo: replace with Queue<Action>
-    private final SelectAction selectAction;
     private final DeleteAction deleteAction;
     private final Connection connection;
     private final Transaction transaction;
-    private final SqlQueryBuilder sqlQueryBuilder;
+    private final SearchService searchService;
 
     private final Map<EntityKey<?>, Object> entitiesCacheMap = new ConcurrentHashMap<>();
     private final Map<EntityKey<?>, Object[]> entitiesSnapshotMap = new ConcurrentHashMap<>();
@@ -41,19 +35,25 @@ public class SessionImpl implements Session {
 
     private final AtomicBoolean isOpen = new AtomicBoolean(true);
 
-    public SessionImpl(SelectAction selectAction, Connection connection) {
-        this.selectAction = selectAction;
+    public SessionImpl(Connection connection, SearchService searchService) {
         this.connection = connection;
         this.transaction = new TransactionImpl(connection);
-        this.sqlQueryBuilder = new SqlQueryBuilder();
-        this.deleteAction = new DeleteAction(this.connection, this.sqlQueryBuilder);
+        this.deleteAction = new DeleteAction(this.connection);
+        this.searchService = searchService;
     }
 
     @Override
     public <T> T find(Class<T> type, Object id) {
         verifySessionIsOpened();
-        return type.cast(
-                entitiesCacheMap.computeIfAbsent(EntityKey.of(type, id), selectAction::execute));
+
+        EntityKey<T> key = EntityKey.of(type, id);
+        T entity = type.cast(entitiesCacheMap.computeIfAbsent(key, searchService::findOne));
+
+        // Todo: pls doublecheck if its logic is right? Mb we need to add this to snapshot everytime
+        //        entitiesSnapshotMap.computeIfAbsent(key, k ->
+        // EntityUtils.getFieldValuesFromEntity(entity));
+
+        return entity;
     }
 
     @Override
@@ -66,8 +66,7 @@ public class SessionImpl implements Session {
     public void delete(Object object) {
         verifySessionIsOpened();
         EntityKey<?> entityKey = EntityKey.valueOf(object);
-        // Do we need to check cache and remove that entity on that step?
-        // Or we need to remove that entity on dirty checking?
+
         // Todo: push it to Query action
         deleteAction.execute(entityKey);
 
@@ -76,35 +75,19 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    // todo: integrate with validation
-    public <T> List<T> findAll(Class<T> type) {
+    public <T> Collection<T> findAll(Class<T> type) {
         verifySessionIsOpened();
-        String selectAllQuery = sqlQueryBuilder.createSelectAllQuery(type);
-        return retrieveAllFromDb(type, selectAllQuery);
-    }
 
-    // todo: move it to the action. Action API must be redesigned
-    private <T> List<T> retrieveAllFromDb(Class<T> type, String selectAllQuery) {
-        List<T> retrievedEntities = new ArrayList<>();
-        try (ResultSet resultSet =
-                JdbcExecutor.executeQueryAndRetrieveResultSet(selectAllQuery, connection)) {
-            while (ResultSetMapper.moveCursorToNextRow(resultSet)) {
-                T loadedEntity = ResultSetMapper.mapToObject(type, resultSet);
-                Optional<?> id = EntityUtils.retrieveIdValue(loadedEntity);
-                EntityKey<T> entityKey = new EntityKey<>(type, id.orElse(null));
+        flush();
 
-                if (entitiesCacheMap.containsKey(entityKey)) {
-                    retrievedEntities.add(type.cast(entitiesCacheMap.get(entityKey)));
-                } else {
-                    entitiesCacheMap.put(entityKey, loadedEntity);
-                    // todo: put it to the snapshot map
-                    retrievedEntities.add(loadedEntity);
-                }
-            }
-        } catch (SQLException e) {
-            throw new BibernateException("", e);
-        }
-        return retrievedEntities;
+        Map<EntityKey<T>, T> entityMap = searchService.findAllByType(type);
+        entityMap.forEach(
+                (key, value) -> {
+                    entitiesCacheMap.put(key, value);
+                    entitiesSnapshotMap.put(key, EntityUtils.getFieldValuesFromEntity(value));
+                });
+
+        return entityMap.values();
     }
 
     @Override
@@ -151,7 +134,7 @@ public class SessionImpl implements Session {
 
         // If the entity is not in the cache, retrieve it from the database
         if (managedEntity == null) {
-            managedEntity = selectAction.execute(entityKey);
+            managedEntity = searchService.findOne(entityKey);
         }
 
         // Merge the states of the detached and managed entities

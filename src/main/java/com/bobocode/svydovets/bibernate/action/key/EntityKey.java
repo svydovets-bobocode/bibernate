@@ -4,7 +4,7 @@ import com.bobocode.svydovets.bibernate.util.EntityUtils;
 
 public record EntityKey<T>(Class<T> type, Object id) {
 
-    public static <T> EntityKey<?> of(Class<T> type, Object id) {
+    public static <T> EntityKey<T> of(Class<T> type, Object id) {
         return new EntityKey<>(type, id);
     }
 

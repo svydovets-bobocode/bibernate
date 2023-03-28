@@ -11,13 +11,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class DeleteAction {
-    private final SqlQueryBuilder sqlQueryBuilder;
     private final RequiredAnnotationValidatorProcessor validatorProcessor;
     private final Connection connection;
 
-    public DeleteAction(Connection connection, SqlQueryBuilder sqlQueryBuilder) {
+    public DeleteAction(Connection connection) {
         this.connection = connection;
-        this.sqlQueryBuilder = sqlQueryBuilder;
         this.validatorProcessor = new RequiredAnnotationValidatorProcessorImpl();
     }
 
@@ -25,7 +23,7 @@ public class DeleteAction {
         var type = entityKey.type();
         var id = entityKey.id();
         validatorProcessor.validate(type, Operation.DELETE);
-        String deleteByIdQuery = sqlQueryBuilder.createDeleteByIdQuery(type);
+        String deleteByIdQuery = SqlQueryBuilder.createDeleteByIdQuery(type);
         try (var statement = connection.prepareStatement(deleteByIdQuery)) {
             statement.setObject(1, id);
             if (statement.executeUpdate() != 1) {

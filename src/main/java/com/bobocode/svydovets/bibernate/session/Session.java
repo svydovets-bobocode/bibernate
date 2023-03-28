@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ public interface Session {
 
     void delete(Object object);
 
-    <T> List<T> findAll(Class<T> type);
+    <T> Collection<T> findAll(Class<T> type);
 
     <T> List<T> findAll(Class<T> type, Map<String, Object> properties);
 

@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
@@ -21,7 +20,7 @@ import org.mockito.Mockito;
 @Tag("unit")
 public class SessionTest {
 
-    private SelectAction selectAction;
+    private SearchService searchService;
     private Session session;
 
     @BeforeEach
@@ -29,9 +28,9 @@ public class SessionTest {
         ConfigurationSource source =
                 new PropertyFileConfiguration("test_svydovets_bibernate_h2.properties");
         DataSource dataSource = new HikariConnectionPool().getDataSource(source);
-        selectAction = mock(SelectAction.class);
+        searchService = mock(SearchService.class);
         Connection connection = mock(Connection.class);
-        session = new SessionImpl(selectAction, connection);
+        session = new SessionImpl(connection, searchService);
     }
 
     @Test
@@ -39,7 +38,7 @@ public class SessionTest {
     void findLoadsEntityFromDbById() {
         // given
         var person = newDefaultPerson();
-        when(selectAction.execute(DEFAULT_ENTITY_KEY)).thenReturn(person);
+        when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(person);
         // when
         var foundPerson = session.find(Person.class, DEFAULT_ID);
         // then
@@ -50,7 +49,7 @@ public class SessionTest {
     @DisplayName("Find Returns Entity from Cache when it is loaded")
     void findReturnsEntityFromCacheWhenItIsLoaded() {
         // given
-        when(selectAction.execute(DEFAULT_ENTITY_KEY)).thenAnswer(in -> newDefaultPerson());
+        when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenAnswer(in -> newDefaultPerson());
         // when
         var person1 = session.find(Person.class, DEFAULT_ID);
         var person2 = session.find(Person.class, DEFAULT_ID);
@@ -62,13 +61,13 @@ public class SessionTest {
     @DisplayName("Find does not call Db When Entity is already loaded")
     void findDoesNotCallDbWhenEntityIsAlreadyLoaded() {
         // given
-        when(selectAction.execute(DEFAULT_ENTITY_KEY))
+        when(searchService.findOne(DEFAULT_ENTITY_KEY))
                 .thenAnswer(invocationOnMock -> newDefaultPerson());
         // when
         session.find(Person.class, DEFAULT_ID);
         session.find(Person.class, DEFAULT_ID);
         // then
-        verify(selectAction, atMostOnce()).execute(DEFAULT_ENTITY_KEY);
+        verify(searchService, atMostOnce()).findOne(DEFAULT_ENTITY_KEY);
     }
 
     @Test
@@ -76,7 +75,7 @@ public class SessionTest {
     void shouldFailIfSessionIsClosed() {
         // given
         var person = newDefaultPerson();
-        when(selectAction.execute(DEFAULT_ENTITY_KEY)).thenReturn(person);
+        when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(person);
         session.close();
         // when
         // then
@@ -112,7 +111,7 @@ public class SessionTest {
         // given
         Person detachedPerson = newDefaultPerson();
         Person managedPerson = newDefaultPerson();
-        when(selectAction.execute(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
+        when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
 
         // when
         Person mergedPerson = session.merge(detachedPerson);
@@ -128,7 +127,7 @@ public class SessionTest {
         // given
         Person detachedPerson = newDefaultPerson();
         Person managedPerson = newDefaultPerson();
-        when(selectAction.execute(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
+        when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
         session.find(Person.class, 123L); // Put entity into cache
 
         // when
