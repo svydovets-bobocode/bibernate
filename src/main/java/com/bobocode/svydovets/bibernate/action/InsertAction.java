@@ -32,7 +32,7 @@ public class InsertAction extends AbstractAction {
                             .findFirst()
                             .orElseThrow();
 
-            //TODO: validate if ID already present
+            // TODO: validate if ID already present
 
             for (int i = 0; i < insertableFields.length; i++) {
                 Field declaredField = insertableFields[i];
