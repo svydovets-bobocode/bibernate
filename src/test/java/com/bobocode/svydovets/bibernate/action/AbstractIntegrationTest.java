@@ -51,7 +51,8 @@ public abstract class AbstractIntegrationTest {
         String createTableQuery =
                 "CREATE TABLE person"
                         + "("
-                        + "    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
+//                        + "    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
+                        + "    id         INTEGER PRIMARY KEY,"
                         + "    first_name VARCHAR(255),"
                         + "    last_name  VARCHAR(255)"
                         + ");";
