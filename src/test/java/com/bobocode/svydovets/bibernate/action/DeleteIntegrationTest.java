@@ -16,14 +16,14 @@ class DeleteIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void testDeleteById() {
-        Person person = selectAction.execute(DEFAULT_ENTITY_KEY);
+        Person person = searchService.findOne(DEFAULT_ENTITY_KEY);
 
         deleteAction.execute(DEFAULT_ENTITY_KEY);
 
         assertNotNull(person);
         assertThrows(
                 BibernateException.class,
-                () -> selectAction.execute(DEFAULT_ENTITY_KEY),
+                () -> searchService.findOne(DEFAULT_ENTITY_KEY),
                 "Unable to find entity: Person by id: 123");
     }
 
