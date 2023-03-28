@@ -15,12 +15,6 @@ public class HikariConnectionPool implements ConnectionPool {
         config.setUsername(source.getProperty("svydovets.bibernate.db.username"));
         config.setPassword(source.getProperty("svydovets.bibernate.db.password"));
 
-        // addtional options possible
-        // config.setMaximumPoolSize(10);
-        // config.setConnectionTimeout(30000);
-        // config.setIdleTimeout(600000);
-        // config.setMaxLifetime(1800000);
-
         return new HikariDataSource(config);
     }
 }

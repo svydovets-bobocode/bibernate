@@ -1,15 +1,14 @@
 package com.bobocode.svydovets.bibernate.config;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.getValidPostgresProperties;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.session.SessionFactory;
+import com.bobocode.svydovets.bibernate.session.SessionImpl;
 import com.bobocode.svydovets.bibernate.testdata.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +20,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.getValidPostgresProperties;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 public class BibernateConfigurationTest {
 
     private DataSource dataSource;
@@ -37,14 +30,13 @@ public class BibernateConfigurationTest {
         ConfigurationSource source =
                 new PropertyFileConfiguration("test_svydovets_bibernate_h2.properties");
         dataSource = new HikariConnectionPool().getDataSource(source);
-        sqlQueryBuilder = new SqlQueryBuilder();
     }
 
     @Test
     public void testSessionConnection() throws SQLException {
         createTestTableAndInsertData();
-        BibernateConfiguration config = new BibernateConfiguration(dataSource, sqlQueryBuilder);
-        config.configure();
+        BibernateConfiguration config = new BibernateConfiguration();
+        config.configure(new PropertyFileConfiguration("test_svydovets_bibernate_h2.properties"));
         SessionFactory sessionFactory = config.buildSessionFactory();
         Session session = sessionFactory.openSession();
 
@@ -56,41 +48,38 @@ public class BibernateConfigurationTest {
 
     @Test
         public void testConfigureDefaultPropertyFile () {
-            BibernateConfiguration config = new BibernateConfiguration(dataSource, sqlQueryBuilder);
+            BibernateConfiguration config = new BibernateConfiguration();
             config.configure();
             SessionFactory sessionFactory = config.buildSessionFactory();
-            assertEquals(dataSource, getFieldValue(sessionFactory, "dataSource", DataSource.class));
-            assertEquals(
-                    sqlQueryBuilder, getFieldValue(sessionFactory, "sqlQueryBuilder", SqlQueryBuilder.class));
+            Session session = sessionFactory.openSession();
+            assertTrue(session.isOpen());
         }
 
         @Test
         public void testConfigureWithPropertyFileConfiguration () {
             ConfigurationSource source =
                     new PropertyFileConfiguration("test_svydovets_bibernate_h2.properties");
-            BibernateConfiguration config = new BibernateConfiguration(dataSource, sqlQueryBuilder);
+            BibernateConfiguration config = new BibernateConfiguration();
             config.configure(source);
             SessionFactory sessionFactory = config.buildSessionFactory();
-            assertEquals(dataSource, getFieldValue(sessionFactory, "dataSource", DataSource.class));
-            assertEquals(
-                    sqlQueryBuilder, getFieldValue(sessionFactory, "sqlQueryBuilder", SqlQueryBuilder.class));
+            Session session = sessionFactory.openSession();
+            assertTrue(session.isOpen());
         }
 
         @Test
         public void testConfigureWithHashMapConfiguration () {
 
-            ConfigurationSource source = new JavaConfiguration(getValidPostgresProperties());
-            BibernateConfiguration config = new BibernateConfiguration(dataSource, sqlQueryBuilder);
+            ConfigurationSource source = new JavaConfiguration(getValidH2Properties());
+            BibernateConfiguration config = new BibernateConfiguration();
             config.configure(source);
             SessionFactory sessionFactory = config.buildSessionFactory();
-            assertEquals(dataSource, getFieldValue(sessionFactory, "dataSource", DataSource.class));
-            assertEquals(
-                    sqlQueryBuilder, getFieldValue(sessionFactory, "sqlQueryBuilder", SqlQueryBuilder.class));
+            Session session = sessionFactory.openSession();
+            assertTrue(session.isOpen());
         }
 
         @Test
         public void testBuildSessionFactoryWithoutConfigure () {
-            BibernateConfiguration config = new BibernateConfiguration(dataSource, sqlQueryBuilder);
+            BibernateConfiguration config = new BibernateConfiguration();
             assertThrows(IllegalStateException.class, config::buildSessionFactory);
         }
 
