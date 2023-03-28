@@ -1,6 +1,7 @@
 package com.bobocode.svydovets.bibernate.session;
 
 import com.bobocode.svydovets.bibernate.action.DeleteAction;
+import com.bobocode.svydovets.bibernate.action.InsertAction;
 import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.action.executor.JdbcExecutor;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
@@ -59,6 +60,12 @@ public class SessionImpl implements Session {
     @Override
     public <T> T save(T entity) {
         verifySessionIsOpened();
+        entitiesCacheMap.put(EntityKey.valueOf(entity), entity);
+
+        InsertAction insertAction = new InsertAction(connection, entity);
+        // put action into some action collection
+        // remove execution
+        insertAction.execute();
         return null;
     }
 

@@ -22,6 +22,13 @@ public class TestPersonFactory {
 
     public static Person newDefaultPerson() {
         Person person = new Person();
+        person.setFirstName(DEFAULT_FIRST_NAME);
+        person.setLastName(DEFAULT_LAST_NAME);
+        return person;
+    }
+
+    public static Person newDefaultInvalidPerson() {
+        Person person = new Person();
         person.setId(DEFAULT_ID);
         person.setFirstName(DEFAULT_FIRST_NAME);
         person.setLastName(DEFAULT_LAST_NAME);

@@ -132,6 +132,14 @@ public class EntityUtils {
                 .orElseThrow(() -> new EntityValidationException(CLASS_HAS_NO_ID));
     }
 
+    public static Field retrieveIdField(Field[] declaredFields) {
+        return Arrays.stream(declaredFields)
+                .filter(EntityUtils::isIdField)
+                .findFirst()
+                .orElseThrow(
+                        () -> new BibernateException("The annotation @Id is not provided but required"));
+    }
+
     public static <T> Optional<Object> retrieveValueFromField(T entity, Field field) {
         try {
             field.setAccessible(true);
