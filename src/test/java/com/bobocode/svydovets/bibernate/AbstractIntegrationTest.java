@@ -1,11 +1,11 @@
 package com.bobocode.svydovets.bibernate;
 
 import com.bobocode.svydovets.bibernate.action.DeleteAction;
-import com.bobocode.svydovets.bibernate.action.SelectAction;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
+import com.bobocode.svydovets.bibernate.session.SearchService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ public abstract class AbstractIntegrationTest {
     protected static DataSource dataSource;
     protected Connection connection;
     protected DeleteAction deleteAction;
-    protected SelectAction selectAction;
+    protected SearchService searchService;
     protected SqlQueryBuilder sqlQueryBuilder;
 
     @BeforeAll
@@ -37,8 +37,8 @@ public abstract class AbstractIntegrationTest {
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
         sqlQueryBuilder = new SqlQueryBuilder();
-        deleteAction = new DeleteAction(connection, sqlQueryBuilder);
-        selectAction = new SelectAction(connection, sqlQueryBuilder);
+        deleteAction = new DeleteAction(connection);
+        searchService = new SearchService(connection);
         createTables();
         insertIntoTables();
     }

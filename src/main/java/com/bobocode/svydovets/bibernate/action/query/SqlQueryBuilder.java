@@ -31,7 +31,7 @@ class SqlQueryBuilder { // Todo: transform it to a abstract class or interface t
         return String.format(SELECT_ALL_FROM_TABLE, tableName);
     }
 
-    public String createDeleteByIdQuery(Class<?> entityType) {
+    public static String createDeleteByIdQuery(Class<?> entityType) {
         String tableName = resolveTableName(entityType);
         String idColumnName = resolveIdColumnName(entityType);
         return String.format(DELETE_FROM_TABLE_BY_ID, tableName, idColumnName);
