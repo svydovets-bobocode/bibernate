@@ -1,6 +1,8 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.setValueToField;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -10,8 +12,11 @@ import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
+import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.util.Arrays;
 import java.util.HashMap;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.*;
@@ -22,6 +27,7 @@ public class SessionTest {
 
     private SearchService searchService;
     private Session session;
+    private EntityStateServiceImpl mockedEntityStateService;
 
     @BeforeEach
     void setUp() {
@@ -64,10 +70,12 @@ public class SessionTest {
         when(searchService.findOne(DEFAULT_ENTITY_KEY))
                 .thenAnswer(invocationOnMock -> newDefaultPerson());
         // when
-        session.find(Person.class, DEFAULT_ID);
-        session.find(Person.class, DEFAULT_ID);
+        Person person = session.find(Person.class, DEFAULT_ID);
+        Person samePerson = session.find(Person.class, DEFAULT_ID);
         // then
         verify(searchService, atMostOnce()).findOne(DEFAULT_ENTITY_KEY);
+        Assertions.assertEquals(MANAGED, session.getEntityState(person));
+        Assertions.assertEquals(MANAGED, session.getEntityState(samePerson));
     }
 
     @Test
@@ -113,6 +121,9 @@ public class SessionTest {
         Person managedPerson = newDefaultPerson();
         when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
 
+        mockedEntityStateService = Mockito.mock(EntityStateServiceImpl.class);
+        setInternalDependency(session, "entityStateService", mockedEntityStateService);
+
         // when
         Person mergedPerson = session.merge(detachedPerson);
 
@@ -127,7 +138,11 @@ public class SessionTest {
         // given
         Person detachedPerson = newDefaultPerson();
         Person managedPerson = newDefaultPerson();
+
         when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
+        mockedEntityStateService = Mockito.mock(EntityStateServiceImpl.class);
+        setInternalDependency(session, "entityStateService", mockedEntityStateService);
+
         session.find(Person.class, 123L); // Put entity into cache
 
         // when
@@ -142,21 +157,35 @@ public class SessionTest {
     @DisplayName("Merge saves transient entity and returns a managed instance with identifier")
     void mergeSavesTransientEntityAndReturnsManagedInstanceWithId() {
         // given
-        Person transientPerson = new Person();
-        transientPerson.setFirstName("John");
-        transientPerson.setLastName("Doe");
+        Person detachedPerson = new Person();
+        detachedPerson.setId(1L);
+        detachedPerson.setFirstName("John");
+        detachedPerson.setLastName("Doe");
 
         session = Mockito.spy(session);
-        when(session.save(transientPerson)).thenReturn(newDefaultPerson());
+
+        when(searchService.findOne(any())).thenReturn(newDefaultPerson());
+        mockedEntityStateService = Mockito.mock(EntityStateServiceImpl.class);
+        setInternalDependency(session, "entityStateService", mockedEntityStateService);
 
         // when
-        Person managedPerson = session.merge(transientPerson);
+        Person managedPerson = session.merge(detachedPerson);
 
         // then
         assertThat(managedPerson).isNotNull();
         assertThat(managedPerson.getId()).isNotNull();
-        assertThat(managedPerson.getFirstName()).isEqualTo(transientPerson.getFirstName());
-        assertThat(managedPerson.getLastName()).isEqualTo(transientPerson.getLastName());
+        assertThat(managedPerson.getFirstName()).isEqualTo(detachedPerson.getFirstName());
+        assertThat(managedPerson.getLastName()).isEqualTo(detachedPerson.getLastName());
+    }
+
+    private void setInternalDependency(Session session, String dependencyName, Object dependency) {
+        Field field =
+                Arrays.stream(session.getClass().getDeclaredFields())
+                        .filter(f -> f.getName().equals(dependencyName))
+                        .findAny()
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("Can't find dependency " + dependencyName));
+        setValueToField(session, field, dependency);
     }
 
     @AfterEach

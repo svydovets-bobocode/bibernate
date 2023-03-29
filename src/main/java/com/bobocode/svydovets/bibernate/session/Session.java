@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import com.bobocode.svydovets.bibernate.state.EntityState;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -43,4 +44,6 @@ public interface Session {
     void rollback();
 
     boolean isOpen();
+
+    EntityState getEntityState(Object entity);
 }
