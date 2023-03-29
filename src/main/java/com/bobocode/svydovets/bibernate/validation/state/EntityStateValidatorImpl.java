@@ -14,8 +14,6 @@ public class EntityStateValidatorImpl implements EntityStateValidator {
         if (isNonAvailableTransition(fromState, toState)) {
             throw new EntityStateValidationException(
                     format("Can't change entity state from %s to %s", fromState.name(), toState.name()));
-            //      throw new EntityStateValidationException(format("%s entity passed to persist:
-            // package.MyEntity", fromState.name()));
         }
     }
 
