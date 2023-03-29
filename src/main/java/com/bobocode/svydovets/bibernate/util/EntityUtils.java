@@ -133,6 +133,11 @@ public class EntityUtils {
                 .orElseThrow(() -> new EntityValidationException(CLASS_HAS_NO_ID));
     }
 
+    public static <T> Object getIdValue(T entity) {
+        return retrieveIdValue(entity)
+                .orElseThrow(() -> new BibernateException("Id is not present in entity"));
+    }
+
     public static <T> Optional<Object> retrieveValueFromField(T entity, Field field) {
         try {
             field.setAccessible(true);

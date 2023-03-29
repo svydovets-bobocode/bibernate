@@ -1,9 +1,17 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import static com.bobocode.svydovets.bibernate.state.EntityState.DETACHED;
+import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
+import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.getIdValue;
+
 import com.bobocode.svydovets.bibernate.action.DeleteAction;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.state.EntityState;
+import com.bobocode.svydovets.bibernate.state.EntityStateService;
+import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
 import com.bobocode.svydovets.bibernate.transaction.TransactionImpl;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
@@ -15,7 +23,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -26,6 +33,7 @@ public class SessionImpl implements Session {
     private final Connection connection;
     private final Transaction transaction;
     private final SearchService searchService;
+    private final EntityStateService entityStateService;
 
     private final Map<EntityKey<?>, Object> entitiesCacheMap = new ConcurrentHashMap<>();
     private final Map<EntityKey<?>, Object[]> entitiesSnapshotMap = new ConcurrentHashMap<>();
@@ -40,6 +48,7 @@ public class SessionImpl implements Session {
         this.transaction = new TransactionImpl(connection);
         this.deleteAction = new DeleteAction(this.connection);
         this.searchService = searchService;
+        this.entityStateService = new EntityStateServiceImpl();
     }
 
     @Override
@@ -52,13 +61,14 @@ public class SessionImpl implements Session {
         // Todo: pls doublecheck if its logic is right? Mb we need to add this to snapshot everytime
         //        entitiesSnapshotMap.computeIfAbsent(key, k ->
         // EntityUtils.getFieldValuesFromEntity(entity));
-
+        entityStateService.setEntityState(entity, MANAGED);
         return entity;
     }
 
     @Override
     public <T> T save(T entity) {
         verifySessionIsOpened();
+        entityStateService.setEntityState(entity, MANAGED);
         return null;
     }
 
@@ -72,6 +82,7 @@ public class SessionImpl implements Session {
 
         entitiesCacheMap.remove(entityKey);
         entitiesSnapshotMap.remove(entityKey);
+        entityStateService.setEntityState(entityKey, REMOVED);
     }
 
     @Override
@@ -85,6 +96,7 @@ public class SessionImpl implements Session {
                 (key, value) -> {
                     entitiesCacheMap.put(key, value);
                     entitiesSnapshotMap.put(key, EntityUtils.getFieldValuesFromEntity(value));
+                    entityStateService.setEntityState(key, MANAGED);
                 });
 
         return entityMap.values();
@@ -93,6 +105,7 @@ public class SessionImpl implements Session {
     @Override
     public <T> List<T> findAll(Class<T> type, Map<String, Object> properties) {
         verifySessionIsOpened();
+        // todo add set entity state when it will be implemented
         return null;
     }
 
@@ -119,17 +132,12 @@ public class SessionImpl implements Session {
             throw new IllegalArgumentException("Entity cannot be null.");
         }
 
-        Optional<?> id = EntityUtils.retrieveIdValue(entity);
-
-        // Handling transient entities
-        if (id.isEmpty()) {
-            return save(entity);
-        }
-
         Class<T> entityType = (Class<T>) entity.getClass();
         validatorProcessor.validate(entityType);
 
-        EntityKey<T> entityKey = new EntityKey<>(entityType, id.get());
+        EntityKey<T> entityKey = new EntityKey<>(entityType, getIdValue(entity));
+        entityStateService.validate(entityKey, MANAGED);
+
         T managedEntity = entityType.cast(entitiesCacheMap.get(entityKey));
 
         // If the entity is not in the cache, retrieve it from the database
@@ -144,6 +152,7 @@ public class SessionImpl implements Session {
 
         // Add the merged entity to the cache
         entitiesCacheMap.put(entityKey, managedEntity);
+        entityStateService.setEntityState(entityKey, MANAGED);
 
         return managedEntity;
     }
@@ -151,6 +160,10 @@ public class SessionImpl implements Session {
     @Override
     public void detach(Object entity) {
         verifySessionIsOpened();
+        EntityKey<?> entityKey = EntityKey.valueOf(entity);
+        entitiesCacheMap.remove(entityKey);
+        entitiesSnapshotMap.remove(entityKey);
+        entityStateService.setEntityState(entity, DETACHED);
     }
 
     @Override
@@ -168,6 +181,7 @@ public class SessionImpl implements Session {
     public void commit() {
         verifySessionIsOpened();
         flush();
+        entityStateService.clearState();
         transaction.commit();
     }
 
@@ -175,6 +189,7 @@ public class SessionImpl implements Session {
     public void rollback() {
         // TODO: think about do we need to clear the persistence context maps
         verifySessionIsOpened();
+        entityStateService.clearState();
         transaction.rollback();
     }
 
@@ -186,5 +201,10 @@ public class SessionImpl implements Session {
 
     public boolean isOpen() {
         return isOpen.get();
+    }
+
+    @Override
+    public EntityState getEntityState(Object entity) {
+        return entityStateService.getEntityState(entity);
     }
 }
