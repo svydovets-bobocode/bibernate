@@ -136,7 +136,7 @@ public class SessionImpl implements Session {
         validatorProcessor.validate(entityType);
 
         EntityKey<T> entityKey = new EntityKey<>(entityType, getIdValue(entity));
-        entityStateService.validate(entityKey, DETACHED);
+        entityStateService.validate(entityKey, MANAGED);
 
         T managedEntity = entityType.cast(entitiesCacheMap.get(entityKey));
 
