@@ -15,6 +15,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 @Tag("integration")
 public abstract class AbstractIntegrationTest {
@@ -39,6 +40,8 @@ public abstract class AbstractIntegrationTest {
         sqlQueryBuilder = new SqlQueryBuilder();
         deleteAction = new DeleteAction(connection);
         searchService = new SearchService(connection);
+        //todo: change it
+        searchService.setEntitiesMaps(new HashMap<>(), new HashMap<>());
         createTables();
         insertIntoTables();
     }

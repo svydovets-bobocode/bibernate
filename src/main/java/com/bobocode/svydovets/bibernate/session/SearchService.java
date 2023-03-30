@@ -32,7 +32,7 @@ public class SearchService {
     }
 
     // todo: move it to constructor
-    protected void setEntitiesMaps(
+    public void setEntitiesMaps(
             Map<EntityKey<?>, Object> entitiesCacheMap, Map<EntityKey<?>, Object[]> entitiesSnapshotMap) {
         this.entitiesCacheMap = entitiesCacheMap;
         this.entitiesSnapshotMap = entitiesSnapshotMap;
