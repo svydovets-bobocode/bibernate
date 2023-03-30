@@ -25,8 +25,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     //    }
     //
     //    private static SessionFactory getSessionFactory() {
-    //        SqlQueryBuilder sqlQueryBuilder = new SqlQueryBuilder();
-    //        BibernateConfiguration config = new BibernateConfiguration(dataSource, sqlQueryBuilder);
+    //        BibernateConfiguration config = new BibernateConfiguration(dataSource);
     //        config.configure();
     //        return config.buildSessionFactory();
     //    }

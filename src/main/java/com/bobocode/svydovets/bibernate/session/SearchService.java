@@ -22,28 +22,12 @@ public class SearchService {
     private final Connection connection;
     private final RequiredAnnotationValidatorProcessor validatorProcessor;
 
-    // todo: make it final
-    private Map<EntityKey<?>, Object> entitiesCacheMap;
-    private Map<EntityKey<?>, Object[]> entitiesSnapshotMap;
-
     public SearchService(Connection connection) {
         this.connection = connection;
         this.validatorProcessor = new RequiredAnnotationValidatorProcessorImpl();
     }
 
-    // todo: move it to constructor
-    public void setEntitiesMaps(
-            Map<EntityKey<?>, Object> entitiesCacheMap, Map<EntityKey<?>, Object[]> entitiesSnapshotMap) {
-        this.entitiesCacheMap = entitiesCacheMap;
-        this.entitiesSnapshotMap = entitiesSnapshotMap;
-    }
-
     public <T> T findOne(EntityKey<T> key) {
-        var type = key.type();
-        return type.cast(entitiesCacheMap.computeIfAbsent(key, this::retrieveOneFromDb));
-    }
-
-    private <T> T retrieveOneFromDb(EntityKey<T> key) {
         var type = key.type();
         var id = key.id();
         validatorProcessor.validate(type, Operation.SELECT);
@@ -54,7 +38,6 @@ public class SearchService {
             if (ResultSetMapper.moveCursorToNextRow(resultSet)) {
                 T result = ResultSetMapper.mapToObject(type, resultSet);
                 log.debug("Mapped result set to object: {}", result);
-                entitiesSnapshotMap.computeIfAbsent(key, k -> EntityUtils.getFieldValuesFromEntity(result));
                 return result;
             } else {
                 // Todo: add Entity not found exception
@@ -66,7 +49,10 @@ public class SearchService {
         }
     }
 
-    public <T> Map<EntityKey<T>, T> findAllByType(Class<T> type) {
+    public <T> Map<EntityKey<T>, T> findAllByType(
+            Class<T> type,
+            Map<EntityKey<?>, Object> entitiesCacheMap,
+            Map<EntityKey<?>, Object[]> entitiesSnapshotMap) {
         validatorProcessor.validate(type, Operation.SELECT);
         Map<EntityKey<T>, T> loadedEntitiesMap = new HashMap<>();
         String selectAllQuery = SqlQueryBuilder.createSelectAllQuery(type);

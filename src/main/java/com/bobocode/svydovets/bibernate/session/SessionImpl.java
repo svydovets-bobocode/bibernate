@@ -47,9 +47,7 @@ public class SessionImpl implements Session {
         this.connection = connection;
         this.transaction = new TransactionImpl(connection);
         this.deleteAction = new DeleteAction(this.connection);
-        // todo: change it to single constructor call
         this.searchService = searchService;
-        this.searchService.setEntitiesMaps(entitiesCacheMap, entitiesSnapshotMap);
         this.entityStateService = new EntityStateServiceImpl();
     }
 
@@ -57,11 +55,18 @@ public class SessionImpl implements Session {
     public <T> T find(Class<T> type, Object id) {
         verifySessionIsOpened();
 
-        EntityKey<T> key = EntityKey.of(type, id);
-        T entity = searchService.findOne(key);
+        EntityKey<T> entityKey = EntityKey.of(type, id);
+        T entity = type.cast(entitiesCacheMap.computeIfAbsent(entityKey, this::loadEntity));
 
         entityStateService.setEntityState(entity, MANAGED);
         return entity;
+    }
+
+    private <T> Object loadEntity(EntityKey<?> entityKey) {
+        Object loadedEntity = searchService.findOne(entityKey);
+        entitiesSnapshotMap.computeIfAbsent(
+                entityKey, k -> EntityUtils.getFieldValuesFromEntity(loadedEntity));
+        return loadedEntity;
     }
 
     @Override
@@ -90,7 +95,8 @@ public class SessionImpl implements Session {
 
         flush();
 
-        Map<EntityKey<T>, T> entityMap = searchService.findAllByType(type);
+        Map<EntityKey<T>, T> entityMap =
+                searchService.findAllByType(type, entitiesCacheMap, entitiesSnapshotMap);
         entityMap.forEach(
                 (key, value) -> {
                     entitiesCacheMap.put(key, value);
