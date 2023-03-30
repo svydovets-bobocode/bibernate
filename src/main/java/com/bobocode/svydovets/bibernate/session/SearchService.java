@@ -1,5 +1,7 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
+
 import com.bobocode.svydovets.bibernate.action.executor.JdbcExecutor;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
@@ -7,24 +9,28 @@ import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.constant.Operation;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.ConnectionException;
+import com.bobocode.svydovets.bibernate.state.EntityStateService;
+import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SearchService {
     private final Connection connection;
     private final RequiredAnnotationValidatorProcessor validatorProcessor;
+    private final EntityStateService entityStateService;
 
     public SearchService(Connection connection) {
         this.connection = connection;
         this.validatorProcessor = new RequiredAnnotationValidatorProcessorImpl();
+        this.entityStateService = new EntityStateServiceImpl();
     }
 
     public <T> T findOne(EntityKey<T> key) {
@@ -49,22 +55,31 @@ public class SearchService {
         }
     }
 
-    public <T> Map<EntityKey<T>, T> findAllByType(
+    public <T> List<T> findAllByType(
             Class<T> type,
             Map<EntityKey<?>, Object> entitiesCacheMap,
             Map<EntityKey<?>, Object[]> entitiesSnapshotMap) {
+
         validatorProcessor.validate(type, Operation.SELECT);
-        Map<EntityKey<T>, T> loadedEntitiesMap = new HashMap<>();
+        List<T> retrievedEntities = new ArrayList<>();
         String selectAllQuery = SqlQueryBuilder.createSelectAllQuery(type);
         try (ResultSet resultSet =
                 JdbcExecutor.executeQueryAndRetrieveResultSet(selectAllQuery, connection)) {
             while (ResultSetMapper.moveCursorToNextRow(resultSet)) {
                 T loadedEntity = ResultSetMapper.mapToObject(type, resultSet);
-                Optional<?> id = EntityUtils.retrieveIdValue(loadedEntity);
-                EntityKey<T> entityKey = new EntityKey<>(type, id.orElse(null));
-                loadedEntitiesMap.put(entityKey, loadedEntity);
+                Object id = EntityUtils.getIdValue(loadedEntity);
+                EntityKey<T> entityKey = new EntityKey<>(type, id);
+
+                if (entitiesCacheMap.containsKey(entityKey)) {
+                    retrievedEntities.add(type.cast(entitiesCacheMap.get(entityKey)));
+                } else {
+                    entitiesCacheMap.put(entityKey, loadedEntity);
+                    entitiesSnapshotMap.put(entityKey, EntityUtils.getFieldValuesFromEntity(loadedEntity));
+                    entityStateService.setEntityState(entityKey, MANAGED);
+                    retrievedEntities.add(loadedEntity);
+                }
             }
-            return loadedEntitiesMap;
+            return retrievedEntities;
         } catch (Exception e) {
             throw new BibernateException(
                     "Unable to findAll entities: %s ".formatted(type.getSimpleName()));

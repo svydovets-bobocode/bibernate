@@ -92,19 +92,8 @@ public class SessionImpl implements Session {
     @Override
     public <T> Collection<T> findAll(Class<T> type) {
         verifySessionIsOpened();
-
         flush();
-
-        Map<EntityKey<T>, T> entityMap =
-                searchService.findAllByType(type, entitiesCacheMap, entitiesSnapshotMap);
-        entityMap.forEach(
-                (key, value) -> {
-                    entitiesCacheMap.put(key, value);
-                    entitiesSnapshotMap.put(key, EntityUtils.getFieldValuesFromEntity(value));
-                    entityStateService.setEntityState(key, MANAGED);
-                });
-
-        return entityMap.values();
+        return searchService.findAllByType(type, entitiesCacheMap, entitiesSnapshotMap);
     }
 
     @Override
