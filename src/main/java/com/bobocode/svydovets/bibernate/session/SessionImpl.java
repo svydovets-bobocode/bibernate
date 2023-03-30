@@ -47,7 +47,9 @@ public class SessionImpl implements Session {
         this.connection = connection;
         this.transaction = new TransactionImpl(connection);
         this.deleteAction = new DeleteAction(this.connection);
+        // todo: change it to single constructor call
         this.searchService = searchService;
+        this.searchService.setEntitiesMaps(entitiesCacheMap, entitiesSnapshotMap);
         this.entityStateService = new EntityStateServiceImpl();
     }
 
@@ -56,11 +58,8 @@ public class SessionImpl implements Session {
         verifySessionIsOpened();
 
         EntityKey<T> key = EntityKey.of(type, id);
-        T entity = type.cast(entitiesCacheMap.computeIfAbsent(key, searchService::findOne));
+        T entity = searchService.findOne(key);
 
-        // Todo: pls doublecheck if its logic is right? Mb we need to add this to snapshot everytime
-        //        entitiesSnapshotMap.computeIfAbsent(key, k ->
-        // EntityUtils.getFieldValuesFromEntity(entity));
         entityStateService.setEntityState(entity, MANAGED);
         return entity;
     }
