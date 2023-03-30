@@ -1,6 +1,5 @@
 package com.bobocode.svydovets.bibernate.state;
 
-import static com.bobocode.svydovets.bibernate.state.EntityState.TRANSIENT;
 import static java.util.Objects.nonNull;
 
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
@@ -39,30 +38,8 @@ public class EntityStateServiceImpl implements EntityStateService {
     @Override
     public void setEntityState(EntityKey<?> entityKey, EntityState toState) {
         EntityState existEntityState = entityStateMap.get(entityKey);
-        validate(existEntityState, toState);
+        entityStateValidator.validate(existEntityState, toState);
         entityStateMap.put(entityKey, toState);
-    }
-
-    @Override
-    public void validate(EntityState fromState, EntityState toState) {
-        if (nonNull(fromState)) {
-            entityStateValidator.validate(fromState, toState);
-        } else {
-            entityStateValidator.validate(TRANSIENT, toState);
-        }
-    }
-
-    @Override
-    public void validate(Object entity, EntityState toState) {
-        EntityKey<?> entityKey = EntityKey.valueOf(entity);
-        EntityState existEntityState = getEntityState(entityKey);
-        validate(existEntityState, toState);
-    }
-
-    @Override
-    public void validate(EntityKey<?> entityKey, EntityState toState) {
-        EntityState existEntityState = getEntityState(entityKey);
-        validate(existEntityState, toState);
     }
 
     @Override
@@ -72,6 +49,18 @@ public class EntityStateServiceImpl implements EntityStateService {
         if (nonNull(entityKey.id())) {
             setEntityState(entityKey, toState);
         }
+    }
+
+    @Override
+    public void validate(EntityKey<?> entityKey, EntityState toState) {
+        EntityState existEntityState = getEntityState(entityKey);
+        entityStateValidator.validate(existEntityState, toState);
+    }
+
+    @Override
+    public void validate(Object entity, EntityState toState) {
+        EntityKey<?> entityKey = EntityKey.valueOf(entity);
+        validate(entityKey, toState);
     }
 
     @Override
