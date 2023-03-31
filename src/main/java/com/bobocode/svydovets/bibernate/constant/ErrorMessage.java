@@ -41,4 +41,13 @@ public final class ErrorMessage {
 
     public static final String SESSION_IS_CLOSED =
             "Session is closed (session must be in the opened state to perform any operation in the database)";
+
+    public static final String CLASS_HAS_MORE_THAN_ONE_VERSION =
+            "Entity '%s' has %d fields annotated with @Version "
+                    + "(every '@Entity' class must have zero or only one field annotated with @Version')";
+
+    public static final String CLASS_HAS_UNSUPPORTED_VERSION_TYPE =
+            "Entity '%s' has unsupported @Version type %s "
+                    + "('@Version' field in '@Entity' must have one of the supported types. "
+                    + "See supported types in '@Version' documentation')";
 }
