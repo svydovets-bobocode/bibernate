@@ -14,7 +14,7 @@ public class InsertActionIntegrationTest extends AbstractIntegrationTest {
     @Disabled
     void testInsertSuccessful() throws SQLException {
         var user = TestUserFactory.newDefaultUser();
-        Action insertAction = new InsertAction(dataSource.getConnection(), user);
+        Action insertAction = new InsertAction<>(dataSource.getConnection(), user);
         insertAction.execute();
 
         Assertions.assertEquals(2, user.getId());

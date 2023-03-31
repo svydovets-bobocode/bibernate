@@ -21,7 +21,6 @@ import java.util.HashMap;
 public abstract class AbstractIntegrationTest {
     protected static DataSource dataSource;
     protected Connection connection;
-    protected DeleteAction deleteAction;
     protected SearchService searchService;
 
     @BeforeAll
@@ -36,7 +35,6 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
-        deleteAction = new DeleteAction(connection);
         searchService = new SearchService(connection);
         createTables();
         insertIntoTables();
