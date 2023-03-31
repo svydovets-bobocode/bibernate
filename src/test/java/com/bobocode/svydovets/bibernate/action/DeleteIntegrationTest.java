@@ -4,6 +4,7 @@ import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactor
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.INVALID_ENTITY_KEY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;

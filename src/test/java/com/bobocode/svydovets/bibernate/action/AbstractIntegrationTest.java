@@ -1,6 +1,5 @@
 package com.bobocode.svydovets.bibernate.action;
 
-import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
@@ -20,7 +19,6 @@ public abstract class AbstractIntegrationTest {
     protected Connection connection;
     protected DeleteAction deleteAction;
     protected SearchService searchService;
-    protected SqlQueryBuilder sqlQueryBuilder;
 
     @BeforeAll
     static void beforeAll() {
@@ -34,7 +32,6 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
-        sqlQueryBuilder = new SqlQueryBuilder();
         deleteAction = new DeleteAction(connection);
         searchService = new SearchService(connection);
         createTable();

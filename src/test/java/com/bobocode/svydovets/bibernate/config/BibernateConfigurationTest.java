@@ -1,29 +1,25 @@
 package com.bobocode.svydovets.bibernate.config;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.session.SessionFactory;
-import com.bobocode.svydovets.bibernate.session.SessionImpl;
 import com.bobocode.svydovets.bibernate.testdata.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
-
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.getValidH2Properties;
+import static org.junit.jupiter.api.Assertions.*;
+
 public class BibernateConfigurationTest {
 
     private DataSource dataSource;
-    private SqlQueryBuilder sqlQueryBuilder;
 
     @BeforeEach
     public void setUp() {
@@ -105,16 +101,17 @@ public class BibernateConfigurationTest {
                                 (
                                     id           INT PRIMARY KEY,
                                     name         VARCHAR,
-                                    creationTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
-                                    phone_number VARCHAR
+                                    phone_number VARCHAR,
+                                    creationTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
                                 )
                                 """;
-                String insertDataSql = "INSERT INTO users (id, name) VALUES (1, 'Test')";
+                String insertDataSql = "INSERT INTO users (id, name, phone_number) VALUES (1, 'Test', '368716')";
 
                 statement.execute(createTableSql);
                 statement.execute(insertDataSql);
             }
-        }
+    }
+
     private void dropTestTable() {
         String dropTableUsers = "DROP TABLE users";
         try (var statement =
