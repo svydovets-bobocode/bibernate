@@ -55,14 +55,18 @@ public class SessionImpl implements Session {
     public <T> T find(Class<T> type, Object id) {
         verifySessionIsOpened();
 
-        EntityKey<T> key = EntityKey.of(type, id);
-        T entity = type.cast(entitiesCacheMap.computeIfAbsent(key, searchService::findOne));
+        EntityKey<T> entityKey = EntityKey.of(type, id);
+        T entity = type.cast(entitiesCacheMap.computeIfAbsent(entityKey, this::loadEntity));
 
-        // Todo: pls doublecheck if its logic is right? Mb we need to add this to snapshot everytime
-        //        entitiesSnapshotMap.computeIfAbsent(key, k ->
-        // EntityUtils.getFieldValuesFromEntity(entity));
         entityStateService.setEntityState(entity, MANAGED);
         return entity;
+    }
+
+    private <T> Object loadEntity(EntityKey<?> entityKey) {
+        Object loadedEntity = searchService.findOne(entityKey);
+        entitiesSnapshotMap.computeIfAbsent(
+                entityKey, k -> EntityUtils.getFieldValuesFromEntity(loadedEntity));
+        return loadedEntity;
     }
 
     @Override
@@ -88,18 +92,8 @@ public class SessionImpl implements Session {
     @Override
     public <T> Collection<T> findAll(Class<T> type) {
         verifySessionIsOpened();
-
         flush();
-
-        Map<EntityKey<T>, T> entityMap = searchService.findAllByType(type);
-        entityMap.forEach(
-                (key, value) -> {
-                    entitiesCacheMap.put(key, value);
-                    entitiesSnapshotMap.put(key, EntityUtils.getFieldValuesFromEntity(value));
-                    entityStateService.setEntityState(key, MANAGED);
-                });
-
-        return entityMap.values();
+        return searchService.findAllByType(type, entitiesCacheMap, entitiesSnapshotMap);
     }
 
     @Override

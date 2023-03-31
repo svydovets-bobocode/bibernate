@@ -5,6 +5,7 @@ import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveColumnNam
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveIdColumnName;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveTableName;
 
+import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,10 @@ class SqlQueryBuilder { // Todo: transform it to a abstract class or interface t
     private static final String SELECT_ALL_FROM_TABLE = "SELECT * FROM %s;";
     private static final String INSERT_INTO_TABLE = "INSERT INTO %s(%s) VALUES(%s);";
     private static final String DELETE_FROM_TABLE_BY_ID = "DELETE FROM %s WHERE %s = ?;";
+
+    private SqlQueryBuilder() {
+        throw new BibernateException("Utility SqlQueryBuilder should not be instantiated");
+    }
 
     public static String createSelectByIdQuery(Class<?> entityType) {
         String tableName = resolveTableName(entityType);
