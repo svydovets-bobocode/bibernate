@@ -31,8 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SessionImpl implements Session {
 
-    // todo: replace with Queue<Action>
-
     private final ActionQueue actionQueue = new ActionQueue();
     private final Connection connection;
     private final Transaction transaction;
