@@ -5,7 +5,10 @@ import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
 import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.getIdValue;
 
+import com.bobocode.svydovets.bibernate.action.ActionQueue;
 import com.bobocode.svydovets.bibernate.action.DeleteAction;
+import com.bobocode.svydovets.bibernate.action.InsertAction;
+import com.bobocode.svydovets.bibernate.action.UpdateAction;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
@@ -17,6 +20,7 @@ import com.bobocode.svydovets.bibernate.transaction.TransactionImpl;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
+import com.google.common.base.Preconditions;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -28,15 +32,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SessionImpl implements Session {
 
-    // todo: replace with Queue<Action>
-    private final DeleteAction deleteAction;
+    private final ActionQueue actionQueue = new ActionQueue();
     private final Connection connection;
     private final Transaction transaction;
     private final SearchService searchService;
     private final EntityStateService entityStateService;
 
     private final Map<EntityKey<?>, Object> entitiesCacheMap = new ConcurrentHashMap<>();
-    private final Map<EntityKey<?>, Object[]> entitiesSnapshotMap = new ConcurrentHashMap<>();
+    private final Map<EntityKey<?>, Map<String, Object>> entitiesSnapshotMap =
+            new ConcurrentHashMap<>();
 
     private final RequiredAnnotationValidatorProcessor validatorProcessor =
             new RequiredAnnotationValidatorProcessorImpl();
@@ -46,7 +50,6 @@ public class SessionImpl implements Session {
     public SessionImpl(Connection connection, SearchService searchService) {
         this.connection = connection;
         this.transaction = new TransactionImpl(connection);
-        this.deleteAction = new DeleteAction(this.connection);
         this.searchService = searchService;
         this.entityStateService = new EntityStateServiceImpl();
     }
@@ -72,7 +75,10 @@ public class SessionImpl implements Session {
     @Override
     public <T> T save(T entity) {
         verifySessionIsOpened();
-        entityStateService.setEntityState(entity, MANAGED);
+        EntityKey<?> entityKey = EntityKey.valueOf(entity);
+        actionQueue.addAction(entityKey, new InsertAction<>(this.connection, entity));
+        entitiesCacheMap.put(entityKey, entity);
+        entityStateService.setEntityState(entity, EntityState.MANAGED);
         return null;
     }
 
@@ -81,9 +87,7 @@ public class SessionImpl implements Session {
         verifySessionIsOpened();
         EntityKey<?> entityKey = EntityKey.valueOf(object);
 
-        // Todo: push it to Query action
-        deleteAction.execute(entityKey);
-
+        actionQueue.addAction(entityKey, new DeleteAction<>(this.connection, object));
         entitiesCacheMap.remove(entityKey);
         entitiesSnapshotMap.remove(entityKey);
         entityStateService.setEntityState(entityKey, REMOVED);
@@ -121,10 +125,7 @@ public class SessionImpl implements Session {
     @Override
     public <T> T merge(T entity) {
         verifySessionIsOpened();
-
-        if (entity == null) {
-            throw new IllegalArgumentException("Entity cannot be null.");
-        }
+        Preconditions.checkArgument(entity != null, "Entity cannot be null.");
 
         Class<T> entityType = (Class<T>) entity.getClass();
         validatorProcessor.validate(entityType);
@@ -148,6 +149,9 @@ public class SessionImpl implements Session {
         entitiesCacheMap.put(entityKey, managedEntity);
         entityStateService.setEntityState(entityKey, MANAGED);
 
+        UpdateAction<T> updateAction = new UpdateAction<>(connection, managedEntity);
+        actionQueue.addAction(entityKey, updateAction);
+
         return managedEntity;
     }
 
@@ -163,6 +167,8 @@ public class SessionImpl implements Session {
     @Override
     public void flush() {
         verifySessionIsOpened();
+        actionQueue.executeAll();
+        actionQueue.clear();
     }
 
     @Override

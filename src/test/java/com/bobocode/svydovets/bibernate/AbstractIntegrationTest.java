@@ -21,7 +21,6 @@ import java.util.HashMap;
 public abstract class AbstractIntegrationTest {
     protected static DataSource dataSource;
     protected Connection connection;
-    protected DeleteAction deleteAction;
     protected SearchService searchService;
 
     @BeforeAll

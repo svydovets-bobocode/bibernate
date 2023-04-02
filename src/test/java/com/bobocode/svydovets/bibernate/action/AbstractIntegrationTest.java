@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Tag;
 public abstract class AbstractIntegrationTest {
     protected static DataSource dataSource;
     protected Connection connection;
-    protected DeleteAction deleteAction;
     protected SearchService searchService;
 
     @BeforeAll
@@ -59,8 +58,11 @@ public abstract class AbstractIntegrationTest {
     }
 
     private void dropTable() throws SQLException {
-        String dropTableQuery = "DROP TABLE person";
-        PreparedStatement statement = connection.prepareStatement(dropTableQuery);
-        statement.executeUpdate();
+        String dropTableQuery = "DROP TABLE IF EXISTS %s";
+        String[] tables = {"person", "users"};
+        for (var table : tables) {
+            PreparedStatement statement = connection.prepareStatement(dropTableQuery.formatted(table));
+            statement.executeUpdate();
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.bobocode.svydovets.bibernate.action;
 
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ENTITY_KEY;
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.INVALID_ENTITY_KEY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -18,21 +17,14 @@ class DeleteIntegrationTest extends AbstractIntegrationTest {
     @Test
     void testDeleteById() {
         Person person = searchService.findOne(DEFAULT_ENTITY_KEY);
+        var deleteAction = new DeleteAction(connection, person);
 
-        deleteAction.execute(DEFAULT_ENTITY_KEY);
+        deleteAction.doExecute();
 
         assertNotNull(person);
         assertThrows(
                 BibernateException.class,
                 () -> searchService.findOne(DEFAULT_ENTITY_KEY),
                 "Unable to find entity: Person by id: 123");
-    }
-
-    @Test
-    void testDeleteByIdShouldThrowNotFoundException() {
-        assertThrows(
-                BibernateException.class,
-                () -> deleteAction.execute(INVALID_ENTITY_KEY),
-                "Unable to delete entity: Person by id: 123");
     }
 }

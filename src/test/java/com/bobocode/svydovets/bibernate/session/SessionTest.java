@@ -141,8 +141,7 @@ public class SessionTest {
         mockedEntityStateService = Mockito.mock(EntityStateServiceImpl.class);
         setInternalDependency(session, "entityStateService", mockedEntityStateService);
 
-        // todo: fix it. Returns null entity. Why magic 123L?
-        session.find(Person.class, 123L); // Put entity into cache
+        session.find(Person.class, DEFAULT_ID); // Put entity into cache
 
         // when
         Person mergedPerson = session.merge(detachedPerson);
