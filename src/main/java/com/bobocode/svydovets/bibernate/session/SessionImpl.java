@@ -1,14 +1,8 @@
 package com.bobocode.svydovets.bibernate.session;
 
-import static com.bobocode.svydovets.bibernate.state.EntityState.DETACHED;
-import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
-import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
-import static com.bobocode.svydovets.bibernate.util.EntityUtils.getIdValue;
-
 import com.bobocode.svydovets.bibernate.action.ActionQueue;
 import com.bobocode.svydovets.bibernate.action.DeleteAction;
 import com.bobocode.svydovets.bibernate.action.InsertAction;
-import com.bobocode.svydovets.bibernate.action.UpdateAction;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
@@ -17,10 +11,10 @@ import com.bobocode.svydovets.bibernate.state.EntityStateService;
 import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
 import com.bobocode.svydovets.bibernate.transaction.TransactionImpl;
-import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import com.google.common.base.Preconditions;
+
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,6 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.bobocode.svydovets.bibernate.state.EntityState.DETACHED;
+import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
+import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.getFieldValuesFromEntity;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.getIdValue;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.updateManagedEntityField;
 
 public class SessionImpl implements Session {
 
@@ -68,7 +69,7 @@ public class SessionImpl implements Session {
     private <T> Object loadEntity(EntityKey<?> entityKey) {
         Object loadedEntity = searchService.findOne(entityKey);
         entitiesSnapshotMap.computeIfAbsent(
-                entityKey, k -> EntityUtils.getFieldValuesFromEntity(loadedEntity));
+                entityKey, k -> getFieldValuesFromEntity(loadedEntity));
         return loadedEntity;
     }
 
@@ -138,19 +139,21 @@ public class SessionImpl implements Session {
         // If the entity is not in the cache, retrieve it from the database
         if (managedEntity == null) {
             managedEntity = searchService.findOne(entityKey);
+            entitiesSnapshotMap.put(entityKey, getFieldValuesFromEntity(managedEntity));
         }
 
         // Merge the states of the detached and managed entities
         for (Field field : entityType.getDeclaredFields()) {
-            EntityUtils.updateManagedEntityField(entity, managedEntity, field);
+            updateManagedEntityField(entity, managedEntity, field);
         }
 
         // Add the merged entity to the cache
         entitiesCacheMap.put(entityKey, managedEntity);
         entityStateService.setEntityState(entityKey, MANAGED);
 
-        UpdateAction<T> updateAction = new UpdateAction<>(connection, managedEntity);
-        actionQueue.addAction(entityKey, updateAction);
+        // todo: move it to the flush
+//        UpdateAction<T> updateAction = new UpdateAction<>(connection, managedEntity);
+//        actionQueue.addAction(entityKey, updateAction);
 
         return managedEntity;
     }
