@@ -5,7 +5,10 @@ import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
 import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.getIdValue;
 
+import com.bobocode.svydovets.bibernate.action.ActionQueue;
 import com.bobocode.svydovets.bibernate.action.DeleteAction;
+import com.bobocode.svydovets.bibernate.action.InsertAction;
+import com.bobocode.svydovets.bibernate.action.UpdateAction;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
@@ -29,7 +32,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SessionImpl implements Session {
 
     // todo: replace with Queue<Action>
-    private final DeleteAction deleteAction;
+
+    private final ActionQueue actionQueue = new ActionQueue();
     private final Connection connection;
     private final Transaction transaction;
     private final SearchService searchService;
@@ -46,7 +50,6 @@ public class SessionImpl implements Session {
     public SessionImpl(Connection connection, SearchService searchService) {
         this.connection = connection;
         this.transaction = new TransactionImpl(connection);
-        this.deleteAction = new DeleteAction(this.connection);
         this.searchService = searchService;
         this.entityStateService = new EntityStateServiceImpl();
     }
@@ -55,20 +58,27 @@ public class SessionImpl implements Session {
     public <T> T find(Class<T> type, Object id) {
         verifySessionIsOpened();
 
-        EntityKey<T> key = EntityKey.of(type, id);
-        T entity = type.cast(entitiesCacheMap.computeIfAbsent(key, searchService::findOne));
+        EntityKey<T> entityKey = EntityKey.of(type, id);
+        T entity = type.cast(entitiesCacheMap.computeIfAbsent(entityKey, this::loadEntity));
 
-        // Todo: pls doublecheck if its logic is right? Mb we need to add this to snapshot everytime
-        //        entitiesSnapshotMap.computeIfAbsent(key, k ->
-        // EntityUtils.getFieldValuesFromEntity(entity));
         entityStateService.setEntityState(entity, MANAGED);
         return entity;
+    }
+
+    private <T> Object loadEntity(EntityKey<?> entityKey) {
+        Object loadedEntity = searchService.findOne(entityKey);
+        entitiesSnapshotMap.computeIfAbsent(
+                entityKey, k -> EntityUtils.getFieldValuesFromEntity(loadedEntity));
+        return loadedEntity;
     }
 
     @Override
     public <T> T save(T entity) {
         verifySessionIsOpened();
-        entityStateService.setEntityState(entity, MANAGED);
+        EntityKey<?> entityKey = EntityKey.valueOf(entity);
+        actionQueue.addAction(entityKey, new InsertAction<>(this.connection, entity));
+        entitiesCacheMap.put(entityKey, entity);
+        entityStateService.setEntityState(entity, EntityState.MANAGED);
         return null;
     }
 
@@ -77,9 +87,7 @@ public class SessionImpl implements Session {
         verifySessionIsOpened();
         EntityKey<?> entityKey = EntityKey.valueOf(object);
 
-        // Todo: push it to Query action
-        deleteAction.execute(entityKey);
-
+        actionQueue.addAction(entityKey, new DeleteAction<>(this.connection, object));
         entitiesCacheMap.remove(entityKey);
         entitiesSnapshotMap.remove(entityKey);
         entityStateService.setEntityState(entityKey, REMOVED);
@@ -88,18 +96,8 @@ public class SessionImpl implements Session {
     @Override
     public <T> Collection<T> findAll(Class<T> type) {
         verifySessionIsOpened();
-
         flush();
-
-        Map<EntityKey<T>, T> entityMap = searchService.findAllByType(type);
-        entityMap.forEach(
-                (key, value) -> {
-                    entitiesCacheMap.put(key, value);
-                    entitiesSnapshotMap.put(key, EntityUtils.getFieldValuesFromEntity(value));
-                    entityStateService.setEntityState(key, MANAGED);
-                });
-
-        return entityMap.values();
+        return searchService.findAllByType(type, entitiesCacheMap, entitiesSnapshotMap);
     }
 
     @Override
@@ -154,6 +152,9 @@ public class SessionImpl implements Session {
         entitiesCacheMap.put(entityKey, managedEntity);
         entityStateService.setEntityState(entityKey, MANAGED);
 
+        UpdateAction<T> updateAction = new UpdateAction<>(connection, managedEntity);
+        actionQueue.addAction(entityKey, updateAction);
+
         return managedEntity;
     }
 
@@ -169,6 +170,8 @@ public class SessionImpl implements Session {
     @Override
     public void flush() {
         verifySessionIsOpened();
+        actionQueue.executeAll();
+        actionQueue.clear();
     }
 
     @Override

@@ -10,6 +10,6 @@ public record EntityKey<T>(Class<T> type, Object id) {
 
     public static <T> EntityKey<?> valueOf(T entity) {
         var id = EntityUtils.retrieveIdValue(entity);
-        return new EntityKey<>(entity.getClass(), id);
+        return new EntityKey<>(entity.getClass(), id.orElse(null));
     }
 }

@@ -15,14 +15,13 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 @Tag("integration")
 public abstract class AbstractIntegrationTest {
     protected static DataSource dataSource;
     protected Connection connection;
-    protected DeleteAction deleteAction;
     protected SearchService searchService;
-    protected SqlQueryBuilder sqlQueryBuilder;
 
     @BeforeAll
     static void beforeAll() {
@@ -36,8 +35,6 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
-        sqlQueryBuilder = new SqlQueryBuilder();
-        deleteAction = new DeleteAction(connection);
         searchService = new SearchService(connection);
         createTables();
         insertIntoTables();
@@ -67,7 +64,7 @@ public abstract class AbstractIntegrationTest {
     private void createUsersTable() throws SQLException {
         String createTableSql =
                 """
-                        CREATE TABLE users
+                        CREATE TABLE IF NOT EXISTS users
                         (
                             id           INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                             name         VARCHAR,
