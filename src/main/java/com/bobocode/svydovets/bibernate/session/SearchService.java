@@ -58,7 +58,7 @@ public class SearchService {
     public <T> List<T> findAllByType(
             Class<T> type,
             Map<EntityKey<?>, Object> entitiesCacheMap,
-            Map<EntityKey<?>, Object[]> entitiesSnapshotMap) {
+            Map<EntityKey<?>, Map<String, Object>> entitiesSnapshotMap) {
 
         validatorProcessor.validate(type, Operation.SELECT);
         List<T> retrievedEntities = new ArrayList<>();

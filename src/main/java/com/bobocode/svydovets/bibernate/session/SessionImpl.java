@@ -20,6 +20,7 @@ import com.bobocode.svydovets.bibernate.transaction.TransactionImpl;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
+import com.google.common.base.Preconditions;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -38,7 +39,8 @@ public class SessionImpl implements Session {
     private final EntityStateService entityStateService;
 
     private final Map<EntityKey<?>, Object> entitiesCacheMap = new ConcurrentHashMap<>();
-    private final Map<EntityKey<?>, Object[]> entitiesSnapshotMap = new ConcurrentHashMap<>();
+    private final Map<EntityKey<?>, Map<String, Object>> entitiesSnapshotMap =
+            new ConcurrentHashMap<>();
 
     private final RequiredAnnotationValidatorProcessor validatorProcessor =
             new RequiredAnnotationValidatorProcessorImpl();
@@ -123,10 +125,7 @@ public class SessionImpl implements Session {
     @Override
     public <T> T merge(T entity) {
         verifySessionIsOpened();
-
-        if (entity == null) {
-            throw new IllegalArgumentException("Entity cannot be null.");
-        }
+        Preconditions.checkArgument(entity != null, "Entity cannot be null.");
 
         Class<T> entityType = (Class<T>) entity.getClass();
         validatorProcessor.validate(entityType);
