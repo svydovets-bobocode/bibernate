@@ -1,25 +1,20 @@
 package com.bobocode.svydovets.bibernate.config;
 
-import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
-import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.action.AbstractIntegrationTest;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.session.SessionFactory;
 import com.bobocode.svydovets.bibernate.testdata.entity.User;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.getValidH2Properties;
-import static org.junit.jupiter.api.Assertions.*;
-import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.getValidH2Properties;
-import static org.junit.jupiter.api.Assertions.*;
-
-public class BibernateConfigurationTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BibernateConfigurationTest extends AbstractIntegrationTest {
 

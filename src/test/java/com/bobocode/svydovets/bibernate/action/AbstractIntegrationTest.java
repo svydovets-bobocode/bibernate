@@ -31,7 +31,6 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
-        deleteAction = new DeleteAction(connection);
         searchService = new SearchService(connection);
         createTable();
         insertIntoTable();

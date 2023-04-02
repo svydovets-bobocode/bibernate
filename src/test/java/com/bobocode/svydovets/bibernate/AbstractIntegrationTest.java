@@ -1,7 +1,5 @@
 package com.bobocode.svydovets.bibernate;
 
-import com.bobocode.svydovets.bibernate.action.DeleteAction;
-import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
@@ -15,7 +13,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 @Tag("integration")
 public abstract class AbstractIntegrationTest {
@@ -35,7 +32,6 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
-        deleteAction = new DeleteAction(connection);
         searchService = new SearchService(connection);
         createTables();
         insertIntoTables();
