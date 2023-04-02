@@ -1,6 +1,5 @@
 package com.bobocode.svydovets.bibernate.action;
 
-import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
@@ -18,9 +17,7 @@ import org.junit.jupiter.api.Tag;
 public abstract class AbstractIntegrationTest {
     protected static DataSource dataSource;
     protected Connection connection;
-    protected DeleteAction deleteAction;
     protected SearchService searchService;
-    protected SqlQueryBuilder sqlQueryBuilder;
 
     @BeforeAll
     static void beforeAll() {
@@ -34,8 +31,6 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
-        sqlQueryBuilder = new SqlQueryBuilder();
-        deleteAction = new DeleteAction(connection);
         searchService = new SearchService(connection);
         createTable();
         insertIntoTable();
@@ -62,8 +57,11 @@ public abstract class AbstractIntegrationTest {
     }
 
     private void dropTable() throws SQLException {
-        String dropTableQuery = "DROP TABLE person";
-        PreparedStatement statement = connection.prepareStatement(dropTableQuery);
-        statement.executeUpdate();
+        String dropTableQuery = "DROP TABLE IF EXISTS %s";
+        String[] tables = {"person", "users"};
+        for (var table : tables) {
+            PreparedStatement statement = connection.prepareStatement(dropTableQuery.formatted(table));
+            statement.executeUpdate();
+        }
     }
 }

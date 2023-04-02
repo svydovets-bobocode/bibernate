@@ -1,27 +1,27 @@
 package com.bobocode.svydovets.bibernate.action;
 
-import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.constant.Operation;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.ConnectionException;
+import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class DeleteAction {
+public class DeleteAction<T> extends AbstractAction<T> {
     private final RequiredAnnotationValidatorProcessor validatorProcessor;
-    private final Connection connection;
 
-    public DeleteAction(Connection connection) {
-        this.connection = connection;
+    public DeleteAction(Connection connection, T actionObject) {
+        super(connection, actionObject);
         this.validatorProcessor = new RequiredAnnotationValidatorProcessorImpl();
     }
 
-    public <T> void execute(EntityKey<T> entityKey) {
-        var type = entityKey.type();
-        var id = entityKey.id();
+    @Override
+    protected void doExecute() {
+        var id = EntityUtils.getIdValue(actionObject);
+        var type = actionObject.getClass();
         validatorProcessor.validate(type, Operation.DELETE);
         String deleteByIdQuery = SqlQueryBuilder.createDeleteByIdQuery(type);
         try (var statement = connection.prepareStatement(deleteByIdQuery)) {
@@ -33,5 +33,10 @@ public class DeleteAction {
         } catch (SQLException e) {
             throw new ConnectionException("Error while executing query %s".formatted(deleteByIdQuery), e);
         }
+    }
+
+    @Override
+    public ActionType getActionType() {
+        return ActionType.REMOVE;
     }
 }

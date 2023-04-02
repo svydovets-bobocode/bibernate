@@ -15,7 +15,9 @@ import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -163,6 +165,9 @@ public class EntityUtils {
     }
 
     public static <T> void updateManagedEntityField(T fromEntity, T toEntity, Field field) {
+        if (field.isAnnotationPresent(Id.class)) {
+            return;
+        }
         Object detachedValue = null;
         try {
             field.setAccessible(true);
@@ -181,13 +186,14 @@ public class EntityUtils {
         }
     }
 
-    public static <T> Object[] getFieldValuesFromEntity(T entity) {
+    public static <T> Map<String, Object> getFieldValuesFromEntity(T entity) {
         try {
             Field[] fields = entity.getClass().getDeclaredFields();
             return Arrays.stream(fields)
-                    .map(field -> retrieveValueFromField(entity, field))
-                    .map(Optional::orElseThrow)
-                    .toArray();
+                    .map(
+                            field ->
+                                    Map.entry(field.getName(), retrieveValueFromField(entity, field).orElseThrow()))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         } catch (Exception e) {
             throw new BibernateException(
                     String.format(ERROR_GETTING_FIELD_VALUES_FROM_ENTITY, entity.getClass().getName()), e);
