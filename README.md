@@ -139,118 +139,114 @@ svydovets.bibernate.driverClassName - String. The name of the JDBC Driver class 
 </details>
 
 > File must be on the path: `src/main/resources/`
->
-> #### Default Configuration
->
-> <details>
->
-> ```
-> BibernateConfiguration configuration = new BibernateConfiguration();
-> configuration.configure();
-> SessionFactory sessionFactory = configuration.buildSessionFactory();
-> ```
->
-> Default configuration should pick up file with name `bibernate.properties` from resources folder
->
-> <details>
-> <summary>Configuration bibernate.properties example</summary>
->
-> ```
-> svydovets.bibernate.driverClassName=org.postgresql.Driver
-> svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
-> svydovets.bibernate.db.username=sa
-> svydovets.bibernate.db.password=
-> ```
->
-> </details>
-> </details>
->
-> #### Property file
->
-> <details>
->
-> ```
-> PropertyFileConfiguration propertyFileConfiguration = new PropertyFileConfiguration("custom.properties");
-> BibernateConfiguration configuration = new BibernateConfiguration();
-> configuration.configure(propertyFileConfiguration);
-> SessionFactory sessionFactory = configuration.buildSessionFactory();
-> ```
->
-> Same as default, but with custom file name.
->
-> <details>
-> <summary>Configuration custom_file_name.properties example</summary>
->
-> ```
-> svydovets.bibernate.driverClassName=org.postgresql.Driver
-> svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
-> svydovets.bibernate.db.username=sa
-> svydovets.bibernate.db.password=
-> ```
->
-> </details>
-> </details>
->
-> #### Xml configuration
->
-> <details>
->
-> ```
-> XmlFileConfiguration xmlFileConfiguration = new XmlFileConfiguration("custom_file_name.xml");
-> BibernateConfiguration configuration = new BibernateConfiguration();
-> configuration.configure(xmlFileConfiguration);
-> SessionFactory sessionFactory = configuration.buildSessionFactory();
-> ```
->
-> Get properties from xml.
->
-> <details>
-> <summary>Configuration custom_file_name.xml example</summary>
->
-> ```
-> <?xml version="1.0" encoding="UTF-8"?>
-> <configuration>
->    <property name="svydovets.bibernate.driverClassName">org.postgresql.Driver</property>
->    <property name="svydovets.bibernate.db.url">jdbc:postgresql://localhost:5432/testdatabase</property>
->    <property name="svydovets.bibernate.db.username">testuser</property>
->    <property name="svydovets.bibernate.db.password">testpassword</property>
-> </configuration>
-> ```
->
-> </details>
-> </details>
->
-> #### Java configuration
->
-> <details>
->
-> ```
-> Map<String, String> propertiesMap = new HashMap<>();
-> propertiesMap.put("property.key", "property.value");
-> JavaConfiguration mapConfiguration = new JavaConfiguration(propertiesMap);
-> BibernateConfiguration configuration = new BibernateConfiguration();
-> configuration.configure(mapConfiguration);
-> SessionFactory sessionFactory = configuration.buildSessionFactory();
-> ```
->
-> Get properties from Hash Map.
->
-> <details>
-> <summary>Configuration java properties example</summary>
->
-> ```
-> HashMap<String, String> properties = new HashMap<>();
-> properties.put("svydovets.bibernate.driverClassName", POSTGRES_DRIVER_CLASS_NAME);
-> properties.put("svydovets.bibernate.db.url", POSTGRES_DB_URL);
-> properties.put("svydovets.bibernate.db.username", POSTGRES_DB_USERNAME);
-> properties.put("svydovets.bibernate.db.password", POSTGRES_DB_PASSWORD);
-> new JavaConfiguration(properties);
-> ```
->
-> </details>
-> </details>
->
-  ### Session factory
+
+ <details>
+ <summary>Default Configuration</summary>
+
+```
+BibernateConfiguration configuration = new BibernateConfiguration();
+configuration.configure();
+SessionFactory sessionFactory = configuration.buildSessionFactory();
+```
+
+Default configuration should pick up file with name `bibernate.properties` from resources folder
+
+ <details>
+ <summary>Configuration bibernate.properties example</summary>
+
+```
+svydovets.bibernate.driverClassName=org.postgresql.Driver
+svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+svydovets.bibernate.db.username=sa
+svydovets.bibernate.db.password=
+```
+
+ </details>
+ </details>
+
+ <details>
+ <summary>Property file</summary>
+
+```
+PropertyFileConfiguration propertyFileConfiguration = new PropertyFileConfiguration("custom.properties");
+BibernateConfiguration configuration = new BibernateConfiguration();
+configuration.configure(propertyFileConfiguration);
+SessionFactory sessionFactory = configuration.buildSessionFactory();
+```
+
+Same as default, but with custom file name.
+
+ <details>
+ <summary>Configuration custom_file_name.properties example</summary>
+
+```
+svydovets.bibernate.driverClassName=org.postgresql.Driver
+svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+svydovets.bibernate.db.username=sa
+svydovets.bibernate.db.password=
+```
+
+ </details>
+ </details>
+
+ <details>
+ <summary>Xml configuration</summary>
+
+```
+XmlFileConfiguration xmlFileConfiguration = new XmlFileConfiguration("custom_file_name.xml");
+BibernateConfiguration configuration = new BibernateConfiguration();
+configuration.configure(xmlFileConfiguration);
+SessionFactory sessionFactory = configuration.buildSessionFactory();
+```
+
+Get properties from xml.
+
+ <details>
+ <summary>Configuration custom_file_name.xml example</summary>
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+   <property name="svydovets.bibernate.driverClassName">org.postgresql.Driver</property>
+   <property name="svydovets.bibernate.db.url">jdbc:postgresql://localhost:5432/testdatabase</property>
+   <property name="svydovets.bibernate.db.username">testuser</property>
+   <property name="svydovets.bibernate.db.password">testpassword</property>
+</configuration>
+```
+
+ </details>
+ </details>
+
+ <details>
+ <summary>Java configuration</summary>
+
+```
+Map<String, String> propertiesMap = new HashMap<>();
+propertiesMap.put("property.key", "property.value");
+JavaConfiguration mapConfiguration = new JavaConfiguration(propertiesMap);
+BibernateConfiguration configuration = new BibernateConfiguration();
+configuration.configure(mapConfiguration);
+SessionFactory sessionFactory = configuration.buildSessionFactory();
+```
+
+Get properties from Hash Map.
+
+ <details>
+ <summary>Configuration java properties example</summary>
+
+```
+HashMap<String, String> properties = new HashMap<>();
+properties.put("svydovets.bibernate.driverClassName", POSTGRES_DRIVER_CLASS_NAME);
+properties.put("svydovets.bibernate.db.url", POSTGRES_DB_URL);
+properties.put("svydovets.bibernate.db.username", POSTGRES_DB_USERNAME);
+properties.put("svydovets.bibernate.db.password", POSTGRES_DB_PASSWORD);
+new JavaConfiguration(properties);
+```
+
+ </details>
+ </details>
+
+### Session factory
 
 ---
 
@@ -403,23 +399,23 @@ public class Employee {
 
 </details>
 
-In Bibernate, entities can exist in different states depending on their lifecycle:
+In Bibernate, entities can exist in different [`states`](src/main/java/com/bobocode/svydovets/bibernate/state/EntityStateService.java) depending on their lifecycle:
 
 - **Transient**: An entity is in the transient state if it has just been instantiated and is not associated with a
   Bibernate Session.
   In this state, the entity is not yet mapped to any database record.
 
-- **Persistent state**: An entity is in the persistent state if it has been associated with a Bibernate Session.
+- **Persistent**: An entity is in the persistent state if it has been associated with a Bibernate Session.
   In this state, Bibernate tracks changes made to the entity and synchronizes them with the database when a transaction
   is committed.
 
-- **Detached state**: An entity is in the detached state if it was previously associated with a Bibernate Session but is
+- **Detached**: An entity is in the detached state if it was previously associated with a Bibernate Session but is
   no longer in that state.
   This can happen when a Session is closed, or when an entity is explicitly detached from a Session.
   In this state, the entity is still mapped to a database record, but changes made to the entity are not automatically
   synchronized with the database.
 
-- **Removed state**: An entity is in the removed state if it has been marked for deletion using the Session.delete()
+- **Removed**: An entity is in the removed state if it has been marked for deletion using the Session.delete()
   method.
   In this state, the entity is still associated with the Bibernate Session,
   but will be deleted from the database when the transaction is committed.
