@@ -50,7 +50,7 @@ Or follow these steps:
 #### Datasource configuration file `src/main/resources/bibernate.properties` example:
 
 ```markdown
-svydovets.bibernate.driverClassName=org.h2.Driver
+svydovets.bibernate.driverClassName=org.postgresql.Driver
 svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
 svydovets.bibernate.db.username=sa
 svydovets.bibernate.db.password=
@@ -151,7 +151,7 @@ svydovets.bibernate.driverClassName - String. The name of the JDBC Driver class 
 > <summary>Configuration bibernate.properties example</summary>
 >
 > ```
-> svydovets.bibernate.driverClassName=org.h2.Driver
+> svydovets.bibernate.driverClassName=org.postgresql.Driver
 > svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
 > svydovets.bibernate.db.username=sa
 > svydovets.bibernate.db.password=
@@ -177,7 +177,7 @@ svydovets.bibernate.driverClassName - String. The name of the JDBC Driver class 
 > <summary>Configuration custom_file_name.properties example</summary>
 >
 > ```
-> svydovets.bibernate.driverClassName=org.h2.Driver
+> svydovets.bibernate.driverClassName=org.postgresql.Driver
 > svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
 > svydovets.bibernate.db.username=sa
 > svydovets.bibernate.db.password=
