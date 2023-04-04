@@ -35,6 +35,12 @@ public enum EntityStateTransition {
                         toMap(EntityStateTransition::getFromState, EntityStateTransition::getToEntityStates));
     }
 
+    /**
+     * Returns the available states to which entity can change the current state.
+     *
+     * @param entityState entity state.
+     * @return set of available states.
+     */
     public static Set<EntityState> getAvailableEntityTransitionStates(EntityState entityState) {
         return TRANSITION_STATE.get(entityState);
     }
