@@ -9,8 +9,7 @@ import com.bobocode.svydovets.bibernate.exception.EntityStateValidationException
 import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.validation.EntityStateTransitionValidator;
 
-public class EntityStateTransitionTransitionValidatorImpl
-        implements EntityStateTransitionValidator {
+public class EntityStateTransitionValidatorImpl implements EntityStateTransitionValidator {
 
     @Override
     public void validate(EntityState fromState, EntityState toState) {

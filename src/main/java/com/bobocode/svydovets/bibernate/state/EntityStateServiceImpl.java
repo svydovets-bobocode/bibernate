@@ -6,7 +6,7 @@ import static java.util.Objects.nonNull;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.exception.EntityStateValidationException;
 import com.bobocode.svydovets.bibernate.validation.EntityStateTransitionValidator;
-import com.bobocode.svydovets.bibernate.validation.state.EntityStateTransitionTransitionValidatorImpl;
+import com.bobocode.svydovets.bibernate.validation.state.EntityStateTransitionValidatorImpl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
@@ -20,7 +20,7 @@ public class EntityStateServiceImpl implements EntityStateService {
     EntityStateTransitionValidator entityStateTransitionValidator;
 
     public EntityStateServiceImpl() {
-        this.entityStateTransitionValidator = new EntityStateTransitionTransitionValidatorImpl();
+        this.entityStateTransitionValidator = new EntityStateTransitionValidatorImpl();
     }
 
     @Override
