@@ -50,7 +50,9 @@ public interface EntityStateService {
     void validate(EntityKey<?> entityKey, EntityState toState);
 
     /**
-     * Validate if an Entity state by entity key is in currentState and can be changed to passed state.
+     * Validate if an Entity state by entity key is in currentState and can be changed to passed
+     * state.
+     *
      * @param entityKey entityKey object that represents a unique entity {@link EntityKey}
      * @param desiredState represent desired state for an entity.
      * @param toState an Entity state to be changed to on Entity object.
