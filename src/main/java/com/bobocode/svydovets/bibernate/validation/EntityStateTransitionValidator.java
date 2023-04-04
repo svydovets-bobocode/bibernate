@@ -3,7 +3,7 @@ package com.bobocode.svydovets.bibernate.validation;
 import com.bobocode.svydovets.bibernate.state.EntityState;
 
 /** Entity state validator. Validates state transition from one state to another. */
-public interface EntityStateValidator {
+public interface EntityStateTransitionValidator {
 
     /**
      * Validates if it allowed to change an entity from one state to another state.

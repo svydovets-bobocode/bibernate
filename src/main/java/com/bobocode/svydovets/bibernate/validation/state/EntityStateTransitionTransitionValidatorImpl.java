@@ -7,16 +7,23 @@ import static java.util.Objects.isNull;
 
 import com.bobocode.svydovets.bibernate.exception.EntityStateValidationException;
 import com.bobocode.svydovets.bibernate.state.EntityState;
-import com.bobocode.svydovets.bibernate.validation.EntityStateValidator;
+import com.bobocode.svydovets.bibernate.validation.EntityStateTransitionValidator;
 
-public class EntityStateValidatorImpl implements EntityStateValidator {
+public class EntityStateTransitionTransitionValidatorImpl
+        implements EntityStateTransitionValidator {
 
     @Override
     public void validate(EntityState fromState, EntityState toState) {
         if (isNonAvailableTransition(fromState, toState)) {
-            throw new EntityStateValidationException(
-                    format("Can't change entity state from %s to %s", fromState.name(), toState.name()));
+            throw new EntityStateValidationException(getFormattedMessage(fromState, toState));
         }
+    }
+
+    private static String getFormattedMessage(EntityState fromState, EntityState toState) {
+        if (isNull(fromState)) {
+            return format("Can't change entity state from TRANSIENT to %s", toState);
+        }
+        return format("Can't change entity state from %s to %s", fromState, toState);
     }
 
     private static boolean isNonAvailableTransition(EntityState fromState, EntityState toState) {
