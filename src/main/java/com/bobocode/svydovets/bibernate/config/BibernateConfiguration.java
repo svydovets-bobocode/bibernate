@@ -1,6 +1,5 @@
 package com.bobocode.svydovets.bibernate.config;
 
-import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
 import com.bobocode.svydovets.bibernate.session.SessionFactory;
 import com.bobocode.svydovets.bibernate.session.SessionFactoryImpl;
@@ -16,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BibernateConfiguration {
     private ConfigurationSource source;
     private DataSource dataSource = null;
-    private final SqlQueryBuilder sqlQueryBuilder = new SqlQueryBuilder();
 
     /**
      * Configures Bibernate with default configuration settings. Default configuration is read from
@@ -53,10 +51,7 @@ public class BibernateConfiguration {
             throw new IllegalStateException(
                     "Configuration source must be set before building the SessionFactory.");
         }
-        log.info(
-                "Building SessionFactory with DataSource: {} and SqlQueryBuilder: {}",
-                dataSource,
-                sqlQueryBuilder);
-        return SessionFactoryImpl.getInstance(dataSource, sqlQueryBuilder);
+        log.info("Building SessionFactory with DataSource: {}", dataSource);
+        return SessionFactoryImpl.getInstance(dataSource);
     }
 }

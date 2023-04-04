@@ -11,14 +11,13 @@ import org.junit.jupiter.api.Test;
 
 @Tag("unit")
 class SqlQueryBuilderTest {
-    private final SqlQueryBuilder sqlBuilder = new SqlQueryBuilder();
 
     @Test
     @DisplayName("Create Select by Id Query")
     void createSelectByIdQuery() {
         // given
         // when
-        var selectByIdQuery = sqlBuilder.createSelectByIdQuery(User.class);
+        var selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(User.class);
         // then
         assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ?;");
     }
@@ -28,7 +27,7 @@ class SqlQueryBuilderTest {
     void createSelectByIdQueryWhenTableNameIsExplicitlySpecified() {
         // given
         // when
-        var selectByIdQuery = sqlBuilder.createSelectByIdQuery(Person.class);
+        var selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(Person.class);
         // then
         assertThat(selectByIdQuery).isEqualTo("SELECT * FROM person WHERE id = ?;");
     }
@@ -38,7 +37,7 @@ class SqlQueryBuilderTest {
     void createSelectAllQuery() {
         // given
         // when
-        var selectAllQuery = sqlBuilder.createSelectAllQuery(User.class);
+        var selectAllQuery = SqlQueryBuilder.createSelectAllQuery(User.class);
         // then
         assertThat(selectAllQuery).isEqualTo("SELECT * FROM users;");
     }
@@ -48,7 +47,7 @@ class SqlQueryBuilderTest {
     void createSelectAllQueryWhenTableNameIsExplicitlySpecified() {
         // given
         // when
-        var selectByAllQuery = sqlBuilder.createSelectAllQuery(Person.class);
+        var selectByAllQuery = SqlQueryBuilder.createSelectAllQuery(Person.class);
         // then
         assertThat(selectByAllQuery).isEqualTo("SELECT * FROM person;");
     }

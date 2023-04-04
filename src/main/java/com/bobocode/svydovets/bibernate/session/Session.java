@@ -21,8 +21,8 @@ public interface Session {
 
     /**
      * Merges the state of the given entity with the current state of a managed entity in the
-     * persistence context. If the given entity is transient, it will be saved as a new entity. If the
-     * given entity is detached, the state of the entity will be updated to match the given entity.
+     * persistence context. If the given entity is detached, the state of the entity will be updated
+     * to match the given entity.
      *
      * @param <T> The type of the entity being merged.
      * @param entity The entity to be merged. Must not be {@code null}.

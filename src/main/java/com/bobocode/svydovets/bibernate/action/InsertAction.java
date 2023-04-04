@@ -13,9 +13,9 @@ import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class InsertAction extends AbstractAction {
+public class InsertAction<T> extends AbstractAction<T> {
 
-    public InsertAction(Connection connection, Object actionObject) {
+    public InsertAction(Connection connection, T actionObject) {
         super(connection, actionObject);
     }
 
@@ -34,11 +34,7 @@ public class InsertAction extends AbstractAction {
 
             // TODO: validate if ID already present
 
-            for (int i = 0; i < insertableFields.length; i++) {
-                Field declaredField = insertableFields[i];
-                preparedStatement.setObject(
-                        i + 1, EntityUtils.retrieveValueFromField(actionObject, declaredField));
-            }
+            setFieldsInPreparedStatement(preparedStatement, insertableFields);
             preparedStatement.execute();
 
             preparedStatement.getGeneratedKeys().next();
