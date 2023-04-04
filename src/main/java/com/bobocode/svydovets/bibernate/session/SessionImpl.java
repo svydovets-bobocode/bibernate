@@ -1,8 +1,18 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import static com.bobocode.svydovets.bibernate.state.EntityState.DETACHED;
+import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
+import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.convertFieldValuesMapToSnapshotArray;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.getFieldValuesFromEntity;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.getIdValue;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.getSnapshotArrayForEntity;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.updateManagedEntityField;
+
 import com.bobocode.svydovets.bibernate.action.ActionQueue;
 import com.bobocode.svydovets.bibernate.action.DeleteAction;
 import com.bobocode.svydovets.bibernate.action.InsertAction;
+import com.bobocode.svydovets.bibernate.action.UpdateAction;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
@@ -14,23 +24,18 @@ import com.bobocode.svydovets.bibernate.transaction.TransactionImpl;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessor;
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import com.google.common.base.Preconditions;
-
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import lombok.extern.slf4j.Slf4j;
 
-import static com.bobocode.svydovets.bibernate.state.EntityState.DETACHED;
-import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
-import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
-import static com.bobocode.svydovets.bibernate.util.EntityUtils.getFieldValuesFromEntity;
-import static com.bobocode.svydovets.bibernate.util.EntityUtils.getIdValue;
-import static com.bobocode.svydovets.bibernate.util.EntityUtils.updateManagedEntityField;
-
+@Slf4j
 public class SessionImpl implements Session {
 
     private final ActionQueue actionQueue = new ActionQueue();
@@ -68,8 +73,7 @@ public class SessionImpl implements Session {
 
     private <T> Object loadEntity(EntityKey<?> entityKey) {
         Object loadedEntity = searchService.findOne(entityKey);
-        entitiesSnapshotMap.computeIfAbsent(
-                entityKey, k -> getFieldValuesFromEntity(loadedEntity));
+        entitiesSnapshotMap.computeIfAbsent(entityKey, k -> getFieldValuesFromEntity(loadedEntity));
         return loadedEntity;
     }
 
@@ -151,10 +155,6 @@ public class SessionImpl implements Session {
         entitiesCacheMap.put(entityKey, managedEntity);
         entityStateService.setEntityState(entityKey, MANAGED);
 
-        // todo: move it to the flush
-//        UpdateAction<T> updateAction = new UpdateAction<>(connection, managedEntity);
-//        actionQueue.addAction(entityKey, updateAction);
-
         return managedEntity;
     }
 
@@ -170,6 +170,7 @@ public class SessionImpl implements Session {
     @Override
     public void flush() {
         verifySessionIsOpened();
+        performDirtyChecking();
         actionQueue.executeAll();
         actionQueue.clear();
     }
@@ -209,5 +210,24 @@ public class SessionImpl implements Session {
     @Override
     public EntityState getEntityState(Object entity) {
         return entityStateService.getEntityState(entity);
+    }
+
+    private void performDirtyChecking() {
+        log.trace("Starting dirty checking...");
+        for (EntityKey<?> entityKey : entitiesCacheMap.keySet()) {
+            Object currentEntity = entitiesCacheMap.get(entityKey);
+            Object[] currentEntitySnapshot = getSnapshotArrayForEntity(currentEntity);
+
+            Map<String, Object> initialFieldValuesMap = entitiesSnapshotMap.get(entityKey);
+            Object[] initialEntitySnapshot = convertFieldValuesMapToSnapshotArray(initialFieldValuesMap);
+
+            log.debug("Comparing snapshots: {} | {}", initialEntitySnapshot, currentEntitySnapshot);
+            if (!Arrays.equals(currentEntitySnapshot, initialEntitySnapshot)) {
+                log.trace("Snapshots are not equal, found dirty entity {}", currentEntity);
+                log.trace("Creating the update action...");
+                UpdateAction<?> updateAction = new UpdateAction<>(connection, currentEntity);
+                actionQueue.addAction(entityKey, updateAction);
+            }
+        }
     }
 }
