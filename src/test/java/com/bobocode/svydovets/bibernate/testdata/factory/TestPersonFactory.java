@@ -27,4 +27,12 @@ public class TestPersonFactory {
         person.setLastName(DEFAULT_LAST_NAME);
         return person;
     }
+
+    public static Person newOtherPerson() {
+        Person person = new Person();
+        person.setId(OTHER_ID);
+        person.setFirstName(OTHER_FIRST_NAME);
+        person.setLastName(OTHER_LAST_NAME);
+        return person;
+    }
 }
