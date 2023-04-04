@@ -27,7 +27,7 @@ Or follow these steps:
 3. ```mvn clean install -DskipTests```
 4. add as a dependency
 
-```
+```xml
 <dependency>
    <groupId>com.bobocode.svydovets</groupId>
    <artifactId>bring-svydovets</artifactId>
@@ -44,12 +44,9 @@ Or follow these steps:
 3. Create [session factory](#session-factory)
 4. Create [session](#session)
 
-<details>
-<summary>Start example</summary>
-
 #### Datasource configuration file `src/main/resources/bibernate.properties` example:
 
-```markdown
+```properties
 svydovets.bibernate.driverClassName=org.postgresql.Driver
 svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
 svydovets.bibernate.db.username=sa
@@ -99,8 +96,6 @@ public class StartExample {
 }
 ```
 
-</details>
-
 ## Features
 
 ---
@@ -129,7 +124,7 @@ custom ConfigurationSource.
 <details>
 <summary>Configuration properties name description</summary>
 
-```markdown
+```properties
 svydovets.bibernate.db.url - string. The JDBC connection url
 svydovets.bibernate.db.username - string. The JDBC connection user name
 svydovets.bibernate.db.password - string. The JDBC connection user password
@@ -138,12 +133,10 @@ svydovets.bibernate.driverClassName - String. The name of the JDBC Driver class 
 
 </details>
 
-> File must be on the path: `src/main/resources/`
-
  <details>
  <summary>Default Configuration</summary>
 
-```
+```java
 BibernateConfiguration configuration = new BibernateConfiguration();
 configuration.configure();
 SessionFactory sessionFactory = configuration.buildSessionFactory();
@@ -151,10 +144,12 @@ SessionFactory sessionFactory = configuration.buildSessionFactory();
 
 Default configuration should pick up file with name `bibernate.properties` from resources folder
 
+> File must be on the path: `src/main/resources/`
+
  <details>
  <summary>Configuration bibernate.properties example</summary>
 
-```
+```properties
 svydovets.bibernate.driverClassName=org.postgresql.Driver
 svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
 svydovets.bibernate.db.username=sa
@@ -165,9 +160,9 @@ svydovets.bibernate.db.password=
  </details>
 
  <details>
- <summary>Property file</summary>
+ <summary>Properties configuration</summary>
 
-```
+```java
 PropertyFileConfiguration propertyFileConfiguration = new PropertyFileConfiguration("custom.properties");
 BibernateConfiguration configuration = new BibernateConfiguration();
 configuration.configure(propertyFileConfiguration);
@@ -176,10 +171,12 @@ SessionFactory sessionFactory = configuration.buildSessionFactory();
 
 Same as default, but with custom file name.
 
+> File must be on the path: `src/main/resources/`
+
  <details>
  <summary>Configuration custom_file_name.properties example</summary>
 
-```
+```properties
 svydovets.bibernate.driverClassName=org.postgresql.Driver
 svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
 svydovets.bibernate.db.username=sa
@@ -192,7 +189,7 @@ svydovets.bibernate.db.password=
  <details>
  <summary>Xml configuration</summary>
 
-```
+```java
 XmlFileConfiguration xmlFileConfiguration = new XmlFileConfiguration("custom_file_name.xml");
 BibernateConfiguration configuration = new BibernateConfiguration();
 configuration.configure(xmlFileConfiguration);
@@ -201,10 +198,12 @@ SessionFactory sessionFactory = configuration.buildSessionFactory();
 
 Get properties from xml.
 
+> File must be on the path: `src/main/resources/`
+
  <details>
  <summary>Configuration custom_file_name.xml example</summary>
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
    <property name="svydovets.bibernate.driverClassName">org.postgresql.Driver</property>
@@ -220,7 +219,7 @@ Get properties from xml.
  <details>
  <summary>Java configuration</summary>
 
-```
+```java
 Map<String, String> propertiesMap = new HashMap<>();
 propertiesMap.put("property.key", "property.value");
 JavaConfiguration mapConfiguration = new JavaConfiguration(propertiesMap);
@@ -234,7 +233,7 @@ Get properties from Hash Map.
  <details>
  <summary>Configuration java properties example</summary>
 
-```
+```java
 HashMap<String, String> properties = new HashMap<>();
 properties.put("svydovets.bibernate.driverClassName", POSTGRES_DRIVER_CLASS_NAME);
 properties.put("svydovets.bibernate.db.url", POSTGRES_DB_URL);
@@ -376,7 +375,7 @@ To use a Java class as a Bibernate entity, the class must meet certain requireme
 
 <details>
 
-```
+```java
 // Entity is required to be marked with @Entity
 @Entity
 @Table(name = "employees")
@@ -453,8 +452,9 @@ Transaction can be started using the `begin()` method and can be committed using
 If an error occurs during the transaction, it can be rolled back using the `rollback()` method.
 
 <details>
+<summary>Example</summary>
 
-```
+```java
 try {
     session.begin();
     saveDefaultPersonIntoDb();
