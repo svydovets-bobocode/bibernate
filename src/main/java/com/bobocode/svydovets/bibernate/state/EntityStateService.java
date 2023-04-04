@@ -37,7 +37,7 @@ public interface EntityStateService {
      * EntityState}
      *
      * @param entity entity object.
-     * @param toState an Entity state to be change to on Entity object.
+     * @param toState an Entity state to be changed to on Entity object.
      */
     void setEntityState(Object entity, EntityState toState);
 
@@ -61,7 +61,7 @@ public interface EntityStateService {
      * Validates if an Entity by Entity Key can be changed to passed state {@link EntityState}.
      *
      * @param entity entity object
-     * @param toState an Entity state to be change to on Entity object.
+     * @param toState an Entity state to be changed to on Entity object.
      */
     void validate(Object entity, EntityState toState);
 
