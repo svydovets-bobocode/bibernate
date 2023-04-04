@@ -39,8 +39,8 @@ public interface Session {
     void delete(Object object);
 
     /**
-     * Find all instances by type. Search for an entity only by specified class. If the
-     * entity instance is contained in the cache, it is returned from there.
+     * Find all instances by type. Search for an entity only by specified class. If the entity
+     * instance is contained in the cache, it is returned from there.
      *
      * @param type entity class
      * @return the found entity instances or empty collection if the entity does not exist
@@ -50,8 +50,8 @@ public interface Session {
     <T> List<T> findAll(Class<T> type, Map<String, Object> properties);
 
     /**
-     * End the session by releasing the JDBC connection and cleaning up.
-     * Under the hood calls a {@link Session#flush()} and clear cache.
+     * End the session by releasing the JDBC connection and cleaning up. Under the hood calls a {@link
+     * Session#flush()} and clear cache.
      *
      * @throws BibernateException If indicates problems cleaning up.
      * @throws BibernateException If after session closed and when any method is called.
@@ -82,8 +82,8 @@ public interface Session {
 
     /**
      * Force this session to flush. Must be called at the end of a unit of work, before the
-     * transaction is committed. Depending on the current, the session automatically flush when
-     * {@link Transaction#commit()} is called, and it is not necessary to call this method directly.
+     * transaction is committed. Depending on the current, the session automatically flush when {@link
+     * Transaction#commit()} is called, and it is not necessary to call this method directly.
      *
      * <p><em>Flushing</em> is the process of synchronizing the underlying persistent store with
      * persistable state held in memory.
