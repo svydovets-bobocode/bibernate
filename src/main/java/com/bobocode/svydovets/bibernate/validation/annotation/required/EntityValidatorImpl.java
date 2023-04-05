@@ -8,6 +8,7 @@ public class EntityValidatorImpl extends AbstractRequiredValidator {
     @Override
     public void validateEntity(Class<?> type) {
         EntityUtils.checkIsEntity(type);
+        EntityUtils.checkRelationsConfiguration(type);
     }
 
     @Override
