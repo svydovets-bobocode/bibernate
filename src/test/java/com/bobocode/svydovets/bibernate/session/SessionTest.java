@@ -131,7 +131,6 @@ public class SessionTest {
 
     @Test
     @DisplayName("Merge Detached Entity When Entity In Cache")
-    @Disabled
     void mergeDetachedEntityWhenEntityInCache() {
         // given
         Person detachedPerson = newDefaultPerson();
@@ -216,6 +215,4 @@ public class SessionTest {
         setValueToField(session, field, dependency);
     }
 
-    @AfterEach
-    void tearDown() {}
 }
