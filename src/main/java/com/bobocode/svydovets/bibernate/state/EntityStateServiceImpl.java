@@ -1,11 +1,12 @@
 package com.bobocode.svydovets.bibernate.state;
 
-import static com.bobocode.svydovets.bibernate.state.EntityState.TRANSIENT;
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
-import com.bobocode.svydovets.bibernate.validation.EntityStateValidator;
-import com.bobocode.svydovets.bibernate.validation.state.EntityStateValidatorImpl;
+import com.bobocode.svydovets.bibernate.exception.EntityStateValidationException;
+import com.bobocode.svydovets.bibernate.validation.EntityStateTransitionValidator;
+import com.bobocode.svydovets.bibernate.validation.state.EntityStateTransitionValidatorImpl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
@@ -16,10 +17,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EntityStateServiceImpl implements EntityStateService {
     Map<EntityKey<?>, EntityState> entityStateMap = new ConcurrentHashMap<>();
-    EntityStateValidator entityStateValidator;
+    EntityStateTransitionValidator entityStateTransitionValidator;
 
     public EntityStateServiceImpl() {
-        this.entityStateValidator = new EntityStateValidatorImpl();
+        this.entityStateTransitionValidator = new EntityStateTransitionValidatorImpl();
     }
 
     @Override
@@ -39,30 +40,8 @@ public class EntityStateServiceImpl implements EntityStateService {
     @Override
     public void setEntityState(EntityKey<?> entityKey, EntityState toState) {
         EntityState existEntityState = entityStateMap.get(entityKey);
-        validate(existEntityState, toState);
+        entityStateTransitionValidator.validate(existEntityState, toState);
         entityStateMap.put(entityKey, toState);
-    }
-
-    @Override
-    public void validate(EntityState fromState, EntityState toState) {
-        if (nonNull(fromState)) {
-            entityStateValidator.validate(fromState, toState);
-        } else {
-            entityStateValidator.validate(TRANSIENT, toState);
-        }
-    }
-
-    @Override
-    public void validate(Object entity, EntityState toState) {
-        EntityKey<?> entityKey = EntityKey.valueOf(entity);
-        EntityState existEntityState = getEntityState(entityKey);
-        validate(existEntityState, toState);
-    }
-
-    @Override
-    public void validate(EntityKey<?> entityKey, EntityState toState) {
-        EntityState existEntityState = getEntityState(entityKey);
-        validate(existEntityState, toState);
     }
 
     @Override
@@ -72,6 +51,29 @@ public class EntityStateServiceImpl implements EntityStateService {
         if (nonNull(entityKey.id())) {
             setEntityState(entityKey, toState);
         }
+    }
+
+    @Override
+    public void validate(EntityKey<?> entityKey, EntityState toState) {
+        EntityState existEntityState = getEntityState(entityKey);
+        entityStateTransitionValidator.validate(existEntityState, toState);
+    }
+
+    @Override
+    public void validate(EntityKey<?> entityKey, EntityState desiredState, EntityState toState) {
+        EntityState existEntityState = getEntityState(entityKey);
+        if (desiredState.equals(existEntityState)) {
+            entityStateTransitionValidator.validate(existEntityState, toState);
+        } else {
+            throw new EntityStateValidationException(
+                    format("Entity state should be in %s, but was in %s", desiredState, existEntityState));
+        }
+    }
+
+    @Override
+    public void validate(Object entity, EntityState toState) {
+        EntityKey<?> entityKey = EntityKey.valueOf(entity);
+        validate(entityKey, toState);
     }
 
     @Override
