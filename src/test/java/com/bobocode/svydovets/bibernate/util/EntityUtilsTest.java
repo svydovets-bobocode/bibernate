@@ -2,9 +2,12 @@ package com.bobocode.svydovets.bibernate.util;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import com.bobocode.svydovets.bibernate.testdata.entity.User;
+import com.bobocode.svydovets.bibernate.testdata.entity.validation.ManyToOneWithoutJoinColumn;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -63,5 +66,18 @@ class EntityUtilsTest {
                         new Field[] {
                             User.class.getDeclaredField("name"), User.class.getDeclaredField("phone")
                         }));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entityManyToOneWithoutJoinColumn")
+    @DisplayName("Check relations configurations")
+    void checkRelationsConfiguration(Class<?> entityClass) {
+        assertThrows(
+                EntityValidationException.class,
+                () -> EntityUtils.checkRelationsConfiguration(entityClass));
+    }
+
+    private static Stream<Arguments> entityManyToOneWithoutJoinColumn() {
+        return Stream.of(Arguments.of(ManyToOneWithoutJoinColumn.class));
     }
 }

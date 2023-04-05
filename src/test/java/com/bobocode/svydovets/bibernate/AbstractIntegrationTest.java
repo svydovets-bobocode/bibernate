@@ -1,9 +1,11 @@
 package com.bobocode.svydovets.bibernate;
 
+import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
 import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
 import com.bobocode.svydovets.bibernate.session.SearchService;
+import com.bobocode.svydovets.bibernate.session.SessionImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +35,8 @@ public abstract class AbstractIntegrationTest {
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
         searchService = new SearchService(connection);
+        searchService.setResultSetMapper(
+                new ResultSetMapper(new SessionImpl(connection, searchService)));
         createTables();
         insertIntoTables();
     }

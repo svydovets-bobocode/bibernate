@@ -14,6 +14,7 @@ import com.bobocode.svydovets.bibernate.action.DeleteAction;
 import com.bobocode.svydovets.bibernate.action.InsertAction;
 import com.bobocode.svydovets.bibernate.action.UpdateAction;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
+import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.state.EntityState;
@@ -29,7 +30,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SessionImpl implements Session {
 
-    private final ActionQueue actionQueue = new ActionQueue();
+    private final ActionQueue actionQueue;
     private final Connection connection;
     private final Transaction transaction;
     private final SearchService searchService;
@@ -55,9 +55,11 @@ public class SessionImpl implements Session {
 
     public SessionImpl(Connection connection, SearchService searchService) {
         this.connection = connection;
-        this.transaction = new TransactionImpl(connection);
         this.searchService = searchService;
+        this.transaction = new TransactionImpl(connection);
         this.entityStateService = new EntityStateServiceImpl();
+        this.actionQueue = new ActionQueue();
+        this.searchService.setResultSetMapper(new ResultSetMapper(this));
     }
 
     @Override
@@ -103,13 +105,6 @@ public class SessionImpl implements Session {
         verifySessionIsOpened();
         flush();
         return searchService.findAllByType(type, entitiesCacheMap, entitiesSnapshotMap);
-    }
-
-    @Override
-    public <T> List<T> findAll(Class<T> type, Map<String, Object> properties) {
-        verifySessionIsOpened();
-        // todo add set entity state when it will be implemented
-        return null;
     }
 
     @Override
