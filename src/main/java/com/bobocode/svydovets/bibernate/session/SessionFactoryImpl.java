@@ -1,5 +1,7 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import static com.bobocode.svydovets.bibernate.util.LogoUtils.getBibernateLogo;
+
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.session.service.SearchService;
 import java.sql.Connection;
@@ -7,8 +9,10 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class SessionFactoryImpl implements SessionFactory {
     private final DataSource dataSource;
 
@@ -18,6 +22,7 @@ public class SessionFactoryImpl implements SessionFactory {
         if (instance == null) {
             synchronized (SessionFactoryImpl.class) {
                 if (instance == null) {
+                    log.info(getBibernateLogo());
                     instance = new SessionFactoryImpl(dataSource);
                 }
             }

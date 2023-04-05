@@ -132,7 +132,6 @@ public class SessionTest {
 
     @Test
     @DisplayName("Merge Detached Entity When Entity In Cache")
-    @Disabled
     void mergeDetachedEntityWhenEntityInCache() {
         // given
         Person detachedPerson = newDefaultPerson();
@@ -142,7 +141,7 @@ public class SessionTest {
         mockedEntityStateService = Mockito.mock(EntityStateServiceImpl.class);
         setInternalDependency(session, "entityStateService", mockedEntityStateService);
 
-        session.find(Person.class, DEFAULT_ID); // Put entity into cache
+        session.find(Person.class, DEFAULT_ID);
 
         // when
         Person mergedPerson = session.merge(detachedPerson);
@@ -216,7 +215,4 @@ public class SessionTest {
                                 () -> new IllegalArgumentException("Can't find dependency " + dependencyName));
         setValueToField(session, field, dependency);
     }
-
-    @AfterEach
-    void tearDown() {}
 }
