@@ -39,11 +39,17 @@ class EntityUtilsTest {
 
     private static Stream<Arguments> entityWithInsertableFieldSource() throws NoSuchFieldException {
         return Stream.of(
-                Arguments.of(Person.class, new Field[] {Person.class.getDeclaredField("firstName")}),
+                Arguments.of(
+                        Person.class,
+                        new Field[] {
+                            Person.class.getDeclaredField("id"), Person.class.getDeclaredField("firstName")
+                        }),
                 Arguments.of(
                         User.class,
                         new Field[] {
-                            User.class.getDeclaredField("name"), User.class.getDeclaredField("phone")
+                            User.class.getDeclaredField("id"),
+                            User.class.getDeclaredField("name"),
+                            User.class.getDeclaredField("phone")
                         }));
     }
 

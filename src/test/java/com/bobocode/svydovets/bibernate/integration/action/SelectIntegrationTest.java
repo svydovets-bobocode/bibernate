@@ -1,4 +1,4 @@
-package com.bobocode.svydovets.bibernate.action;
+package com.bobocode.svydovets.bibernate.integration.action;
 
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;

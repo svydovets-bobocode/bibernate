@@ -16,6 +16,8 @@ import com.bobocode.svydovets.bibernate.action.UpdateAction;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.session.service.IdResolverService;
+import com.bobocode.svydovets.bibernate.session.service.SearchService;
 import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.state.EntityStateService;
 import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
@@ -42,6 +44,7 @@ public class SessionImpl implements Session {
     private final Connection connection;
     private final Transaction transaction;
     private final SearchService searchService;
+    private final IdResolverService idService;
     private final EntityStateService entityStateService;
 
     private final Map<EntityKey<?>, Object> entitiesCacheMap = new ConcurrentHashMap<>();
@@ -57,6 +60,7 @@ public class SessionImpl implements Session {
         this.connection = connection;
         this.transaction = new TransactionImpl(connection);
         this.searchService = searchService;
+        this.idService = new IdResolverService();
         this.entityStateService = new EntityStateServiceImpl();
     }
 
@@ -80,11 +84,13 @@ public class SessionImpl implements Session {
     @Override
     public <T> T save(T entity) {
         verifySessionIsOpened();
+        idService.resolveIdValue(this.connection, entity);
+
         EntityKey<?> entityKey = EntityKey.valueOf(entity);
         actionQueue.addAction(entityKey, new InsertAction<>(this.connection, entity));
         entitiesCacheMap.put(entityKey, entity);
         entityStateService.setEntityState(entity, EntityState.MANAGED);
-        return null;
+        return entity;
     }
 
     @Override
