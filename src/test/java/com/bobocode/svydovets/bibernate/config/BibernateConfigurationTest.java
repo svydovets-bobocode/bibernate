@@ -11,7 +11,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.getValidH2Properties;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BibernateConfigurationTest extends AbstractIntegrationTest {
 
