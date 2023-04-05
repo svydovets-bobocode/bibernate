@@ -1,6 +1,7 @@
 package com.bobocode.svydovets.bibernate.session.service;
 
-import static com.bobocode.svydovets.bibernate.constant.GenerationType.*;
+import static com.bobocode.svydovets.bibernate.constant.GenerationType.IDENTITY;
+import static com.bobocode.svydovets.bibernate.constant.GenerationType.SEQUENCE;
 
 import com.bobocode.svydovets.bibernate.constant.GenerationType;
 import java.util.Map;
