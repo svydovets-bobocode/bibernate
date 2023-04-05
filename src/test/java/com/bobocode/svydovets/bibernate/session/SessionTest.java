@@ -11,12 +11,12 @@ import com.bobocode.svydovets.bibernate.action.ActionQueue;
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.session.service.SearchService;
 import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.Arrays;
-import java.util.HashMap;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
@@ -94,9 +94,6 @@ public class SessionTest {
                 .isInstanceOf(BibernateException.class)
                 .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.findAll(Person.class))
-                .isInstanceOf(BibernateException.class)
-                .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
-        assertThatThrownBy(() -> session.findAll(Person.class, new HashMap<>()))
                 .isInstanceOf(BibernateException.class)
                 .hasMessage(ErrorMessage.SESSION_IS_CLOSED);
         assertThatThrownBy(() -> session.merge(Person.class))

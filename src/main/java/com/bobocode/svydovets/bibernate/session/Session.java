@@ -4,8 +4,6 @@ import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 public interface Session {
 
@@ -46,8 +44,6 @@ public interface Session {
      * @return the found entity instances or empty collection if the entity does not exist
      */
     <T> Collection<T> findAll(Class<T> type);
-
-    <T> List<T> findAll(Class<T> type, Map<String, Object> properties);
 
     /**
      * End the session by releasing the JDBC connection and cleaning up. Under the hood calls a {@link

@@ -1,6 +1,7 @@
 package com.bobocode.svydovets.bibernate.action.query;
 
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.getInsertableFields;
+import static com.bobocode.svydovets.bibernate.util.EntityUtils.getUpdatableFields;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveColumnName;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveIdColumnName;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveTableName;
@@ -44,7 +45,17 @@ public class SqlQueryBuilder {
         return String.format(DELETE_FROM_TABLE_BY_ID, tableName, idColumnName);
     }
 
-    private static List<String> getColumnNamesAndPlaceholders(Class<?> entityType) {
+    private static List<String> getColumnNamesForUpdate(Class<?> entityType) {
+        List<String> columnNames = new ArrayList<>();
+        Field[] insertableFields = getUpdatableFields(entityType);
+        for (Field declaredField : insertableFields) {
+            var columnName = resolveColumnName(declaredField);
+            columnNames.add(columnName);
+        }
+        return columnNames;
+    }
+
+    private static List<String> getColumnNamesForInsert(Class<?> entityType) {
         List<String> columnNames = new ArrayList<>();
         Field[] insertableFields = getInsertableFields(entityType);
         for (Field declaredField : insertableFields) {
@@ -56,7 +67,7 @@ public class SqlQueryBuilder {
 
     public static String createInsertQuery(Class<?> entityType) {
         var tableName = resolveTableName(entityType);
-        List<String> columnNames = getColumnNamesAndPlaceholders(entityType);
+        List<String> columnNames = getColumnNamesForInsert(entityType);
         List<String> valuePlaceholders = new ArrayList<>(Collections.nCopies(columnNames.size(), "?"));
 
         return String.format(
@@ -68,7 +79,7 @@ public class SqlQueryBuilder {
 
     public static String createUpdateQuery(Class<?> entityType) {
         var tableName = resolveTableName(entityType);
-        List<String> columnNames = getColumnNamesAndPlaceholders(entityType);
+        List<String> columnNames = getColumnNamesForUpdate(entityType);
         List<String> columnValuePairs = new ArrayList<>();
 
         for (String columnName : columnNames) {

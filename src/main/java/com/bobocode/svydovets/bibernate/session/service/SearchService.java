@@ -1,4 +1,4 @@
-package com.bobocode.svydovets.bibernate.session;
+package com.bobocode.svydovets.bibernate.session.service;
 
 import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
 
@@ -9,6 +9,7 @@ import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.constant.Operation;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.ConnectionException;
+import com.bobocode.svydovets.bibernate.exception.EntityNotFoundException;
 import com.bobocode.svydovets.bibernate.state.EntityStateService;
 import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
@@ -19,6 +20,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -26,6 +28,8 @@ public class SearchService {
     private final Connection connection;
     private final RequiredAnnotationValidatorProcessor validatorProcessor;
     private final EntityStateService entityStateService;
+
+    @Setter private ResultSetMapper resultSetMapper;
 
     public SearchService(Connection connection) {
         this.connection = connection;
@@ -42,12 +46,11 @@ public class SearchService {
             statement.setObject(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (ResultSetMapper.moveCursorToNextRow(resultSet)) {
-                T result = ResultSetMapper.mapToObject(type, resultSet);
+                T result = resultSetMapper.mapToObject(type, resultSet);
                 log.debug("Mapped result set to object: {}", result);
                 return result;
             } else {
-                // Todo: add Entity not found exception
-                throw new BibernateException(
+                throw new EntityNotFoundException(
                         "Unable to find entity: %s by id: %s".formatted(type.getSimpleName(), id));
             }
         } catch (Exception e) {
@@ -66,7 +69,7 @@ public class SearchService {
         try (ResultSet resultSet =
                 JdbcExecutor.executeQueryAndRetrieveResultSet(selectAllQuery, connection)) {
             while (ResultSetMapper.moveCursorToNextRow(resultSet)) {
-                T loadedEntity = ResultSetMapper.mapToObject(type, resultSet);
+                T loadedEntity = resultSetMapper.mapToObject(type, resultSet);
                 Object id = EntityUtils.getIdValue(loadedEntity);
                 EntityKey<T> entityKey = new EntityKey<>(type, id);
 
