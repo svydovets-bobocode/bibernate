@@ -1,7 +1,10 @@
 package com.bobocode.svydovets.bibernate.config;
 
 import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.getValidH2Properties;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
 import com.bobocode.svydovets.bibernate.session.Session;

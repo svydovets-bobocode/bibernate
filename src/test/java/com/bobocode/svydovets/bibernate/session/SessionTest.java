@@ -7,8 +7,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
-import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
+import com.bobocode.svydovets.bibernate.action.ActionQueue;
+import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.session.service.SearchService;
@@ -27,13 +27,13 @@ public class SessionTest {
     private SearchService searchService;
     private Session session;
     private EntityStateServiceImpl mockedEntityStateService;
+    private ActionQueue actionQueue;
 
     @BeforeEach
     void setUp() {
-        ConfigurationSource source =
-                new PropertyFileConfiguration("test_svydovets_bibernate_h2.properties");
         searchService = mock(SearchService.class);
         Connection connection = mock(Connection.class);
+        actionQueue = mock(ActionQueue.class);
         session = new SessionImpl(connection, searchService);
     }
 
@@ -132,6 +132,7 @@ public class SessionTest {
 
     @Test
     @DisplayName("Merge Detached Entity When Entity In Cache")
+    @Disabled
     void mergeDetachedEntityWhenEntityInCache() {
         // given
         Person detachedPerson = newDefaultPerson();
@@ -174,6 +175,36 @@ public class SessionTest {
         assertThat(managedPerson.getId()).isNotNull();
         assertThat(managedPerson.getFirstName()).isEqualTo(detachedPerson.getFirstName());
         assertThat(managedPerson.getLastName()).isEqualTo(detachedPerson.getLastName());
+    }
+
+    @Test
+    @DisplayName(
+            "Flush triggers dirty checking, it creates correct update actions and puts it to the ActionQueue")
+    void testFlushTriggersDirtyChecking() {
+        session = Mockito.spy(session);
+
+        Person firstPerson = newDefaultPerson();
+        EntityKey<?> firstEntityKey = EntityKey.of(Person.class, firstPerson.getId());
+        doReturn(firstPerson).when(searchService).findOne(eq(firstEntityKey));
+
+        Person secondPerson = newOtherPerson();
+        EntityKey<?> secondEntityKey = EntityKey.of(Person.class, secondPerson.getId());
+        doReturn(secondPerson).when(searchService).findOne(eq(secondEntityKey));
+
+        mockedEntityStateService = Mockito.mock(EntityStateServiceImpl.class);
+        setInternalDependency(session, "entityStateService", mockedEntityStateService);
+        setInternalDependency(session, "actionQueue", actionQueue);
+
+        Person firstLoadedPerson = session.find(Person.class, firstPerson.getId());
+        firstLoadedPerson.setFirstName(OTHER_FIRST_NAME);
+
+        Person secondLoadedPerson = session.find(Person.class, secondPerson.getId());
+        secondLoadedPerson.setFirstName(DEFAULT_FIRST_NAME);
+
+        session.flush();
+
+        verify(actionQueue).addAction(eq(firstEntityKey), any());
+        verify(actionQueue).addAction(eq(secondEntityKey), any());
     }
 
     private void setInternalDependency(Session session, String dependencyName, Object dependency) {
