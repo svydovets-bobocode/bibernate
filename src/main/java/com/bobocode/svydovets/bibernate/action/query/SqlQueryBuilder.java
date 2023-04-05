@@ -47,9 +47,9 @@ public class SqlQueryBuilder {
 
     private static List<String> getColumnNamesForUpdate(Class<?> entityType) {
         List<String> columnNames = new ArrayList<>();
-        Field[] insertableFields = getUpdatableFields(entityType);
-        for (Field declaredField : insertableFields) {
-            var columnName = resolveColumnName(declaredField);
+        Field[] updatableFields = getUpdatableFields(entityType);
+        for (Field updatableField : updatableFields) {
+            var columnName = resolveColumnName(updatableField);
             columnNames.add(columnName);
         }
         return columnNames;
