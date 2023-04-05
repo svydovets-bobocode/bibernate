@@ -12,9 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 @Tag("integration")
 public abstract class AbstractIntegrationTest {
@@ -51,6 +49,8 @@ public abstract class AbstractIntegrationTest {
     private void createTables() throws SQLException {
         createPersonTable();
         createUsersTable();
+        createParentTable();
+        createChildTable();
     }
 
     private void insertIntoTables() throws SQLException {
@@ -60,6 +60,22 @@ public abstract class AbstractIntegrationTest {
 
         String insertUsersQuery = "INSERT INTO users (name) VALUES ('Test')";
         connection.prepareStatement(insertUsersQuery).execute();
+
+        String insertParentQuery = "INSERT INTO parent (id, name) VALUES (4, 'Test')";
+        PreparedStatement insertParentStatement = connection.prepareStatement(insertParentQuery, Statement.RETURN_GENERATED_KEYS);
+        insertParentStatement.execute();
+
+        ResultSet generatedKeys = insertParentStatement.getGeneratedKeys();
+        Long parentId = 0L;
+        if (generatedKeys.next()) {
+            parentId = generatedKeys.getObject("id", Long.class);
+        }
+
+        String insertChildrenQuery = "INSERT INTO child (id, name, parent_id) VALUES (5, 'Test1', ?), (6, 'Test2', ?)";
+        PreparedStatement insertChildStatement = connection.prepareStatement(insertChildrenQuery);
+        insertChildStatement.setLong(1, parentId);
+        insertChildStatement.setLong(2, parentId);
+        insertChildStatement.execute();
     }
 
     private void createUsersTable() throws SQLException {
@@ -81,7 +97,7 @@ public abstract class AbstractIntegrationTest {
     private void createPersonTable() throws SQLException {
         String createTableQuery =
                 """
-                        CREATE TABLE person 
+                        CREATE TABLE IF NOT EXISTS person 
                         (
                             id       BIGINT ,
                             first_name VARCHAR(255),
@@ -93,10 +109,43 @@ public abstract class AbstractIntegrationTest {
         statement.executeUpdate();
     }
 
+    private void createParentTable() throws SQLException {
+        String createTableQuery =
+                """
+                        CREATE TABLE IF NOT EXISTS parent 
+                        (
+                            id   BIGINT PRIMARY KEY,
+                            name VARCHAR(255)
+                        );
+                         """;
+
+        PreparedStatement statement = connection.prepareStatement(createTableQuery);
+        statement.executeUpdate();
+    }
+
+    private void createChildTable() throws SQLException {
+        String createTableQuery =
+                """
+                        CREATE TABLE IF NOT EXISTS child 
+                        (
+                            id        BIGINT PRIMARY KEY ,
+                            name      VARCHAR(255),
+                            parent_id INT REFERENCES parent(id)
+                        );
+                         """;
+
+        PreparedStatement statement = connection.prepareStatement(createTableQuery);
+        statement.executeUpdate();
+    }
+
     private void dropTables() throws SQLException {
         String dropTablePerson = "DROP TABLE person";
         String dropTableUsers = "DROP TABLE users";
+        String dropTableChild = "DROP TABLE child";
+        String dropTableParent = "DROP TABLE parent";
         connection.prepareStatement(dropTablePerson).executeUpdate();
         connection.prepareStatement(dropTableUsers).executeUpdate();
+        connection.prepareStatement(dropTableChild).executeUpdate();
+        connection.prepareStatement(dropTableParent).executeUpdate();
     }
 }

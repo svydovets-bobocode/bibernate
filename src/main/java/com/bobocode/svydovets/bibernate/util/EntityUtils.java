@@ -1,21 +1,8 @@
 package com.bobocode.svydovets.bibernate.util;
 
-import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ARG_CONSTRUCTOR;
-import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ENTITY_ANNOTATION;
-import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ID;
-import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_GETTING_FIELD_VALUES_FROM_ENTITY;
-import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_RETRIEVING_VALUE_FROM_FIELD;
-import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_SETTING_VALUE_TO_FIELD;
-import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.JOIN_COLUMN_HAS_NO_NAME;
-import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.MANY_TO_ONE_HAS_NO_JOIN_COLUMN;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.*;
 
-import com.bobocode.svydovets.bibernate.annotation.Column;
-import com.bobocode.svydovets.bibernate.annotation.Entity;
-import com.bobocode.svydovets.bibernate.annotation.Id;
-import com.bobocode.svydovets.bibernate.annotation.JoinColumn;
-import com.bobocode.svydovets.bibernate.annotation.ManyToOne;
-import com.bobocode.svydovets.bibernate.annotation.OneToMany;
-import com.bobocode.svydovets.bibernate.annotation.Table;
+import com.bobocode.svydovets.bibernate.annotation.*;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
 import java.lang.reflect.Field;
@@ -215,6 +202,7 @@ public class EntityUtils {
         try {
             Field[] fields = entity.getClass().getDeclaredFields();
             return Arrays.stream(fields)
+                    .filter(EntityUtils::isColumnField)
                     .map(
                             field ->
                                     Map.entry(field.getName(), retrieveValueFromField(entity, field).orElseThrow()))
@@ -231,6 +219,7 @@ public class EntityUtils {
         try {
             Field[] fields = entity.getClass().getDeclaredFields();
             return Arrays.stream(fields)
+                    .filter(EntityUtils::isColumnField)
                     .map(field -> retrieveValueFromField(entity, field))
                     .map(Optional::orElseThrow)
                     .toArray();
