@@ -5,11 +5,10 @@ import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.connectionpool.HikariConnectionPool;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.session.SessionImpl;
 import com.bobocode.svydovets.bibernate.session.service.IdResolverService;
 import com.bobocode.svydovets.bibernate.session.service.SearchService;
 import lombok.extern.slf4j.Slf4j;
-import com.bobocode.svydovets.bibernate.session.SearchService;
-import com.bobocode.svydovets.bibernate.session.SessionImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +17,10 @@ import org.junit.jupiter.api.Tag;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
-import java.sql.*;
 
 @Tag("integration")
 @Slf4j
@@ -42,6 +42,7 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void setUp() throws SQLException {
         connection = dataSource.getConnection();
+        searchService = new SearchService(connection);
         searchService.setResultSetMapper(
                 new ResultSetMapper(new SessionImpl(connection, searchService)));
         idResolverService = new IdResolverService();
