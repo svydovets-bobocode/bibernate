@@ -172,7 +172,7 @@ public class SessionImpl implements Session {
     public void flush() {
         verifySessionIsOpened();
         performDirtyChecking();
-        actionQueue.executeAll();
+        actionQueue.executeAllWithOrder();
         actionQueue.clear();
     }
 
