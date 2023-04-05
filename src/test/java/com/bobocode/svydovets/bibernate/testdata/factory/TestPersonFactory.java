@@ -8,10 +8,6 @@ public class TestPersonFactory {
     public static final String DEFAULT_FIRST_NAME = "John";
     public static final String DEFAULT_LAST_NAME = "Doe";
 
-    public static final Long OTHER_ID = 2L;
-    public static final String OTHER_FIRST_NAME = "Martin";
-    public static final String OTHER_LAST_NAME = "Fowler";
-
     public static final Long INVALID_ID = -1L;
 
     public static final EntityKey<Person> DEFAULT_ENTITY_KEY =
@@ -23,6 +19,13 @@ public class TestPersonFactory {
     public static Person newDefaultPerson() {
         Person person = new Person();
         person.setId(DEFAULT_ID);
+        person.setFirstName(DEFAULT_FIRST_NAME);
+        person.setLastName(DEFAULT_LAST_NAME);
+        return person;
+    }
+
+    public static Person newDefaultInvalidPerson() {
+        Person person = new Person();
         person.setFirstName(DEFAULT_FIRST_NAME);
         person.setLastName(DEFAULT_LAST_NAME);
         return person;

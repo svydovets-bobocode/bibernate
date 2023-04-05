@@ -11,6 +11,7 @@ import com.bobocode.svydovets.bibernate.config.ConfigurationSource;
 import com.bobocode.svydovets.bibernate.config.PropertyFileConfiguration;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.session.service.SearchService;
 import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.lang.reflect.Field;

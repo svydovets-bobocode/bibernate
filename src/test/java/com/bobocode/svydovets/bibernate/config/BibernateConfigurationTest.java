@@ -1,23 +1,19 @@
 package com.bobocode.svydovets.bibernate.config;
 
-import com.bobocode.svydovets.bibernate.action.AbstractIntegrationTest;
+import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.getValidH2Properties;
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.session.SessionFactory;
 import com.bobocode.svydovets.bibernate.testdata.entity.User;
-import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-
-import static com.bobocode.svydovets.bibernate.testdata.factory.PropertiesFactory.getValidH2Properties;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class BibernateConfigurationTest extends AbstractIntegrationTest {
 
     @Test
     public void testSessionConnection() throws SQLException {
-        createTestTableAndInsertData();
         BibernateConfiguration config = new BibernateConfiguration();
         config.configure(new PropertyFileConfiguration("test_svydovets_bibernate_h2.properties"));
         SessionFactory sessionFactory = config.buildSessionFactory();
@@ -63,28 +59,5 @@ public class BibernateConfigurationTest extends AbstractIntegrationTest {
     public void testBuildSessionFactoryWithoutConfigure() {
         BibernateConfiguration config = new BibernateConfiguration();
         assertThrows(IllegalStateException.class, config::buildSessionFactory);
-    }
-
-    // Todo: move it to abstract method if needed
-
-    private void createTestTableAndInsertData() throws SQLException {
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-
-            String createTableSql =
-                    """
-                            CREATE TABLE users
-                            (
-                                id           INT PRIMARY KEY,
-                                name         VARCHAR,
-                                creationTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
-                                phone_number VARCHAR
-                            )
-                            """;
-            String insertDataSql = "INSERT INTO users (id, name, phone_number) VALUES (1, 'Test', '123-123-123')";
-
-            statement.execute(createTableSql);
-            statement.execute(insertDataSql);
-        }
     }
 }
