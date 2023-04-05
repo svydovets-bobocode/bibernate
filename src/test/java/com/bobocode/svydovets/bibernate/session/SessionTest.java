@@ -214,5 +214,4 @@ public class SessionTest {
                                 () -> new IllegalArgumentException("Can't find dependency " + dependencyName));
         setValueToField(session, field, dependency);
     }
-
 }
