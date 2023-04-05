@@ -35,4 +35,11 @@ public class TestPersonFactory {
         person.setLastName(OTHER_LAST_NAME);
         return person;
     }
+
+    public static Person newDefaultInvalidPerson() {
+        Person person = new Person();
+        person.setFirstName(DEFAULT_FIRST_NAME);
+        person.setLastName(DEFAULT_LAST_NAME);
+        return person;
+    }
 }

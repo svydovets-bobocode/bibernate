@@ -1,4 +1,4 @@
-package com.bobocode.svydovets.bibernate.session;
+package com.bobocode.svydovets.bibernate.session.service;
 
 import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
 

@@ -4,5 +4,4 @@ public enum ActionType {
     INSERT,
     UPDATE,
     REMOVE
-    // todo: add priority as param
 }
