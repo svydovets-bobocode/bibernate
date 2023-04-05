@@ -6,10 +6,15 @@ import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_N
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_GETTING_FIELD_VALUES_FROM_ENTITY;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_RETRIEVING_VALUE_FROM_FIELD;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_SETTING_VALUE_TO_FIELD;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.JOIN_COLUMN_HAS_NO_NAME;
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.MANY_TO_ONE_HAS_NO_JOIN_COLUMN;
 
 import com.bobocode.svydovets.bibernate.annotation.Column;
 import com.bobocode.svydovets.bibernate.annotation.Entity;
 import com.bobocode.svydovets.bibernate.annotation.Id;
+import com.bobocode.svydovets.bibernate.annotation.JoinColumn;
+import com.bobocode.svydovets.bibernate.annotation.ManyToOne;
+import com.bobocode.svydovets.bibernate.annotation.OneToMany;
 import com.bobocode.svydovets.bibernate.annotation.Table;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
@@ -50,15 +55,28 @@ public class EntityUtils {
                 .orElseGet(field::getName);
     }
 
-    public static String resolveIdColumnName(Class<?> type) {
+    public static String resolveJoinColumnName(Field field) {
+        return Optional.ofNullable(field.getAnnotation(JoinColumn.class))
+                .map(JoinColumn::name)
+                .filter(StringUtils::isNotBlank)
+                .orElseThrow(
+                        () ->
+                                new EntityValidationException(
+                                        String.format(JOIN_COLUMN_HAS_NO_NAME, field.getName())));
+    }
+
+    public static Field resolveIdColumnField(Class<?> type) {
         return Arrays.stream(type.getDeclaredFields())
                 .filter(EntityUtils::isIdField)
                 .findAny()
-                .map(EntityUtils::resolveColumnName)
                 .orElseThrow(
                         () ->
                                 new EntityValidationException(
                                         String.format(CLASS_HAS_NO_ARG_CONSTRUCTOR, type.getName())));
+    }
+
+    public static String resolveIdColumnName(Class<?> type) {
+        return resolveColumnName(resolveIdColumnField(type));
     }
 
     public static Field[] getInsertableFields(Class<?> entityType) {
@@ -78,11 +96,7 @@ public class EntityUtils {
     }
 
     private static boolean isInsertableField(Field field) {
-        return isInsertableNonId(field) || isNonColumnAnnotatedNonIdField(field);
-    }
-
-    private static boolean isInsertableNonId(Field field) {
-        return isInsertable(field) && !isIdField(field);
+        return isInsertable(field) || isNonColumnAnnotated(field);
     }
 
     private static boolean isInsertable(Field field) {
@@ -99,11 +113,17 @@ public class EntityUtils {
     }
 
     private static boolean isUpdatable(Field field) {
-        return field.isAnnotationPresent(Column.class) && field.getAnnotation(Column.class).updatable();
+        return field.isAnnotationPresent(Column.class)
+                && field.getAnnotation(Column.class).updatable()
+                && isColumnField(field);
     }
 
     private static boolean isNonColumnAnnotatedNonIdField(Field field) {
         return !field.isAnnotationPresent(Column.class) && !isIdField(field);
+    }
+
+    private static boolean isNonColumnAnnotated(Field field) {
+        return !field.isAnnotationPresent(Column.class);
     }
 
     public static <T> T createEmptyInstance(Class<T> type) {
@@ -143,8 +163,15 @@ public class EntityUtils {
 
     public static <T> Optional<Object> retrieveValueFromField(T entity, Field field) {
         try {
+            Object value = null;
             field.setAccessible(true);
-            return Optional.ofNullable(field.get(entity));
+            if (isSimpleColumnField(field)) {
+                value = field.get(entity);
+            } else if (isEntityField(field)) {
+                Object relatedEntity = field.get(entity);
+                value = retrieveIdValue(relatedEntity);
+            }
+            return Optional.ofNullable(value);
         } catch (Exception e) {
             throw new BibernateException(
                     String.format(
@@ -163,6 +190,12 @@ public class EntityUtils {
                             ERROR_SETTING_VALUE_TO_FIELD, value, field.getType(), instance.getClass().getName()),
                     e);
         }
+    }
+
+    public static <T> void setIdValueToEntity(T entity, Object value) {
+        Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(EntityUtils::isIdField)
+                .forEach(field -> setValueToField(entity, field, value));
     }
 
     public static <T> void updateManagedEntityField(T fromEntity, T toEntity, Field field) {
@@ -191,6 +224,7 @@ public class EntityUtils {
         try {
             Field[] fields = entity.getClass().getDeclaredFields();
             return Arrays.stream(fields)
+                    .filter(EntityUtils::isColumnField)
                     .map(
                             field ->
                                     Map.entry(field.getName(), retrieveValueFromField(entity, field).orElseThrow()))
@@ -207,6 +241,7 @@ public class EntityUtils {
         try {
             Field[] fields = entity.getClass().getDeclaredFields();
             return Arrays.stream(fields)
+                    .filter(EntityUtils::isColumnField)
                     .map(field -> retrieveValueFromField(entity, field))
                     .map(Optional::orElseThrow)
                     .toArray();
@@ -218,5 +253,43 @@ public class EntityUtils {
 
     public static Object[] convertFieldValuesMapToSnapshotArray(Map<String, Object> fieldValuesMap) {
         return fieldValuesMap.values().toArray();
+    }
+
+    public static void checkRelationsConfiguration(Class<?> type) {
+        Arrays.stream(type.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(ManyToOne.class))
+                .forEach(field -> checkManyToOneConfiguration(type, field));
+    }
+
+    private static void checkManyToOneConfiguration(Class<?> type, Field field) {
+        if (!field.isAnnotationPresent(JoinColumn.class)) {
+            throw new EntityValidationException(
+                    String.format(MANY_TO_ONE_HAS_NO_JOIN_COLUMN, type.getName()));
+        }
+        String joinColumnName = field.getAnnotation(JoinColumn.class).name();
+        if (StringUtils.isBlank(joinColumnName)) {
+            throw new EntityValidationException(String.format(JOIN_COLUMN_HAS_NO_NAME, field.getName()));
+        }
+        checkIsEntity(field.getType());
+    }
+
+    public static boolean isSimpleColumnField(Field field) {
+        return !isRelationsField(field);
+    }
+
+    public static boolean isRelationsField(Field field) {
+        return isEntityField(field) || isEntityCollectionField(field);
+    }
+
+    public static boolean isColumnField(Field field) {
+        return !isEntityCollectionField(field);
+    }
+
+    public static boolean isEntityField(Field field) {
+        return field.isAnnotationPresent(ManyToOne.class);
+    }
+
+    public static boolean isEntityCollectionField(Field field) {
+        return field.isAnnotationPresent(OneToMany.class);
     }
 }

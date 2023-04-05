@@ -1,6 +1,7 @@
 package com.bobocode.svydovets.bibernate.session;
 
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.session.service.SearchService;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;

@@ -19,6 +19,10 @@ public final class ErrorMessage {
             "Entity '%s' has unsupported @Id type %s "
                     + "('@Id' field in '@Entity' must have one of the supported types. "
                     + "See supported types in '@Id' documentation')";
+    public static final String MANY_TO_ONE_HAS_NO_JOIN_COLUMN =
+            "@ManyToOne relation must be also marked by @JoinColumn in your entity `%s`";
+    public static final String JOIN_COLUMN_HAS_NO_NAME =
+            "Field '%s' is marked by @JoinColumn, but has no provided column name, which is mandatory";
 
     public static final String ERROR_MAPPING_RESULT_SET_TO_OBJECT =
             "Error while mapping result set to object of type '%s'";
