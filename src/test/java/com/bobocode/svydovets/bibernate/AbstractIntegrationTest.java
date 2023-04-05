@@ -133,7 +133,7 @@ public abstract class AbstractIntegrationTest {
     private void createPersonTable() throws SQLException {
         String createTableQuery =
                 """
-                        CREATE TABLE person 
+                        CREATE TABLE IF NOT EXISTS person
                         (
                             id       BIGINT ,
                             first_name VARCHAR(255),
