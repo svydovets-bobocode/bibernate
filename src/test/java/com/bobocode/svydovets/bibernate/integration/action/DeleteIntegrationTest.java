@@ -1,10 +1,11 @@
-package com.bobocode.svydovets.bibernate.action;
+package com.bobocode.svydovets.bibernate.integration.action;
 
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ENTITY_KEY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
+import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
+import com.bobocode.svydovets.bibernate.action.DeleteAction;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ class DeleteIntegrationTest extends AbstractIntegrationTest {
         Person person = searchService.findOne(DEFAULT_ENTITY_KEY);
         var deleteAction = new DeleteAction(connection, person);
 
-        deleteAction.doExecute();
+        deleteAction.execute();
 
         assertNotNull(person);
         assertThrows(

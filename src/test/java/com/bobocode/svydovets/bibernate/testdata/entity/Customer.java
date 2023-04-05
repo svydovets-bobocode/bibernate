@@ -13,21 +13,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table("users")
+@Table("customers")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class User {
+public class Customer {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
     private String name;
 
     @Column(insertable = false, updatable = false)
     private LocalDateTime creationTime;
 
-    @Column(name = "phone_number")
-    private String phone;
+    private String email;
 }

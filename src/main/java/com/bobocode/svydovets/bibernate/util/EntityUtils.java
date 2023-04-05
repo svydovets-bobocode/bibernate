@@ -65,15 +65,18 @@ public class EntityUtils {
                                         String.format(JOIN_COLUMN_HAS_NO_NAME, field.getName())));
     }
 
-    public static String resolveIdColumnName(Class<?> type) {
+    public static Field resolveIdColumnField(Class<?> type) {
         return Arrays.stream(type.getDeclaredFields())
                 .filter(EntityUtils::isIdField)
                 .findAny()
-                .map(EntityUtils::resolveColumnName)
                 .orElseThrow(
                         () ->
                                 new EntityValidationException(
                                         String.format(CLASS_HAS_NO_ARG_CONSTRUCTOR, type.getName())));
+    }
+
+    public static String resolveIdColumnName(Class<?> type) {
+        return resolveColumnName(resolveIdColumnField(type));
     }
 
     public static Field[] getInsertableFields(Class<?> entityType) {
@@ -93,11 +96,7 @@ public class EntityUtils {
     }
 
     private static boolean isInsertableField(Field field) {
-        return isInsertableNonId(field) || isNonColumnAnnotatedNonIdField(field);
-    }
-
-    private static boolean isInsertableNonId(Field field) {
-        return isInsertable(field) && !isIdField(field);
+        return isInsertable(field) || isNonColumnAnnotated(field);
     }
 
     private static boolean isInsertable(Field field) {
@@ -121,6 +120,10 @@ public class EntityUtils {
 
     private static boolean isNonColumnAnnotatedNonIdField(Field field) {
         return !field.isAnnotationPresent(Column.class) && !isIdField(field);
+    }
+
+    private static boolean isNonColumnAnnotated(Field field) {
+        return !field.isAnnotationPresent(Column.class);
     }
 
     public static <T> T createEmptyInstance(Class<T> type) {
@@ -187,6 +190,12 @@ public class EntityUtils {
                             ERROR_SETTING_VALUE_TO_FIELD, value, field.getType(), instance.getClass().getName()),
                     e);
         }
+    }
+
+    public static <T> void setIdValueToEntity(T entity, Object value) {
+        Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(EntityUtils::isIdField)
+                .forEach(field -> setValueToField(entity, field, value));
     }
 
     public static <T> void updateManagedEntityField(T fromEntity, T toEntity, Field field) {
