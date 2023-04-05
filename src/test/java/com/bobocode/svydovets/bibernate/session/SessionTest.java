@@ -128,7 +128,6 @@ public class SessionTest {
 
     @Test
     @DisplayName("Merge Detached Entity When Entity In Cache")
-    @Disabled
     void mergeDetachedEntityWhenEntityInCache() {
         // given
         Person detachedPerson = newDefaultPerson();
@@ -212,7 +211,4 @@ public class SessionTest {
                                 () -> new IllegalArgumentException("Can't find dependency " + dependencyName));
         setValueToField(session, field, dependency);
     }
-
-    @AfterEach
-    void tearDown() {}
 }
