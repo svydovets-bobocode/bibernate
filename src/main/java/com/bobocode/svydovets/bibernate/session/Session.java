@@ -4,6 +4,7 @@ import com.bobocode.svydovets.bibernate.action.ActionQueue;
 import com.bobocode.svydovets.bibernate.annotation.Entity;
 import com.bobocode.svydovets.bibernate.annotation.Id;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.exception.EntityNotFoundException;
 import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
 import com.bobocode.svydovets.bibernate.validation.Validator;
@@ -56,7 +57,8 @@ public interface Session {
      *
      * @param type entity class
      * @param id primary key
-     * @return the found entity instance or null if the entity does not exist
+     * @return the found entity instance
+     * @throws EntityNotFoundException if entity is not exists in the DB
      */
     <T> T find(Class<T> type, Object id);
 
@@ -73,7 +75,8 @@ public interface Session {
      * @param type entity class
      * @param id primary key
      * @param lockModeType type of the pessimistic locking strategy
-     * @return the found entity instance or null if the entity does not exist
+     * @return the found entity instance
+     * @throws EntityNotFoundException if entity is not exists in the DB
      * @see LockModeType
      */
     <T> T find(Class<T> type, Object id, LockModeType lockModeType);
