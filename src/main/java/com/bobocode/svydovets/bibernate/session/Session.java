@@ -65,9 +65,6 @@ public interface Session {
      */
     <T> T find(Class<T> type, Object id);
 
-    // todo JavaDoc
-    <T> T find(Class<T> type, Object id, LockModeType lockModeType);
-
     /**
      * Find by primary key. Search for an entity of the specified class and primary key. If the entity
      * instance is contained in the cache, it is returned from there. Here you are able to provide
