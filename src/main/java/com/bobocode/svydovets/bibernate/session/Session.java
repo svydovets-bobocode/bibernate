@@ -17,6 +17,9 @@ public interface Session {
      */
     <T> T find(Class<T> type, Object id);
 
+    // todo JavaDoc
+    <T> T find(Class<T> type, Object id, LockModeType lockModeType);
+
     /**
      * Make an instance managed and persistent. This operation changes the entity's status to {@link
      * EntityState#MANAGED}.

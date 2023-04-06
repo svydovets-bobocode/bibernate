@@ -19,7 +19,28 @@ class SqlQueryBuilderTest {
         // when
         var selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(User.class);
         // then
-        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ?;");
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ? ;");
+    }
+
+    @Test
+    @DisplayName("Create Select by Id Query with explicit lock for update")
+    void createSelectByIdQueryWithExplicitLockForUpdate() {
+        // given
+        // when
+        var selectByIdQuery =
+                SqlQueryBuilder.createSelectByIdQuery(User.class, LockModeType.FOR_UPDATE);
+        // then
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ? FOR UPDATE;");
+    }
+
+    @Test
+    @DisplayName("Create Select by Id Query with explicit lock for share")
+    void createSelectByIdQueryWithExplicitLockForShare() {
+        // given
+        // when
+        var selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(User.class, LockModeType.FOR_SHARE);
+        // then
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ? FOR SHARE;");
     }
 
     @Test
@@ -29,7 +50,7 @@ class SqlQueryBuilderTest {
         // when
         var selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(Person.class);
         // then
-        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM person WHERE id = ?;");
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM person WHERE id = ? ;");
     }
 
     @Test

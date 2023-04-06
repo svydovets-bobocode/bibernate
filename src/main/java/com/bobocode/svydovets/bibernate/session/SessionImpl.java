@@ -71,17 +71,24 @@ public class SessionImpl implements Session {
 
     @Override
     public <T> T find(Class<T> type, Object id) {
+        return find(type, id, LockModeType.NONE);
+    }
+
+    @Override
+    public <T> T find(Class<T> type, Object id, LockModeType lockModeType) {
         verifySessionIsOpened();
 
         EntityKey<T> entityKey = EntityKey.of(type, id);
-        T entity = type.cast(entitiesCacheMap.computeIfAbsent(entityKey, this::loadEntity));
+        T entity =
+                type.cast(
+                        entitiesCacheMap.computeIfAbsent(entityKey, key -> loadEntity(key, lockModeType)));
 
         entityStateService.setEntityState(entity, MANAGED);
         return entity;
     }
 
-    private <T> Object loadEntity(EntityKey<?> entityKey) {
-        Object loadedEntity = searchService.findOne(entityKey);
+    private <T> Object loadEntity(EntityKey<?> entityKey, LockModeType lockModeType) {
+        Object loadedEntity = searchService.findOne(entityKey, lockModeType);
         entitiesSnapshotMap.computeIfAbsent(entityKey, k -> getFieldValuesFromEntity(loadedEntity));
         return loadedEntity;
     }
