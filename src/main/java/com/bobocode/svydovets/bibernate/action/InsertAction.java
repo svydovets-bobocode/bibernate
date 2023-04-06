@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.action;
 
+import static com.bobocode.svydovets.bibernate.annotation.Version.INITIAL_VERSION_FIELD_VALUE;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.getInsertableFields;
 
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
@@ -33,5 +34,10 @@ public class InsertAction<T> extends AbstractAction<T> {
     @Override
     public ActionType getActionType() {
         return ActionType.INSERT;
+    }
+
+    @Override
+    protected long resolveVersionField(Object optFieldValue) {
+        return INITIAL_VERSION_FIELD_VALUE;
     }
 }

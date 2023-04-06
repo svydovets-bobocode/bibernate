@@ -17,6 +17,7 @@ import com.bobocode.svydovets.bibernate.validation.annotation.required.processor
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class SearchService {
                 throw new EntityNotFoundException(
                         "Unable to find entity: %s by id: %s".formatted(type.getSimpleName(), id));
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new ConnectionException("Error while executing query %s".formatted(selectByIdQuery), e);
         }
     }
