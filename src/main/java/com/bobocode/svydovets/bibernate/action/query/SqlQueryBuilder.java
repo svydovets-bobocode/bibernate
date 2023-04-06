@@ -7,10 +7,12 @@ import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveIdColumnN
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveTableName;
 
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -23,6 +25,8 @@ public class SqlQueryBuilder {
 
     private static final String UPDATE_TABLE = "UPDATE %s SET %s WHERE %s;";
     private static final String DELETE_FROM_TABLE_BY_ID = "DELETE FROM %s WHERE %s = ?;";
+
+    private static final String VERSION_WHERE_CONDITION = " AND %s = ?;";
 
     private SqlQueryBuilder() {
         throw new BibernateException("Utility SqlQueryBuilder should not be instantiated");
@@ -89,5 +93,16 @@ public class SqlQueryBuilder {
         String whereCondition = "id = ?";
         return String.format(
                 UPDATE_TABLE, tableName, String.join(",", columnValuePairs), whereCondition);
+    }
+
+    public static String addVersionToWhereConditionIfNeeds(
+            String originSqlQuery, Class<?> entityType) {
+        return EntityUtils.findVersionField(entityType)
+                .flatMap(
+                        field ->
+                                Optional.of(
+                                        originSqlQuery.replace(
+                                                ";", String.format(VERSION_WHERE_CONDITION, field.getName()))))
+                .orElse(originSqlQuery);
     }
 }

@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.util;
 
+import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_MORE_THAN_ONE_VERSION;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ARG_CONSTRUCTOR;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ENTITY_ANNOTATION;
 import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.CLASS_HAS_NO_ID;
@@ -16,11 +17,13 @@ import com.bobocode.svydovets.bibernate.annotation.JoinColumn;
 import com.bobocode.svydovets.bibernate.annotation.ManyToOne;
 import com.bobocode.svydovets.bibernate.annotation.OneToMany;
 import com.bobocode.svydovets.bibernate.annotation.Table;
+import com.bobocode.svydovets.bibernate.annotation.Version;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -291,5 +294,23 @@ public class EntityUtils {
 
     public static boolean isEntityCollectionField(Field field) {
         return field.isAnnotationPresent(OneToMany.class);
+    }
+
+    public static Optional<Field> findVersionField(Class<?> type) {
+        List<Field> versionFields =
+                Arrays.stream(type.getDeclaredFields())
+                        .filter(field -> field.isAnnotationPresent(Version.class))
+                        .toList();
+
+        if (versionFields.size() > 1) {
+            throw new EntityValidationException(
+                    String.format(CLASS_HAS_MORE_THAN_ONE_VERSION, type.getName(), versionFields.size()));
+        }
+        return versionFields.stream().findFirst();
+    }
+
+    public static <T> Object getVersionValue(T entity, Field versionField) {
+        return retrieveValueFromField(entity, versionField)
+                .orElseThrow(() -> new BibernateException("Version is not present in entity"));
     }
 }

@@ -64,6 +64,7 @@ public abstract class AbstractIntegrationTest {
         createEmployeeTable();
         createParentTable();
         createChildTable();
+        createProductTable();
     }
 
     private void insertIntoTables() throws SQLException {
@@ -198,9 +199,24 @@ public abstract class AbstractIntegrationTest {
         statement.executeUpdate();
     }
 
+    private void createProductTable() throws SQLException {
+        String createTableQuery =
+                """
+                        CREATE TABLE IF NOT EXISTS product
+                        (
+                            id       BIGINT ,
+                            quantity INT,
+                            version  INT
+                        );
+                         """;
+
+        PreparedStatement statement = connection.prepareStatement(createTableQuery);
+        statement.executeUpdate();
+    }
+
     private void dropTables() {
         List<String> queries = List.of("DROP TABLE person", "DROP TABLE users", "DROP TABLE customers",
-                "DROP TABLE employees", "DROP SEQUENCE \"custom_seq\"", "DROP SEQUENCE \"customers_seq\"", "DROP TABLE child", "DROP TABLE parent");
+                "DROP TABLE employees", "DROP TABLE product", "DROP SEQUENCE \"custom_seq\"", "DROP SEQUENCE \"customers_seq\"", "DROP TABLE child", "DROP TABLE parent");
         queries.forEach(query -> {
             try {
                 connection.prepareStatement(query).executeUpdate();
