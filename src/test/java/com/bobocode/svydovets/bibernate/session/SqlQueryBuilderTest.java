@@ -19,7 +19,7 @@ class SqlQueryBuilderTest {
         // when
         var selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(User.class);
         // then
-        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ?;");
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ? ;");
     }
 
     @Test
@@ -50,7 +50,7 @@ class SqlQueryBuilderTest {
         // when
         var selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(Person.class);
         // then
-        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM person WHERE id = ?;");
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM person WHERE id = ? ;");
     }
 
     @Test

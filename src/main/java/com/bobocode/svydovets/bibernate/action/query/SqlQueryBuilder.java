@@ -36,7 +36,8 @@ public class SqlQueryBuilder {
     public static String createSelectByIdQuery(Class<?> entityType, LockModeType lockModeType) {
         String tableName = resolveTableName(entityType);
         String idColumnName = resolveIdColumnName(entityType);
-        return String.format(SELECT_FROM_TABLE_BY_ID, tableName, idColumnName, lockModeType.getValue());
+        String lockMode = lockModeType.getValue();
+        return String.format(SELECT_FROM_TABLE_BY_ID, tableName, idColumnName, lockMode);
     }
 
     public static String createSelectAllQuery(Class<?> entityType) {
