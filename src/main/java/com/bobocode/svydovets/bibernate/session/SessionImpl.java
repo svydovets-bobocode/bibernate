@@ -91,6 +91,7 @@ public class SessionImpl implements Session {
         EntityKey<?> entityKey = EntityKey.valueOf(entity);
         actionQueue.addAction(entityKey, new InsertAction<>(this.connection, entity));
         entitiesCacheMap.put(entityKey, entity);
+        entitiesSnapshotMap.put(entityKey, getFieldValuesFromEntity(entity));
         entityStateService.setEntityState(entity, EntityState.MANAGED);
         return entity;
     }
