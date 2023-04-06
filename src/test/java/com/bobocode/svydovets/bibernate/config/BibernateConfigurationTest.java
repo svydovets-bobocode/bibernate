@@ -25,6 +25,7 @@ public class BibernateConfigurationTest extends AbstractIntegrationTest {
         var testRecord = session.find(User.class, 1);
         assertNotNull(testRecord);
         assertEquals(1, testRecord.getId());
+        session.close();
     }
 
     @Test
@@ -34,6 +35,7 @@ public class BibernateConfigurationTest extends AbstractIntegrationTest {
         SessionFactory sessionFactory = config.buildSessionFactory();
         Session session = sessionFactory.openSession();
         assertTrue(session.isOpen());
+        session.close();
     }
 
     @Test
@@ -45,6 +47,7 @@ public class BibernateConfigurationTest extends AbstractIntegrationTest {
         SessionFactory sessionFactory = config.buildSessionFactory();
         Session session = sessionFactory.openSession();
         assertTrue(session.isOpen());
+        session.close();
     }
 
     @Test
@@ -56,6 +59,7 @@ public class BibernateConfigurationTest extends AbstractIntegrationTest {
         SessionFactory sessionFactory = config.buildSessionFactory();
         Session session = sessionFactory.openSession();
         assertTrue(session.isOpen());
+        session.close();
     }
 
     @Test

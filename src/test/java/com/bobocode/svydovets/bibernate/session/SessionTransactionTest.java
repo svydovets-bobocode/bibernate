@@ -14,10 +14,8 @@ import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.sql.SQLException;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.*;
 
 class SessionTransactionTest extends AbstractIntegrationTest {
     private static SessionFactory sessionFactory;
@@ -38,6 +36,11 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @BeforeEach
     void beforeEach() {
         session = sessionFactory.openSession();
+    }
+
+    @AfterEach
+    void afterEach() {
+        session.close();
     }
 
     @Test
