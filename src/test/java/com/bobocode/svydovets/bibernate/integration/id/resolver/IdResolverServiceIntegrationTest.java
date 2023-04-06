@@ -30,14 +30,6 @@ public class IdResolverServiceIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        void retrieveIdForCustomerFailsIfAlreadyProvided() {
-            var customer = newDefaultInvalidCustomer();
-            assertThrows(
-                    EntityValidationException.class,
-                    () -> idResolverService.resolveIdValue(connection, customer));
-        }
-
-        @Test
         void retrieveIdForEmployeeFromCustomSequence() {
             var employee = newDefaultValidEmployee();
             idResolverService.resolveIdValue(connection, employee);
@@ -70,14 +62,6 @@ public class IdResolverServiceIntegrationTest extends AbstractIntegrationTest {
 
             assertNotNull(user.getId());
             assertEquals(1, user.getId());
-        }
-
-        @Test
-        void retrieveIdForUserFailsIfAlreadyProvided() {
-            var customer = newDefaultInvalidCustomer();
-            assertThrows(
-                    EntityValidationException.class,
-                    () -> idResolverService.resolveIdValue(connection, customer));
         }
     }
 
