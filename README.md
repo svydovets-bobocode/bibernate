@@ -480,6 +480,41 @@ reducing the amount of code required to manage persistence.
 
 ---
 
-The Bibernate Action Queue is a collection of pending database operations that are queued up to be executed as part of a
-transaction.
-It ensures that database operations are executed in the correct order and that the database remains consistent.
+The Bibernate Action Queue is responsible for managing and executing the following types of actions:
+
+- `INSERT`: Represents the insertion of a new entity into the database.
+- `UPDATE`: Represents the update of an existing entity in the database.
+- `DELETE`: Represents the deletion of an existing entity from the database.
+
+When an action is added to the queue, it is not immediately executed.
+Instead, the Action Queue collects all actions that need to be executed within a transaction, and then executes them in the correct order when the transaction is committed.
+
+To ensure that the actions are executed in the correct order, the Action Queue follows these rules:
+
+`INSERT` actions are executed before `UPDATE` actions.
+`UPDATE` actions should be skipped if follow with `DELETE` actions.
+Actions are executed in the order they were added to the queue.
+This ordering guarantees that all insertions are completed before any updates or deletions are performed, preventing any inconsistencies in the database.
+
+Here is an example of using the Action Queue within a transaction:
+
+```java
+try {
+  session.begin(); // Start the transaction
+  
+  // Perform database operations (these actions will be added to the Action Queue)
+  
+  Person personsFromDb = session.find(Person.class,1L);
+  
+  personsFromDb.setFirstName("Jane");
+  
+  session.delete(personsFromDb);
+  
+  session.commit(); // Commit the transaction (this will execute the actions in the Action Queue)
+  } catch (Exception ex) {
+  session.rollback(); // Rollback the transaction in case of any errors
+}
+```
+
+In this example, when the transaction is committed, the actions in the Action Queue are executed in the following order: UPDATE, DELETE.
+This ensures that the employee is first retrieved from db, it will be deleted from the database, skipping update.
