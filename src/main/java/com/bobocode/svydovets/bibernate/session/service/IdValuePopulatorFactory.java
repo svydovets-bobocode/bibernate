@@ -9,9 +9,22 @@ import java.util.Map;
 public class IdValuePopulatorFactory {
     private final Map<GenerationType, IdValuePopulator> idValuePopulatorMap;
 
-    public IdValuePopulatorFactory() {
+    private static volatile IdValuePopulatorFactory instance;
+
+    private IdValuePopulatorFactory() {
         this.idValuePopulatorMap =
                 Map.of(IDENTITY, new IdentityIdValuePopulator(), SEQUENCE, new SequenceIdValuePopulator());
+    }
+
+    public static IdValuePopulatorFactory getInstance() {
+        if (instance == null) {
+            synchronized (IdValuePopulatorFactory.class) {
+                if (instance == null) {
+                    instance = new IdValuePopulatorFactory();
+                }
+            }
+        }
+        return instance;
     }
 
     public IdValuePopulator getIdValuePopulator(GenerationType idPopulatorType) {
