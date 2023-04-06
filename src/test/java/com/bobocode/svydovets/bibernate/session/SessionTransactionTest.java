@@ -14,7 +14,6 @@ import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.sql.SQLException;
 import java.util.List;
-
 import org.junit.jupiter.api.*;
 
 class SessionTransactionTest extends AbstractIntegrationTest {
