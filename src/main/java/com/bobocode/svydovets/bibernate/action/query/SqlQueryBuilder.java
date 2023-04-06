@@ -7,8 +7,8 @@ import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveIdColumnN
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveTableName;
 
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
-import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import com.bobocode.svydovets.bibernate.session.LockModeType;
+import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;

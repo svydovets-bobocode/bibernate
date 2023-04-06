@@ -17,6 +17,7 @@ public interface Session {
      */
     <T> T find(Class<T> type, Object id);
 
+    // todo JavaDoc
     <T> T find(Class<T> type, Object id, LockModeType lockModeType);
 
     /**

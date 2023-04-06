@@ -3,6 +3,7 @@ package com.bobocode.svydovets.bibernate.session;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+// todo JavaDoc
 @AllArgsConstructor
 public enum LockModeType {
     NONE(""),
