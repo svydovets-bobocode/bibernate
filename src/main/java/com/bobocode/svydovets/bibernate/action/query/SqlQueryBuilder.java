@@ -7,6 +7,7 @@ import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveIdColumnN
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.resolveTableName;
 
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.session.LockModeType;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SqlQueryBuilder {
     // Todo: transform it to a abstract class or interface to cover different dialects
     // Todo: mb create enum to store queries
-    private static final String SELECT_FROM_TABLE_BY_ID = "SELECT * FROM %s WHERE %s = ?;";
+    private static final String SELECT_FROM_TABLE_BY_ID = "SELECT * FROM %s WHERE %s = ? %s;";
     private static final String SELECT_ALL_FROM_TABLE = "SELECT * FROM %s;";
     private static final String INSERT_INTO_TABLE = "INSERT INTO %s(%s) VALUES(%s);";
 
@@ -29,9 +30,13 @@ public class SqlQueryBuilder {
     }
 
     public static String createSelectByIdQuery(Class<?> entityType) {
+        return createSelectByIdQuery(entityType, LockModeType.NONE);
+    }
+
+    public static String createSelectByIdQuery(Class<?> entityType, LockModeType lockModeType) {
         String tableName = resolveTableName(entityType);
         String idColumnName = resolveIdColumnName(entityType);
-        return String.format(SELECT_FROM_TABLE_BY_ID, tableName, idColumnName);
+        return String.format(SELECT_FROM_TABLE_BY_ID, tableName, idColumnName, lockModeType.getValue());
     }
 
     public static String createSelectAllQuery(Class<?> entityType) {

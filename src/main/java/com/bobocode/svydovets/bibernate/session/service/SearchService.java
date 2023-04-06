@@ -10,6 +10,7 @@ import com.bobocode.svydovets.bibernate.constant.Operation;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.ConnectionException;
 import com.bobocode.svydovets.bibernate.exception.EntityNotFoundException;
+import com.bobocode.svydovets.bibernate.session.LockModeType;
 import com.bobocode.svydovets.bibernate.state.EntityStateService;
 import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
@@ -38,10 +39,14 @@ public class SearchService {
     }
 
     public <T> T findOne(EntityKey<T> key) {
+        return findOne(key, LockModeType.NONE);
+    }
+
+    public <T> T findOne(EntityKey<T> key, LockModeType lockModeType) {
         var type = key.type();
         var id = key.id();
         validatorProcessor.validate(type, Operation.SELECT);
-        String selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(type);
+        String selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(type, lockModeType);
         try (var statement = connection.prepareStatement(selectByIdQuery)) {
             statement.setObject(1, id);
             ResultSet resultSet = statement.executeQuery();

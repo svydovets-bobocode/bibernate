@@ -23,6 +23,28 @@ class SqlQueryBuilderTest {
     }
 
     @Test
+    @DisplayName("Create Select by Id Query with explicit lock for update")
+    void createSelectByIdQueryWithExplicitLockForUpdate() {
+        // given
+        // when
+        var selectByIdQuery =
+                SqlQueryBuilder.createSelectByIdQuery(User.class, LockModeType.FOR_UPDATE);
+        // then
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ? FOR UPDATE;");
+    }
+
+    @Test
+    @DisplayName("Create Select by Id Query with explicit lock for share")
+    void createSelectByIdQueryWithExplicitLockForShare() {
+        // given
+        // when
+        var selectByIdQuery =
+                SqlQueryBuilder.createSelectByIdQuery(User.class, LockModeType.FOR_SHARE);
+        // then
+        assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ? FOR SHARE;");
+    }
+
+    @Test
     @DisplayName("Create Select by id query when table name is Explicitly Specified")
     void createSelectByIdQueryWhenTableNameIsExplicitlySpecified() {
         // given
