@@ -38,8 +38,7 @@ class SqlQueryBuilderTest {
     void createSelectByIdQueryWithExplicitLockForShare() {
         // given
         // when
-        var selectByIdQuery =
-                SqlQueryBuilder.createSelectByIdQuery(User.class, LockModeType.FOR_SHARE);
+        var selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(User.class, LockModeType.FOR_SHARE);
         // then
         assertThat(selectByIdQuery).isEqualTo("SELECT * FROM users WHERE id = ? FOR SHARE;");
     }
