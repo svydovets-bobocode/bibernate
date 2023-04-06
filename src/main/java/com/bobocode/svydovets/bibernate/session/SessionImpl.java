@@ -105,6 +105,7 @@ public class SessionImpl implements Session {
 
         actionQueue.addAction(entityKey, new InsertAction<>(this.connection, entity));
         entitiesCacheMap.put(entityKey, entity);
+        entitiesSnapshotMap.put(entityKey, getFieldValuesFromEntity(entity));
         entityStateService.setEntityState(entity, EntityState.MANAGED);
         return entity;
     }
@@ -189,7 +190,7 @@ public class SessionImpl implements Session {
     public void flush() {
         verifySessionIsOpened();
         performDirtyChecking();
-        actionQueue.executeAll();
+        actionQueue.executeAllWithOrder();
         actionQueue.clear();
     }
 
