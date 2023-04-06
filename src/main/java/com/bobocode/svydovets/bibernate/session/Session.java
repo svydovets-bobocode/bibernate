@@ -31,9 +31,12 @@ import java.util.Collection;
  *
  * <p>When you perform the operation on your Entity - they are not sent to the DB at the time.
  * Instead, they are added to the {@link ActionQueue}, which postpones the DB operations, optimizes
- * them and provide you with the next features: 1. Queries mey be not executed at all, if you
- * created an entity and deleted it within one TX. 2. All the operations will be sent only by one
- * DB-request, which decreases the latency and optimizes the perfomance.
+ * them and provide you with the next features:
+ * <p>
+ * 1. Queries mey be not executed at all, if you created an entity and deleted it within one TX.
+ * <p>
+ * 2. All the operations will be sent only by one DB-request, which decreases the latency and
+ * optimizes the perfomance.
  *
  * <p>You have to close your Session as soon as possible. When Session is opened - it stores in
  * memory all the cached entities and it's snapshots. Also, if you was using {@link LockModeType},
