@@ -17,6 +17,7 @@ import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.locking.optimistic.OptimisticLockService;
 import com.bobocode.svydovets.bibernate.session.service.IdResolverService;
 import com.bobocode.svydovets.bibernate.session.service.SearchService;
 import com.bobocode.svydovets.bibernate.state.EntityState;
@@ -46,6 +47,7 @@ public class SessionImpl implements Session {
     private final SearchService searchService;
     private final IdResolverService idService;
     private final EntityStateService entityStateService;
+    private final OptimisticLockService optimisticLockService;
 
     private final Map<EntityKey<?>, Object> entitiesCacheMap = new ConcurrentHashMap<>();
     private final Map<EntityKey<?>, Map<String, Object>> entitiesSnapshotMap =
@@ -64,6 +66,7 @@ public class SessionImpl implements Session {
         this.entityStateService = new EntityStateServiceImpl();
         this.actionQueue = new ActionQueue();
         this.searchService.setResultSetMapper(new ResultSetMapper(this));
+        this.optimisticLockService = new OptimisticLockService();
     }
 
     @Override
@@ -89,6 +92,10 @@ public class SessionImpl implements Session {
         idService.resolveIdValue(this.connection, entity);
 
         EntityKey<?> entityKey = EntityKey.valueOf(entity);
+
+        optimisticLockService.syncVersionValueWithSnapshotIfNeeds(
+                entity, entityKey, entitiesSnapshotMap);
+
         actionQueue.addAction(entityKey, new InsertAction<>(this.connection, entity));
         entitiesCacheMap.put(entityKey, entity);
         entityStateService.setEntityState(entity, EntityState.MANAGED);
@@ -99,6 +106,9 @@ public class SessionImpl implements Session {
     public void delete(Object object) {
         verifySessionIsOpened();
         EntityKey<?> entityKey = EntityKey.valueOf(object);
+
+        optimisticLockService.syncVersionValueWithSnapshotIfNeeds(
+                object, entityKey, entitiesSnapshotMap);
 
         actionQueue.addAction(entityKey, new DeleteAction<>(this.connection, object));
         entitiesCacheMap.remove(entityKey);

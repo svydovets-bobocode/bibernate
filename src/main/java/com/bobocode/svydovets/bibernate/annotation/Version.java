@@ -12,11 +12,14 @@ import java.util.Set;
  * Version annotation is applied should be one of the types are listed in {@link
  * Version#SUPPORTED_OBJECT_TYPES}. All changes you made manually in the code to the field annotated
  * with Version annotation will be ignored. Version value incrementing happens automatically while
- * applying changes to the database.
+ * applying changes to the database. Initial value after insert to database is {@link
+ * Version#INITIAL_VERSION_FIELD_VALUE}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Version {
+    int INITIAL_VERSION_FIELD_VALUE = 0;
+
     Set<Class<?>> SUPPORTED_OBJECT_TYPES =
             Set.of(Short.class, Integer.class, Long.class, short.class, int.class, long.class);
 }
