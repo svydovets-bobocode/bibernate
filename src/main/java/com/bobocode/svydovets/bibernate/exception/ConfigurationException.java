@@ -7,6 +7,5 @@ public class ConfigurationException extends BibernateException {
 
     public ConfigurationException(String message, Throwable cause) {
         super(message, cause);
-        log.error(message);
     }
 }

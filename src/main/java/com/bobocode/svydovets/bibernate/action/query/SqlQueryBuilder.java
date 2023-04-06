@@ -16,6 +16,11 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * The {@code SqlQueryBuilder} class provides a set of static methods for building SQL queries based on the passed
+ * entity type and its properties. This class includes methods for building SELECT, INSERT, UPDATE, and DELETE queries
+ * with additional options such as locking and versioning.
+ */
 @Slf4j
 public class SqlQueryBuilder {
     // Todo: transform it to a abstract class or interface to cover different dialects
@@ -33,10 +38,23 @@ public class SqlQueryBuilder {
         throw new BibernateException("Utility SqlQueryBuilder should not be instantiated");
     }
 
+    /**
+     * Builds a SELECT query with a WHERE clause that selects an entity by its ID.
+     *
+     * @param entityType the entity type to build the query for.
+     * @return a SELECT query with a WHERE clause that selects an entity by its ID.
+     */
     public static String createSelectByIdQuery(Class<?> entityType) {
         return createSelectByIdQuery(entityType, LockModeType.NONE);
     }
 
+    /**
+     *  Builds a SELECT query with a WHERE clause that selects an entity by its ID and applies a specified lock mode.
+     *
+     *  @param entityType the entity type to build the query for.
+     *  @param lockModeType the lock mode to apply to the query.
+     *  @return a SELECT query with a WHERE clause that selects an entity by its ID and applies a specified lock mode.
+     */
     public static String createSelectByIdQuery(Class<?> entityType, LockModeType lockModeType) {
         String tableName = resolveTableName(entityType);
         String idColumnName = resolveIdColumnName(entityType);
@@ -44,17 +62,32 @@ public class SqlQueryBuilder {
         return String.format(SELECT_FROM_TABLE_BY_ID, tableName, idColumnName, lockMode);
     }
 
+    /**
+     * Builds a SELECT query that retrieves all entities from the specified table.
+     * @param entityType the entity type to build the query for.
+     * @return a SELECT query that retrieves all entities from the specified table.
+     */
     public static String createSelectAllQuery(Class<?> entityType) {
         String tableName = resolveTableName(entityType);
         return String.format(SELECT_ALL_FROM_TABLE, tableName);
     }
 
+    /**
+     * Builds a DELETE query with a WHERE clause that deletes an entity by its ID.
+     * @param entityType the entity type to build the query for.
+     * @return a DELETE query with a WHERE clause that deletes an entity by its ID.
+     */
     public static String createDeleteByIdQuery(Class<?> entityType) {
         String tableName = resolveTableName(entityType);
         String idColumnName = resolveIdColumnName(entityType);
         return String.format(DELETE_FROM_TABLE_BY_ID, tableName, idColumnName);
     }
 
+    /**
+     * Retrieves a list of column names for fields that are updatable in the specified entity class.
+     * @param entityType The entity class for which to retrieve updatable fields.
+     * @return A list of column names for fields that are updatable in the specified entity class.
+     */
     private static List<String> getColumnNamesForUpdate(Class<?> entityType) {
         List<String> columnNames = new ArrayList<>();
         Field[] insertableFields = getUpdatableFields(entityType);
@@ -65,6 +98,11 @@ public class SqlQueryBuilder {
         return columnNames;
     }
 
+    /**
+     * Retrieves a list of column names for fields that are insertable in the specified entity class.
+     * @param entityType The entity class for which to retrieve insertable fields.
+     * @return A list of column names for fields that are insertable in the specified entity class.
+     */
     private static List<String> getColumnNamesForInsert(Class<?> entityType) {
         List<String> columnNames = new ArrayList<>();
         Field[] insertableFields = getInsertableFields(entityType);
@@ -75,6 +113,11 @@ public class SqlQueryBuilder {
         return columnNames;
     }
 
+    /**
+     * Creates an SQL insert query based on the specified entity class.
+     * @param entityType The entity class for which to create an SQL insert query.
+     * @return An SQL insert query based on the specified entity class.
+     */
     public static String createInsertQuery(Class<?> entityType) {
         var tableName = resolveTableName(entityType);
         List<String> columnNames = getColumnNamesForInsert(entityType);
@@ -87,6 +130,11 @@ public class SqlQueryBuilder {
                 String.join(",", valuePlaceholders));
     }
 
+    /**
+     * Creates an SQL update query based on the specified entity class.
+     * @param entityType The entity class for which to create an SQL update query.
+     * @return An SQL update query based on the specified entity class.
+     */
     public static String createUpdateQuery(Class<?> entityType) {
         var tableName = resolveTableName(entityType);
         List<String> columnNames = getColumnNamesForUpdate(entityType);
@@ -101,6 +149,12 @@ public class SqlQueryBuilder {
                 UPDATE_TABLE, tableName, String.join(",", columnValuePairs), whereCondition);
     }
 
+    /**
+     * Adds a version field to the WHERE condition of the specified SQL query if necessary.
+     * @param originSqlQuery The original SQL query.
+     * @param entityType The entity class associated with the SQL query.
+     * @return The modified SQL query with a version field in the WHERE condition if necessary.
+     */
     public static String addVersionToWhereConditionIfNeeds(
             String originSqlQuery, Class<?> entityType) {
         return EntityUtils.findVersionField(entityType)
