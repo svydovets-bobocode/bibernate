@@ -6,6 +6,7 @@ import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class UpdateAction<T> extends AbstractAction<T> {
 
@@ -16,14 +17,27 @@ public class UpdateAction<T> extends AbstractAction<T> {
     @Override
     protected void doExecute() {
         var actionObjectType = actionObject.getClass();
-        try (var preparedStatement =
-                connection.prepareStatement(SqlQueryBuilder.createUpdateQuery(actionObjectType))) {
+        String updateQuery = SqlQueryBuilder.createUpdateQuery(actionObjectType);
+
+        Optional<Field> optionalVersionField = EntityUtils.findVersionField(actionObject.getClass());
+        if (optionalVersionField.isPresent()) {
+            updateQuery =
+                    SqlQueryBuilder.addVersionToWhereConditionIfNeeds(updateQuery, actionObject.getClass());
+        }
+
+        try (var preparedStatement = connection.prepareStatement(updateQuery)) {
             Field[] updatableFields = EntityUtils.getUpdatableFields(actionObjectType);
 
             setFieldsInPreparedStatement(preparedStatement, updatableFields);
 
             Object id = EntityUtils.getIdValue(actionObject);
             preparedStatement.setObject(updatableFields.length + 1, id);
+
+            if (optionalVersionField.isPresent()) {
+                Object inWhereCondition =
+                        EntityUtils.getVersionValue(actionObject, optionalVersionField.get());
+                preparedStatement.setObject(updatableFields.length + 2, inWhereCondition);
+            }
 
             int updatedRows = preparedStatement.executeUpdate();
             if (updatedRows != 1) {
