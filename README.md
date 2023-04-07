@@ -154,6 +154,7 @@ public class StartExample {
 - **[Transaction](#transaction)**
 - **[Dirty checking](#dirty-checking)**
 - **[Action Queue](#action-queue)**
+- **[Optimistic locking](#optimistic-locking)**
 
 ### Datasource configuration
 
@@ -428,6 +429,19 @@ private String phone;
 
  </details>
 
+<details>
+<summary>@Version</summary>
+
+[`@Version`](src/main/java/com/bobocode/svydovets/bibernate/annotation/Version.java)
+annotation is used to indicate that the field will be used for optimistic locking
+
+```java
+@Version
+private long version; 
+```
+
+ </details>
+
 ### Entity
 
 ---
@@ -649,3 +663,32 @@ try {
 
 In this example, when the transaction is committed, the actions in the Action Queue are executed in the following order: UPDATE, DELETE.
 This ensures that the employee is first retrieved from db, it will be deleted from the database, skipping update.
+
+### Optimistic locking
+
+---
+
+The optimistic locking mechanism can be applied by using [**@Version**](#mapping) annotation.
+Supported data types for fields annotated by @Version: Short, Integer, Long, short, int, long. The initial value for the field annotated after the insert operation is 0.
+Optimistic lock works for update and as well delete operations. When the entity is subsequently updated or deleted, Bibernate checks whether
+the version number in the database matches the version number of the entity being updated/deleted. If the version numbers match, the update/delete
+is allowed to proceed. If the version numbers do not match, it means that the entity has been updated by another transaction, and the update/delete
+is rejected.
+
+<details>
+
+```java
+@Entity
+public class Product {
+    @Id
+    private Long id;
+
+    private String name;
+    
+    @Version
+    private long version;
+}
+```
+
+</details>
+
