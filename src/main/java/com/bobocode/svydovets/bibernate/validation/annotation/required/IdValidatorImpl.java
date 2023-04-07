@@ -29,7 +29,7 @@ public class IdValidatorImpl extends AbstractRequiredValidator {
                         .filter(field -> field.isAnnotationPresent(Id.class))
                         .toList();
 
-        if (idFields.size() == 0) {
+        if (idFields.isEmpty()) {
             throw new EntityValidationException(String.format(CLASS_HAS_NO_ID, type.getName()));
         }
         if (idFields.size() > 1) {

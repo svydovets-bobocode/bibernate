@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 /** JdbcExecutor provides static methods to execute SQL queries and statements using JDBC. */
 @Slf4j
 public class JdbcExecutor {
+    private JdbcExecutor() {
+    }
 
     /**
      * Executes a SQL query and returns the result set.
