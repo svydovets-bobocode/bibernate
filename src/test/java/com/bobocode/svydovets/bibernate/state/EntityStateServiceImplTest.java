@@ -22,7 +22,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Newly created entity should be in TRANSIENT state after creation.")
     void theNewlyCreatedEntityShouldBeInTransientState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(19L, "reallyFirstName", "justLastName");
         assertEquals(TRANSIENT, entityStateService.getEntityState(person));
     }
 
