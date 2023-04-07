@@ -42,6 +42,7 @@ public class SessionTest {
         // given
         var person = newDefaultPerson();
         when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(person);
+        when(searchService.findOne(eq(DEFAULT_ENTITY_KEY), any())).thenReturn(person);
         // when
         var foundPerson = session.find(Person.class, DEFAULT_ID);
         // then
@@ -53,6 +54,7 @@ public class SessionTest {
     void findReturnsEntityFromCacheWhenItIsLoaded() {
         // given
         when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenAnswer(in -> newDefaultPerson());
+        when(searchService.findOne(eq(DEFAULT_ENTITY_KEY), any())).thenAnswer(in -> newDefaultPerson());
         // when
         var person1 = session.find(Person.class, DEFAULT_ID);
         var person2 = session.find(Person.class, DEFAULT_ID);
@@ -64,7 +66,7 @@ public class SessionTest {
     @DisplayName("Find does not call Db When Entity is already loaded")
     void findDoesNotCallDbWhenEntityIsAlreadyLoaded() {
         // given
-        when(searchService.findOne(DEFAULT_ENTITY_KEY))
+        when(searchService.findOne(eq(DEFAULT_ENTITY_KEY), any()))
                 .thenAnswer(invocationOnMock -> newDefaultPerson());
         // when
         Person person = session.find(Person.class, DEFAULT_ID);
@@ -80,7 +82,7 @@ public class SessionTest {
     void shouldFailIfSessionIsClosed() {
         // given
         var person = newDefaultPerson();
-        when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(person);
+        when(searchService.findOne(eq(DEFAULT_ENTITY_KEY), any())).thenReturn(person);
         session.close();
         // when
         // then
@@ -114,6 +116,7 @@ public class SessionTest {
         Person detachedPerson = newDefaultPerson();
         Person managedPerson = newDefaultPerson();
         when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
+        when(searchService.findOne(eq(DEFAULT_ENTITY_KEY), any())).thenReturn(managedPerson);
 
         mockedEntityStateService = Mockito.mock(EntityStateServiceImpl.class);
         setInternalDependency(session, "entityStateService", mockedEntityStateService);
@@ -133,7 +136,7 @@ public class SessionTest {
         Person detachedPerson = newDefaultPerson();
         Person managedPerson = newDefaultPerson();
 
-        when(searchService.findOne(DEFAULT_ENTITY_KEY)).thenReturn(managedPerson);
+        when(searchService.findOne(eq(DEFAULT_ENTITY_KEY), any())).thenReturn(managedPerson);
         mockedEntityStateService = Mockito.mock(EntityStateServiceImpl.class);
         setInternalDependency(session, "entityStateService", mockedEntityStateService);
 
@@ -181,10 +184,12 @@ public class SessionTest {
         Person firstPerson = newDefaultPerson();
         EntityKey<?> firstEntityKey = EntityKey.of(Person.class, firstPerson.getId());
         doReturn(firstPerson).when(searchService).findOne(eq(firstEntityKey));
+        doReturn(firstPerson).when(searchService).findOne(eq(firstEntityKey), any());
 
         Person secondPerson = newOtherPerson();
         EntityKey<?> secondEntityKey = EntityKey.of(Person.class, secondPerson.getId());
         doReturn(secondPerson).when(searchService).findOne(eq(secondEntityKey));
+        doReturn(secondPerson).when(searchService).findOne(eq(secondEntityKey), any());
 
         mockedEntityStateService = Mockito.mock(EntityStateServiceImpl.class);
         setInternalDependency(session, "entityStateService", mockedEntityStateService);

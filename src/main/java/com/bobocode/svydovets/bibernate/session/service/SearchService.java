@@ -10,6 +10,7 @@ import com.bobocode.svydovets.bibernate.constant.Operation;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.ConnectionException;
 import com.bobocode.svydovets.bibernate.exception.EntityNotFoundException;
+import com.bobocode.svydovets.bibernate.session.LockModeType;
 import com.bobocode.svydovets.bibernate.state.EntityStateService;
 import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
@@ -17,6 +18,7 @@ import com.bobocode.svydovets.bibernate.validation.annotation.required.processor
 import com.bobocode.svydovets.bibernate.validation.annotation.required.processor.RequiredAnnotationValidatorProcessorImpl;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +40,14 @@ public class SearchService {
     }
 
     public <T> T findOne(EntityKey<T> key) {
+        return findOne(key, LockModeType.NONE);
+    }
+
+    public <T> T findOne(EntityKey<T> key, LockModeType lockModeType) {
         var type = key.type();
         var id = key.id();
         validatorProcessor.validate(type, Operation.SELECT);
-        String selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(type);
+        String selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(type, lockModeType);
         try (var statement = connection.prepareStatement(selectByIdQuery)) {
             statement.setObject(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -53,7 +59,7 @@ public class SearchService {
                 throw new EntityNotFoundException(
                         "Unable to find entity: %s by id: %s".formatted(type.getSimpleName(), id));
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new ConnectionException("Error while executing query %s".formatted(selectByIdQuery), e);
         }
     }

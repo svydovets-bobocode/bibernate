@@ -3,21 +3,18 @@ package com.bobocode.svydovets.bibernate.session;
 import static com.bobocode.svydovets.bibernate.state.EntityState.DETACHED;
 import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
 import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_FIRST_NAME;
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ID;
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_LAST_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
+import com.bobocode.svydovets.bibernate.config.BibernateConfiguration;
 import com.bobocode.svydovets.bibernate.exception.EntityStateValidationException;
 import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,26 +24,26 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     private Session session;
 
     // todo: rework connection in tests after adding find(), save() to the session
-    //    @BeforeAll
-    //    static void initBeforeAll() {
-    //        sessionFactory = getSessionFactory();
-    //    }
-    //
-    //    private static SessionFactory getSessionFactory() {
-    //        BibernateConfiguration config = new BibernateConfiguration(dataSource);
-    //        config.configure();
-    //        return config.buildSessionFactory();
-    //    }
+    @BeforeAll
+    static void initBeforeAll() {
+        sessionFactory = getSessionFactory();
+    }
 
-    //    @BeforeEach
-    //    void beforeEach() {
-    //        session = sessionFactory.openSession();
-    //    }
+    private static SessionFactory getSessionFactory() {
+        BibernateConfiguration config = new BibernateConfiguration();
+        config.configure();
+        return config.buildSessionFactory();
+    }
 
     @BeforeEach
     void beforeEach() {
         sessionFactory = SessionFactoryImpl.getInstance(dataSource);
-        session = new SessionImpl(connection, searchService);
+        session = sessionFactory.openSession();
+    }
+
+    @AfterEach
+    void afterEach() {
+        session.close();
     }
 
     @Test
@@ -57,7 +54,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
         session.begin();
 
-        saveDefaultPersonIntoDb();
+        savePersonIntoDb();
         personsFromDb = getPersonsFromDb();
         assertEquals(3, personsFromDb.size());
 
@@ -75,7 +72,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
         session.begin();
 
-        saveDefaultPersonIntoDb();
+        savePersonIntoDb();
         personsFromDb = getPersonsFromDb();
         assertEquals(3, personsFromDb.size());
 
@@ -91,7 +88,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBefore() throws SQLException {
         Session session1 = sessionFactory.openSession();
 
-        Person personsFromDb = session1.find(Person.class, 1);
+        Person personsFromDb = session1.find(Person.class, 1L);
         personsFromDb.setFirstName("blablabla");
         EntityState actualEntityState = session1.getEntityState(personsFromDb);
         assertEquals(MANAGED, actualEntityState);
@@ -112,7 +109,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @DisplayName("Check if the selected entity is in the MANAGED state")
     void findAndCheckIfAnEntityIsInManagedState() throws SQLException {
         session.begin();
-        Person personsFromDb = session.find(Person.class, 1);
+        Person personsFromDb = session.find(Person.class, 1L);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(MANAGED, actualEntityState);
         session.commit();
@@ -122,7 +119,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @DisplayName("Check if the session detach method set DETACHED state")
     void detachFoundEntityAndCheckIfAnEntityIsInDetachedState() throws SQLException {
         session.begin();
-        Person personsFromDb = session.find(Person.class, 1);
+        Person personsFromDb = session.find(Person.class, 1L);
         session.detach(personsFromDb);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(DETACHED, actualEntityState);
@@ -133,7 +130,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @DisplayName("Check if the entity is in MANAGED state after merge method call")
     void mergeDetachedEntityAndCheckIfAnEntityIsInManagedState() throws SQLException {
         session.begin();
-        Person personsFromDb = session.find(Person.class, 1);
+        Person personsFromDb = session.find(Person.class, 1L);
         session.detach(personsFromDb);
         session.merge(personsFromDb);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
@@ -145,7 +142,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @DisplayName("Check if the entity is in REMOVED state after delete method call")
     void removeEntityAndCheckIfAnEntityIsInRemovedState() throws SQLException {
         session.begin();
-        Person personsFromDb = session.find(Person.class, 1);
+        Person personsFromDb = session.find(Person.class, 1L);
         session.delete(personsFromDb);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(REMOVED, actualEntityState);
@@ -176,28 +173,15 @@ class SessionTransactionTest extends AbstractIntegrationTest {
         assertThrows(
                 EntityStateValidationException.class,
                 () -> session.delete(personsFromDb),
-                "Can't change entity state from DETACHED to REMOVED");
+                "Can't change entity state from TRANSIENT to REMOVED");
         session.commit();
     }
 
-    private void saveDefaultPersonIntoDb() throws SQLException {
-        String insertQuery = "INSERT INTO person VALUES (?, ?, ?)";
-        PreparedStatement statement = connection.prepareStatement(insertQuery);
-        statement.setLong(1, DEFAULT_ID);
-        statement.setString(2, DEFAULT_FIRST_NAME);
-        statement.setString(3, DEFAULT_LAST_NAME);
-        statement.executeUpdate();
+    private void savePersonIntoDb() {
+        session.save(new Person(333L, "test", "testovich"));
     }
 
-    private List<Person> getPersonsFromDb() throws SQLException {
-        ArrayList<Person> persons = new ArrayList<>();
-        ResultSet rs = connection.prepareStatement("select * from person").executeQuery();
-        while (rs.next()) {
-            var id = rs.getLong(1);
-            var firstName = rs.getString(2);
-            var secondName = rs.getString(3);
-            persons.add(new Person(id, firstName, secondName));
-        }
-        return persons;
+    private List<Person> getPersonsFromDb() {
+        return (List<Person>) session.findAll(Person.class);
     }
 }

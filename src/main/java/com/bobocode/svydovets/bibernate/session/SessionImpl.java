@@ -17,6 +17,7 @@ import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.action.mapper.ResultSetMapper;
 import com.bobocode.svydovets.bibernate.constant.ErrorMessage;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.locking.optimistic.OptimisticLockService;
 import com.bobocode.svydovets.bibernate.session.service.IdResolverService;
 import com.bobocode.svydovets.bibernate.session.service.SearchService;
 import com.bobocode.svydovets.bibernate.state.EntityState;
@@ -46,6 +47,7 @@ public class SessionImpl implements Session {
     private final SearchService searchService;
     private final IdResolverService idService;
     private final EntityStateService entityStateService;
+    private final OptimisticLockService optimisticLockService;
 
     private final Map<EntityKey<?>, Object> entitiesCacheMap = new ConcurrentHashMap<>();
     private final Map<EntityKey<?>, Map<String, Object>> entitiesSnapshotMap =
@@ -64,21 +66,29 @@ public class SessionImpl implements Session {
         this.entityStateService = EntityStateServiceImpl.getInstance();
         this.actionQueue = new ActionQueue();
         this.searchService.setResultSetMapper(new ResultSetMapper(this));
+        this.optimisticLockService = new OptimisticLockService();
     }
 
     @Override
     public <T> T find(Class<T> type, Object id) {
+        return find(type, id, LockModeType.NONE);
+    }
+
+    @Override
+    public <T> T find(Class<T> type, Object id, LockModeType lockModeType) {
         verifySessionIsOpened();
 
         EntityKey<T> entityKey = EntityKey.of(type, id);
-        T entity = type.cast(entitiesCacheMap.computeIfAbsent(entityKey, this::loadEntity));
+        T entity =
+                type.cast(
+                        entitiesCacheMap.computeIfAbsent(entityKey, key -> loadEntity(key, lockModeType)));
 
         entityStateService.setEntityState(entity, MANAGED);
         return entity;
     }
 
-    private <T> Object loadEntity(EntityKey<?> entityKey) {
-        Object loadedEntity = searchService.findOne(entityKey);
+    private <T> Object loadEntity(EntityKey<?> entityKey, LockModeType lockModeType) {
+        Object loadedEntity = searchService.findOne(entityKey, lockModeType);
         entitiesSnapshotMap.computeIfAbsent(entityKey, k -> getFieldValuesFromEntity(loadedEntity));
         return loadedEntity;
     }
@@ -89,8 +99,13 @@ public class SessionImpl implements Session {
         idService.resolveIdValue(this.connection, entity);
 
         EntityKey<?> entityKey = EntityKey.valueOf(entity);
+
+        optimisticLockService.syncVersionValueWithSnapshotIfNeeds(
+                entity, entityKey, entitiesSnapshotMap);
+
         actionQueue.addAction(entityKey, new InsertAction<>(this.connection, entity));
         entitiesCacheMap.put(entityKey, entity);
+        entitiesSnapshotMap.put(entityKey, getFieldValuesFromEntity(entity));
         entityStateService.setEntityState(entity, EntityState.MANAGED);
         return entity;
     }
@@ -99,6 +114,9 @@ public class SessionImpl implements Session {
     public void delete(Object object) {
         verifySessionIsOpened();
         EntityKey<?> entityKey = EntityKey.valueOf(object);
+
+        optimisticLockService.syncVersionValueWithSnapshotIfNeeds(
+                object, entityKey, entitiesSnapshotMap);
 
         actionQueue.addAction(entityKey, new DeleteAction<>(this.connection, object));
         entitiesCacheMap.remove(entityKey);
@@ -173,7 +191,7 @@ public class SessionImpl implements Session {
     public void flush() {
         verifySessionIsOpened();
         performDirtyChecking();
-        actionQueue.executeAll();
+        actionQueue.executeAllWithOrder();
         actionQueue.clear();
     }
 
@@ -187,7 +205,6 @@ public class SessionImpl implements Session {
     public void commit() {
         verifySessionIsOpened();
         flush();
-        entityStateService.clearState();
         transaction.commit();
     }
 
@@ -202,6 +219,8 @@ public class SessionImpl implements Session {
     private void detachAllManagedEntities() {
         entitiesCacheMap
             .values()
+            .stream()
+            .filter(entity -> entityStateService.getEntityState(entity).equals(MANAGED))
             .forEach(entity -> entityStateService.setEntityState(entity, DETACHED));
     }
 
