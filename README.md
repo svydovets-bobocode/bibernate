@@ -15,6 +15,7 @@ Overall, Bibernate is a powerful and popular tool for building Java-based applic
 databases in a convenient and efficient manner.
 
 For demonstration you can use the **[Bibernate demo project](https://github.com/svydovets-bobocode/bibernate-demo-project)**.
+
 ## Get started
 
 ---
