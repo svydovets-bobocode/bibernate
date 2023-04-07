@@ -193,20 +193,20 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public void begin() {
+    public void beginTransaction() {
         verifySessionIsOpened();
         transaction.begin();
     }
 
     @Override
-    public void commit() {
+    public void commitTransaction() {
         verifySessionIsOpened();
         flush();
         transaction.commit();
     }
 
     @Override
-    public void rollback() {
+    public void rollbackTransaction() {
         verifySessionIsOpened();
         entityStateService.clearState();
         transaction.rollback();
