@@ -14,11 +14,10 @@ over SQL-based database interactions.
 Overall, Bibernate is a powerful and popular tool for building Java-based applications that interact with relational
 databases in a convenient and efficient manner.
 
+For demonstration you can use the **[Bibernate demo project](https://github.com/svydovets-bobocode/bibernate-demo-project)**.
 ## Get started
 
 ---
-
-You can use the **[Bibernate demo project]()**.
 
 Or follow these steps:
 
