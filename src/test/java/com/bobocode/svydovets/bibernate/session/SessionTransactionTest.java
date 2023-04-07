@@ -105,11 +105,11 @@ class SessionTransactionTest extends AbstractIntegrationTest {
         session2.close();
     }
 
-
     @Test
     @DisplayName(
-        "State should be DETACHED after open new session after close when the entity was managed in old session before")
-    void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBeforeTransaction() throws SQLException {
+            "State should be DETACHED after open new session after close when the entity was managed in old session before")
+    void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBeforeTransaction()
+            throws SQLException {
         session.begin();
         Person personsFromDb = session.find(Person.class, 1L);
         personsFromDb.setFirstName("blablabla");
