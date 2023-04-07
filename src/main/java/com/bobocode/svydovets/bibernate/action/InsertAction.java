@@ -36,7 +36,7 @@ public class InsertAction<T> extends AbstractAction<T> {
             JdbcExecutor.executePreparedStatement(preparedStatement);
         } catch (SQLException ex) {
             throw new BibernateException(
-                    "Now able to process insert action for entity " + actionObjectType.getSimpleName(), ex);
+                    "Unable to execute update action for " + actionObjectType.getSimpleName(), ex);
         }
     }
 

@@ -15,10 +15,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ActionQueue {
-    public Map<EntityKey<?>, List<Action>> getActionsMap() {
-        return actionsMap;
-    }
-
     private final Map<EntityKey<?>, List<Action>> actionsMap = new ConcurrentHashMap<>();
 
     /**
@@ -42,13 +38,10 @@ public class ActionQueue {
     /** Executes all actions in the queue in the correct order (insert, update, remove). */
     public void executeAllWithOrder() {
         for (Map.Entry<EntityKey<?>, List<Action>> entry : actionsMap.entrySet()) {
-
             var actions = filterDuplicateSaveActions(entry.getValue());
 
-            // Sort actions by actionType, so they will be executed in the order: insert, update, remove
             actions.sort(Comparator.comparing(Action::getActionType));
 
-            // Execute optimized actions
             for (Action action : actions) {
                 action.execute();
                 log.debug("Executing action: {}", action.getActionType());

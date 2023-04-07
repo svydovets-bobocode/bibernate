@@ -23,7 +23,6 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     private static SessionFactory sessionFactory;
     private Session session;
 
-    // todo: rework connection in tests after adding find(), save() to the session
     @BeforeAll
     static void initBeforeAll() {
         sessionFactory = getSessionFactory();
@@ -85,7 +84,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @Test
     @DisplayName(
             "State should be DETACHED after open new session after close when the entity was managed in old session before")
-    void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBefore() throws SQLException {
+    void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBefore() {
         Session session1 = sessionFactory.openSession();
 
         Person personsFromDb = session1.find(Person.class, 1L);
@@ -133,7 +132,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Check if the session detach method set DETACHED state")
-    void detachFoundEntityAndCheckIfAnEntityIsInDetachedState() throws SQLException {
+    void detachFoundEntityAndCheckIfAnEntityIsInDetachedState() {
         session.begin();
         Person personsFromDb = session.find(Person.class, 1L);
         session.detach(personsFromDb);
@@ -144,7 +143,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Check if the entity is in MANAGED state after merge method call")
-    void mergeDetachedEntityAndCheckIfAnEntityIsInManagedState() throws SQLException {
+    void mergeDetachedEntityAndCheckIfAnEntityIsInManagedState() {
         session.begin();
         Person personsFromDb = session.find(Person.class, 1L);
         session.detach(personsFromDb);
@@ -156,7 +155,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Check if the entity is in REMOVED state after delete method call")
-    void removeEntityAndCheckIfAnEntityIsInRemovedState() throws SQLException {
+    void removeEntityAndCheckIfAnEntityIsInRemovedState() {
         session.begin();
         Person personsFromDb = session.find(Person.class, 1L);
         session.delete(personsFromDb);
@@ -167,7 +166,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Should throw en exception when merge entity in TRANSIENT state")
-    void shouldThrowAnExceptionWhenMergeEntityThatIsInTransientState() throws SQLException {
+    void shouldThrowAnExceptionWhenMergeEntityThatIsInTransientState() {
         session.begin();
 
         Person personsFromDb = new Person(2L, "Transient person", "Last name");
@@ -181,7 +180,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Should throw en exception when delete entity in TRANSIENT state")
-    void shouldThrowAnExceptionWhenDeleteEntityThatIsInTransientState() throws SQLException {
+    void shouldThrowAnExceptionWhenDeleteEntityThatIsInTransientState() {
         session.begin();
 
         Person personsFromDb = new Person(1L, "Transient person", "Last name");

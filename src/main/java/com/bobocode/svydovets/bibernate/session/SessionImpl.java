@@ -87,7 +87,7 @@ public class SessionImpl implements Session {
         return entity;
     }
 
-    private <T> Object loadEntity(EntityKey<?> entityKey, LockModeType lockModeType) {
+    private Object loadEntity(EntityKey<?> entityKey, LockModeType lockModeType) {
         Object loadedEntity = searchService.findOne(entityKey, lockModeType);
         entitiesSnapshotMap.computeIfAbsent(entityKey, k -> getFieldValuesFromEntity(loadedEntity));
         return loadedEntity;
@@ -160,18 +160,15 @@ public class SessionImpl implements Session {
 
         T managedEntity = entityType.cast(entitiesCacheMap.get(entityKey));
 
-        // If the entity is not in the cache, retrieve it from the database
         if (managedEntity == null) {
             managedEntity = searchService.findOne(entityKey);
             entitiesSnapshotMap.put(entityKey, getFieldValuesFromEntity(managedEntity));
         }
 
-        // Merge the states of the detached and managed entities
         for (Field field : entityType.getDeclaredFields()) {
             updateManagedEntityField(entity, managedEntity, field);
         }
 
-        // Add the merged entity to the cache
         entitiesCacheMap.put(entityKey, managedEntity);
         entityStateService.setEntityState(entityKey, MANAGED);
 
@@ -210,7 +207,6 @@ public class SessionImpl implements Session {
 
     @Override
     public void rollback() {
-        // TODO: think about do we need to clear the persistence context maps
         verifySessionIsOpened();
         entityStateService.clearState();
         transaction.rollback();

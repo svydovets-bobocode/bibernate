@@ -67,13 +67,6 @@ public class ResultSetMapper {
      * @throws SQLException if an error occurs while accessing the ResultSet
      * @throws BibernateException if an error occurs while mapping the ResultSet to an object
      */
-    // todo: @ManyToOne relations
-    // + todo 1: add util methods isRegularField, isRelationsField(isEntityField, isEntityCollection)
-    // + todo 2: process within the ResultSetMapper.mapToObject
-    // + todo 3: if is entity field: retrieve the column name from the JoinColumn
-    // + todo 4: retrieve the ID value from the ResultSet
-    // + todo 5: findById and related entity class and set it to the entity object
-    // + todo 6: change the snapshot saving logic to save the ID of the related entity
     private <T> T mapResultSetToObject(Class<T> type, ResultSet resultSet) throws SQLException {
         T instance = EntityUtils.createEmptyInstance(type);
         Field[] fields = type.getDeclaredFields();
