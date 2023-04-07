@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.action;
 
+import com.bobocode.svydovets.bibernate.action.executor.JdbcExecutor;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.constant.Operation;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
@@ -60,7 +61,7 @@ public class DeleteAction<T> extends AbstractAction<T> {
                 statement.setObject(VERSION_PARAM_INDEX, versionValue);
             }
 
-            if (statement.executeUpdate() != 1) {
+            if (JdbcExecutor.executePreparedStatementUpdate(statement) != 1) {
                 throw new BibernateException(
                         "Unable to delete entity: %s by id: %s".formatted(type.getSimpleName(), id));
             }

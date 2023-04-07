@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.action;
 
+import com.bobocode.svydovets.bibernate.action.executor.JdbcExecutor;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
@@ -54,7 +55,7 @@ public class UpdateAction<T> extends AbstractAction<T> {
                 preparedStatement.setObject(updatableFields.length + 2, inWhereCondition);
             }
 
-            int updatedRows = preparedStatement.executeUpdate();
+            int updatedRows = JdbcExecutor.executePreparedStatementUpdate(preparedStatement);
             if (updatedRows != 1) {
                 throw new BibernateException(
                         "Unable to update entity: %s with id: %s"
