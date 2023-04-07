@@ -1,10 +1,57 @@
 package com.bobocode.svydovets.bibernate.session;
 
+import com.bobocode.svydovets.bibernate.action.ActionQueue;
+import com.bobocode.svydovets.bibernate.annotation.Entity;
+import com.bobocode.svydovets.bibernate.annotation.Id;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
+import com.bobocode.svydovets.bibernate.exception.EntityNotFoundException;
 import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
+import com.bobocode.svydovets.bibernate.validation.Validator;
+import com.bobocode.svydovets.bibernate.validation.state.EntityStateTransition;
 import java.util.Collection;
 
+/**
+ * The main abstraction, which represents the power of the ORM. Provides an API to perform basic DB
+ * operations.
+ *
+ * <p>All the methods will only with the correctly mapped Entity. The minimum requirements for the
+ * Entity is the presence of the {@link Entity} class-level annotation and {@link Id} field-level
+ * annotation.
+ *
+ * <p>If you will pass the non-mapped entity or incorrectly mapped entity: your Session will fail
+ * and you will face the corresponding exception.
+ *
+ * <p>When you work with entities using Session, your entities may transit from one logical {@link
+ * EntityState} to another.
+ *
+ * <p>Session provides you with the first-level cache. When entity is retrieved from the DB for the
+ * first time, it is cached. Also, the Session stores the snapshot object arrays for all the
+ * entities, in order to be able to trigger the dirty checking on Session flushing.
+ *
+ * <p>When you perform the operation on your Entity - they are not sent to the DB at the time.
+ * Instead, they are added to the {@link ActionQueue}, which postpones the DB operations, optimizes
+ * them and provide you with the next features:
+ *
+ * <p>1. Queries mey be not executed at all, if you created an entity and deleted it within one TX.
+ *
+ * <p>2. All the operations will be sent only by one DB-request, which decreases the latency and
+ * optimizes the perfomance.
+ *
+ * <p>You have to close your Session as soon as possible. When Session is opened - it stores in
+ * memory all the cached entities and it's snapshots. Also, if you was using {@link LockModeType},
+ * the corresponding rows in DB will be locked until you either close your transaction or Session.
+ * Also, the connection to the DB is linked with the Session and will be returned to the Connection
+ * Poll on {@link Session#close()}.
+ *
+ * @see Entity
+ * @see Id
+ * @see Validator
+ * @see EntityState
+ * @see EntityStateTransition
+ * @see LockModeType
+ * @see ActionQueue
+ */
 public interface Session {
 
     /**
@@ -13,11 +60,28 @@ public interface Session {
      *
      * @param type entity class
      * @param id primary key
-     * @return the found entity instance or null if the entity does not exist
+     * @return the found entity instance
+     * @throws EntityNotFoundException if entity is not exists in the DB
      */
     <T> T find(Class<T> type, Object id);
 
-    // todo JavaDoc
+    /**
+     * Find by primary key. Search for an entity of the specified class and primary key. If the entity
+     * instance is contained in the cache, it is returned from there. Here you are able to provide
+     * {@link LockModeType}, which will be used for the pessimistic concurrency control on the row
+     * level.
+     *
+     * <p>You will obtain the lock on the entity and it will be possible to perform changes on this
+     * entity only in your current transaction. The lock will be released on the transaction {@link
+     * Session#commit()} or {@link Session#rollback()}.
+     *
+     * @param type entity class
+     * @param id primary key
+     * @param lockModeType type of the pessimistic locking strategy
+     * @return the found entity instance
+     * @throws EntityNotFoundException if entity is not exists in the DB
+     * @see LockModeType
+     */
     <T> T find(Class<T> type, Object id, LockModeType lockModeType);
 
     /**
