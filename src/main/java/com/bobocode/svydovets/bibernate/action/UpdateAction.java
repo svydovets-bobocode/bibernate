@@ -62,7 +62,8 @@ public class UpdateAction<T> extends AbstractAction<T> {
                                 .formatted(actionObjectType.getSimpleName(), id));
             }
         } catch (SQLException ex) {
-            throw new BibernateException("Unable to execute update action for " + actionObjectType.getSimpleName(), ex);
+            throw new BibernateException(
+                    "Unable to execute update action for " + actionObjectType.getSimpleName(), ex);
         }
     }
 
