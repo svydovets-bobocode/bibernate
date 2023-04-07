@@ -73,7 +73,7 @@ public interface Session extends AutoCloseable {
      *
      * <p>You will obtain the lock on the entity and it will be possible to perform changes on this
      * entity only in your current transaction. The lock will be released on the transaction {@link
-     * Session#commit()} or {@link Session#rollback()}.
+     * Session#commitTransaction()} or {@link Session#rollbackTransaction()}.
      *
      * @param type entity class
      * @param id primary key
@@ -156,19 +156,19 @@ public interface Session extends AutoCloseable {
     void flush();
 
     /** Begin a new transaction. Using {@link Transaction#begin()} */
-    void begin();
+    void beginTransaction();
 
     /**
      * Commit the current transaction, making any changes to the database permanent. Using {@link
      * Transaction#commit()}
      */
-    void commit();
+    void commitTransaction();
 
     /**
      * Roll back the current transaction, discarding any changes made since the transaction began.
      * Using {@link Transaction#rollback()}
      */
-    void rollback();
+    void rollbackTransaction();
 
     /**
      * Check if the session is still open.

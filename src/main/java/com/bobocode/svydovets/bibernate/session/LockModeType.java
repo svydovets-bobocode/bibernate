@@ -11,8 +11,8 @@ import lombok.Getter;
  * <p>The lock will be obtained till the transaction commit or rollback.
  *
  * @see Session#find(Class, Object, LockModeType)
- * @see Session#commit()
- * @see Session#rollback()
+ * @see Session#commitTransaction()
+ * @see Session#rollbackTransaction()
  */
 @AllArgsConstructor
 public enum LockModeType {
