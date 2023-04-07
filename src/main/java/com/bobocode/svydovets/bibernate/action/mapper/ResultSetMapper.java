@@ -15,11 +15,19 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 
+/** The ResultSetMapper class provides methods for mapping a JDBC ResultSet to Java objects. */
 @RequiredArgsConstructor
 public class ResultSetMapper {
 
     private final Session session;
 
+    /**
+     * Moves the cursor to the next row in the specified ResultSet.
+     *
+     * @param resultSet the ResultSet to move the cursor on
+     * @return true if there is a next row; false otherwise
+     * @throws ConnectionException if there is an error while moving the cursor
+     */
     public static boolean moveCursorToNextRow(ResultSet resultSet) {
         try {
             return resultSet.next();
@@ -28,6 +36,16 @@ public class ResultSetMapper {
         }
     }
 
+    /**
+     * Maps the current row of the specified ResultSet to a Java object of the specified type.
+     *
+     * @param type the type of the object to map the ResultSet row to
+     * @param resultSet the ResultSet to map to the Java object
+     * @param <T> the type of the object to map the ResultSet row to
+     * @return the Java object obtained by mapping the ResultSet row
+     * @throws BibernateException if there is an error while mapping the ResultSet row to a Java
+     *     object
+     */
     public <T> T mapToObject(Class<T> type, ResultSet resultSet) {
         try {
             return mapResultSetToObject(type, resultSet);
@@ -36,6 +54,19 @@ public class ResultSetMapper {
         }
     }
 
+    /**
+     * Maps a {@link ResultSet} to an object of the given type using the provided {@link EntityUtils}
+     * and {@link Session}. The method iterates over the fields of the given type, mapping simple
+     * column fields to their corresponding columns in the ResultSet, and entity fields to related
+     * entities in the database.
+     *
+     * @param <T> the type of object to map the ResultSet to
+     * @param type the type of object to map the ResultSet to
+     * @param resultSet the ResultSet to map to an object
+     * @return an object of the given type mapped from the ResultSet
+     * @throws SQLException if an error occurs while accessing the ResultSet
+     * @throws BibernateException if an error occurs while mapping the ResultSet to an object
+     */
     // todo: @ManyToOne relations
     // + todo 1: add util methods isRegularField, isRelationsField(isEntityField, isEntityCollection)
     // + todo 2: process within the ResultSetMapper.mapToObject
@@ -62,6 +93,13 @@ public class ResultSetMapper {
         return instance;
     }
 
+    /**
+     * Converts the specified object to a compatible type based on the type of the specified field.
+     *
+     * @param object the object to convert to a compatible type
+     * @param field the field that specifies the type to convert the object to
+     * @return the converted object
+     */
     private Object convertObjectToCompatibleType(Object object, Field field) {
         Class<?> fieldType = field.getType();
 
