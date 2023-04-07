@@ -58,10 +58,10 @@ com.bobocode.svydovets.bibernate
 ├── transaction       # Transaction control management API
 ├── util              # Util classes
 └── validation        # Validation on the entity mapping and entity states
-├── annotation
-│   └── required
-│       └── processor
-└── state
+    ├── annotation
+    │   └── required
+    │       └── processor
+    └── state
 ```
 
 ## How to start Bibernate
