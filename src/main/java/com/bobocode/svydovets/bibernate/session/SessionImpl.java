@@ -63,7 +63,7 @@ public class SessionImpl implements Session {
         this.searchService = searchService;
         this.transaction = new TransactionImpl(connection);
         this.idService = new IdResolverService();
-        this.entityStateService = new EntityStateServiceImpl();
+        this.entityStateService = EntityStateServiceImpl.getInstance();
         this.actionQueue = new ActionQueue();
         this.searchService.setResultSetMapper(new ResultSetMapper(this));
         this.optimisticLockService = new OptimisticLockService();
@@ -135,6 +135,7 @@ public class SessionImpl implements Session {
     public void close() {
         try {
             flush();
+            detachAllManagedEntities();
             entitiesCacheMap.clear();
             entitiesSnapshotMap.clear();
             if (connection != null && !connection.isClosed()) {
@@ -204,7 +205,6 @@ public class SessionImpl implements Session {
     public void commit() {
         verifySessionIsOpened();
         flush();
-        entityStateService.clearState();
         transaction.commit();
     }
 
@@ -214,6 +214,12 @@ public class SessionImpl implements Session {
         verifySessionIsOpened();
         entityStateService.clearState();
         transaction.rollback();
+    }
+
+    private void detachAllManagedEntities() {
+        entitiesCacheMap.values().stream()
+                .filter(entity -> entityStateService.getEntityState(entity).equals(MANAGED))
+                .forEach(entity -> entityStateService.setEntityState(entity, DETACHED));
     }
 
     private void verifySessionIsOpened() {

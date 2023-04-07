@@ -36,7 +36,7 @@ public class SearchService {
     public SearchService(Connection connection) {
         this.connection = connection;
         this.validatorProcessor = new RequiredAnnotationValidatorProcessorImpl();
-        this.entityStateService = new EntityStateServiceImpl();
+        this.entityStateService = EntityStateServiceImpl.getInstance();
     }
 
     public <T> T findOne(EntityKey<T> key) {
