@@ -34,7 +34,9 @@ Or follow these steps:
    <version>1.0</version>
 </dependency>
 ```
-5. add db dependency
+
+5. add database dependency
+
 ```xml
 <dependency>
    <groupId>org.postgresql</groupId>
@@ -112,7 +114,7 @@ public class User {
   @Column(name = "phone_number")
   private String phone;
 
-  @Column(insertable = false, updatable = false)
+  @Column(updatable = false)
   private LocalDateTime creationTime;
 }
 ```
