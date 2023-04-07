@@ -52,7 +52,7 @@ import java.util.Collection;
  * @see LockModeType
  * @see ActionQueue
  */
-public interface Session {
+public interface Session extends AutoCloseable {
 
     /**
      * Find by primary key. Search for an entity of the specified class and primary key. If the entity
