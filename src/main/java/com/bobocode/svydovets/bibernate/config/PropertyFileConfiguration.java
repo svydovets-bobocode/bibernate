@@ -1,7 +1,6 @@
 package com.bobocode.svydovets.bibernate.config;
 
 import com.bobocode.svydovets.bibernate.exception.ConfigurationException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
