@@ -416,6 +416,49 @@ private String phone;
 
  </details>
 
+<details>
+<summary>@ManyToOne</summary>
+
+[`@ManyToOne`](src/main/java/com/bobocode/svydovets/bibernate/annotation/ManyToOne.java)
+Used for Many - to - One DB relation (child entity has one parent entity, when parent entity can
+have multiple children).
+<br>
+When you retrieve from the DB the child entity, the parent entity will be eagerly loaded and
+set too. There is no need to perform the explicit loading of the parent entity. Currently, you
+cannot configure it if you want to load the parent lazily.
+
+```java
+import com.bobocode.svydovets.bibernate.annotation.JoinColumn;
+import com.bobocode.svydovets.bibernate.annotation.ManyToOne;
+
+@Entity
+@Table(name = "employees")
+public class Employee {
+
+  public Employee() {
+  }
+
+  @Id
+  private Long id;
+
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private List<User> user;
+  
+}
+```
+
+ </details>
+
+<details>
+<summary>@JoinColumn</summary>
+
+[`@JoinColumn`](src/main/java/com/bobocode/svydovets/bibernate/annotation/JoinColumn.java)
+Used among with the **@ManyToOne** mapping in order to provide the ORM with the information
+about the foreign key relation column name.
+
+ </details>
+
 ### Entity
 
 ---
