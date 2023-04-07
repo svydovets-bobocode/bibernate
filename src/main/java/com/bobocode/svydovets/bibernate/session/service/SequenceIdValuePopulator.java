@@ -19,6 +19,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * The class implements the IdValuePopulator interface and provides the population of ID values for
+ * entities with an ID column annotated with the @GeneratedValue annotation specifying
+ * GenerationType.SEQUENCE. <br>
+ * <br>
+ * The populator retrieves the sequence name and allocation size from the @GeneratedValue
+ * annotation, and retrieves a new ID value from the specified sequence.
+ */
 public class SequenceIdValuePopulator implements IdValuePopulator {
     private static final String SEQUENCE_SQL_REQUEST = "SELECT nextval('%s');";
     private static final String SEQUENCE_COLUMN_NAME = "%s_seq";
@@ -26,6 +34,17 @@ public class SequenceIdValuePopulator implements IdValuePopulator {
     private Map<Class<?>, AtomicLong> latestSequenceValueMap = new HashMap<>();
     private Map<Class<?>, AtomicLong> currentIdMap = new HashMap<>();
 
+    /**
+     * Populates the ID value of the given entity object with a new unique value. <br>
+     * Executes a SELECT statement to retrieve a new value from the specified sequence. If the
+     * allocation size for the sequence has been reached, a new value is selected from the sequence.
+     *
+     * @param connection the JDBC connection to use for executing the SQL query
+     * @param entity the entity object for which to populate the ID value
+     * @param <T> the type of the entity object
+     * @throws BibernateException if an error occurs while executing the SQL query or populating the
+     *     ID value
+     */
     @Override
     public <T> void populateIdValue(Connection connection, T entity) {
         var entityType = entity.getClass();
@@ -35,7 +54,7 @@ public class SequenceIdValuePopulator implements IdValuePopulator {
         Field idField = EntityUtils.resolveIdColumnField(entityType);
         var tableName = resolveTableName(entityType);
         String sequenceName = format(SEQUENCE_COLUMN_NAME, tableName);
-        int allocationSize = 50;
+        int allocationSize = 1;
 
         if (idField.isAnnotationPresent(GeneratedValue.class)) {
             var generatedValueAnnotation = idField.getAnnotation(GeneratedValue.class);
