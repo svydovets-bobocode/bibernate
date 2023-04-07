@@ -7,8 +7,8 @@ import com.bobocode.svydovets.bibernate.constant.GenerationType;
 import java.util.Map;
 
 /**
- The IdValuePopulatorFactory class is responsible for creating and returning an instance of IdValuePopulator
- based on the given GenerationType.
+ * The IdValuePopulatorFactory class is responsible for creating and returning an instance of
+ * IdValuePopulator based on the given GenerationType.
  */
 public class IdValuePopulatorFactory {
     private final Map<GenerationType, IdValuePopulator> idValuePopulatorMap;
@@ -19,10 +19,12 @@ public class IdValuePopulatorFactory {
     }
 
     /**
-     Returns the appropriate IdValuePopulator based on the given GenerationType.
-     @param idPopulatorType the GenerationType to get the IdValuePopulator for.
-     @return the corresponding IdValuePopulator.
-     @throws UnsupportedOperationException if no IdValuePopulator is found for the given GenerationType.
+     * Returns the appropriate IdValuePopulator based on the given GenerationType.
+     *
+     * @param idPopulatorType the GenerationType to get the IdValuePopulator for.
+     * @return the corresponding IdValuePopulator.
+     * @throws UnsupportedOperationException if no IdValuePopulator is found for the given
+     *     GenerationType.
      */
     public IdValuePopulator getIdValuePopulator(GenerationType idPopulatorType) {
         if (idValuePopulatorMap.containsKey(idPopulatorType)) {

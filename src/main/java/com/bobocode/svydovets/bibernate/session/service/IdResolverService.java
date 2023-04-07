@@ -11,7 +11,8 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 
 /**
- * IdResolverService is responsible for resolving the ID value of an entity based on the GenerationType strategy.
+ * IdResolverService is responsible for resolving the ID value of an entity based on the
+ * GenerationType strategy.
  */
 public class IdResolverService {
 
@@ -22,11 +23,11 @@ public class IdResolverService {
     }
 
     /**
-     * Resolves the ID value of an entity based on the GenerationType strategy.
-     * If the ID value is present and the strategy is MANUAL, no action is taken, skip the processing.
-     * If the ID value is missing and the strategy is MANUAL, an EntityValidationException is thrown.
-     * If the ID value is missing, the appropriate IdValuePopulator is determined from the IdValuePopulatorFactory
-     * based on the GenerationType and the ID value is populated using that IdValuePopulator.
+     * Resolves the ID value of an entity based on the GenerationType strategy. If the ID value is
+     * present and the strategy is MANUAL, no action is taken, skip the processing. If the ID value is
+     * missing and the strategy is MANUAL, an EntityValidationException is thrown. If the ID value is
+     * missing, the appropriate IdValuePopulator is determined from the IdValuePopulatorFactory based
+     * on the GenerationType and the ID value is populated using that IdValuePopulator.
      *
      * @param connection the database connection
      * @param entity the entity whose ID value needs to be resolved
