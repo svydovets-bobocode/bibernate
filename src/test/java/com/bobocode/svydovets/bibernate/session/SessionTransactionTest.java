@@ -3,7 +3,9 @@ package com.bobocode.svydovets.bibernate.session;
 import static com.bobocode.svydovets.bibernate.state.EntityState.DETACHED;
 import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
 import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_FIRST_NAME;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ID;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_LAST_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -43,6 +45,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void beforeEach() {
+        sessionFactory = SessionFactoryImpl.getInstance(dataSource);
         session = new SessionImpl(connection, searchService);
     }
 
@@ -80,6 +83,29 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
         personsFromDb = getPersonsFromDb();
         assertEquals(2, personsFromDb.size());
+    }
+
+    @Test
+    @DisplayName(
+            "State should be DETACHED after open new session after close when the entity was managed in old session before")
+    void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBefore() throws SQLException {
+        Session session1 = sessionFactory.openSession();
+
+        Person personsFromDb = session1.find(Person.class, 1);
+        personsFromDb.setFirstName("blablabla");
+        EntityState actualEntityState = session1.getEntityState(personsFromDb);
+        assertEquals(MANAGED, actualEntityState);
+        session1.close();
+
+        EntityState actualEntityState3 = session1.getEntityState(personsFromDb);
+        assertEquals(DETACHED, actualEntityState3);
+
+        Session session2 = sessionFactory.openSession();
+        Person merged = session2.merge(personsFromDb);
+        merged.setFirstName("blablablaMerged");
+        EntityState actualEntityState2 = session2.getEntityState(merged);
+        assertEquals(MANAGED, actualEntityState2);
+        session2.close();
     }
 
     @Test
@@ -131,7 +157,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     void shouldThrowAnExceptionWhenMergeEntityThatIsInTransientState() throws SQLException {
         session.begin();
 
-        Person personsFromDb = new Person(1L, "Transient person", "Last name");
+        Person personsFromDb = new Person(2L, "Transient person", "Last name");
 
         assertThrows(
                 EntityStateValidationException.class,
@@ -150,7 +176,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
         assertThrows(
                 EntityStateValidationException.class,
                 () -> session.delete(personsFromDb),
-                "an't change entity state from TRANSIENT to REMOVED");
+                "Can't change entity state from DETACHED to REMOVED");
         session.commit();
     }
 
