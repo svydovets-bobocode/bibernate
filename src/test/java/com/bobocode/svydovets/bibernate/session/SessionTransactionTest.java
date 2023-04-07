@@ -105,6 +105,22 @@ class SessionTransactionTest extends AbstractIntegrationTest {
         session2.close();
     }
 
+
+    @Test
+    @DisplayName(
+        "State should be DETACHED after open new session after close when the entity was managed in old session before")
+    void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBeforeTransaction() throws SQLException {
+        session.begin();
+        Person personsFromDb = session.find(Person.class, 1L);
+        personsFromDb.setFirstName("blablabla");
+        EntityState actualEntityState = session.getEntityState(personsFromDb);
+        assertEquals(MANAGED, actualEntityState);
+        session.commit();
+
+        EntityState actualEntityState3 = session.getEntityState(personsFromDb);
+        assertEquals(MANAGED, actualEntityState3);
+    }
+
     @Test
     @DisplayName("Check if the selected entity is in the MANAGED state")
     void findAndCheckIfAnEntityIsInManagedState() throws SQLException {
