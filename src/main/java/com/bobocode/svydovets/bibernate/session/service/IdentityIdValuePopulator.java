@@ -15,10 +15,25 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * The IdentityIdValuePopulator class implements the IdValuePopulator interface and provides
+ * functionality to populate the ID column of an entity with an automatically generated value using
+ * a database sequence. This class supports only IDENTITY generation type.
+ */
 public class IdentityIdValuePopulator implements IdValuePopulator {
     private static final String SEQUENCE_SQL_REQUEST = "SELECT nextval('%s');";
     private static final String SEQUENCE_COLUMN_NAME = "%s_%s_seq";
 
+    /**
+     * Populates the ID value of the given entity with an automatically generated value using a
+     * database sequence. This method retrieves the next value from the sequence, sets it as the ID
+     * value of the entity, and updates the entity accordingly.
+     *
+     * @param <T> the type of the entity
+     * @param connection the database connection to use
+     * @param entity the entity whose ID value needs to be populated
+     * @throws BibernateException if there is an error while populating the ID value
+     */
     @Override
     public <T> void populateIdValue(Connection connection, T entity) {
         var entityType = entity.getClass();
