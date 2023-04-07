@@ -392,7 +392,7 @@ import com.bobocode.svydovets.bibernate.constant.GenerationType;
 private Long id;
 ```
 
-For details see **[Id generation strategies](#Id generation strategies)**
+For details see **[Id generation strategies](#id-generation-strategies)**
 
  </details>
 
