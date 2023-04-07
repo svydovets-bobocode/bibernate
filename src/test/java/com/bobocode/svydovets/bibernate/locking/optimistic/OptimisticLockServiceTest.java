@@ -26,7 +26,8 @@ class OptimisticLockServiceTest {
     }
 
     @Test
-    @DisplayName("Default value for field annotated with @Version should be taken when snapshot does not have field")
+    @DisplayName(
+            "Default value for field annotated with @Version should be taken when snapshot does not have field")
     void setDefaultVersionValueWhenSnapshotIsEmpty() {
         Product product = new Product(1L, 5, null);
         EntityKey<Product> entityKey = EntityKey.of(Product.class, product.getId());
