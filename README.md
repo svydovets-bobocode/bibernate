@@ -35,6 +35,35 @@ Or follow these steps:
 </dependency>
 ```
 
+## Project packages structure
+
+Below is the package structure for the Bibernate ORM:
+
+```
+com.bobocode.svydovets.bibernate
+├── action            # provides an API for DB actions creation and execution
+│   ├── executor
+│   ├── key
+│   ├── mapper
+│   └── query
+├── annotation        # core ORM annotations
+├── config            # API for Bibernate configuration
+├── connectionpool    # Connection pooling API
+├── exception         # Bibernate exceptions
+├── locking           # Locking API
+│   └── optimistic
+├── session           # Session API
+│   └── service
+├── state             # Entity states managing API
+├── transaction       # Transaction control management API
+├── util              # Util classes
+└── validation        # Validation on the entity mapping and entity states
+├── annotation
+│   └── required
+│       └── processor
+└── state
+```
+
 ## How to start Bibernate
 
 ---
