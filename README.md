@@ -30,7 +30,7 @@ Or follow these steps:
 ```xml
 <dependency>
    <groupId>com.bobocode.svydovets</groupId>
-   <artifactId>bring-svydovets</artifactId>
+   <artifactId>bibernate-svydovets</artifactId>
    <version>1.0</version>
 </dependency>
 ```
@@ -77,14 +77,17 @@ com.bobocode.svydovets.bibernate
 
 ```properties
 svydovets.bibernate.driverClassName=org.postgresql.Driver
-svydovets.bibernate.db.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
-svydovets.bibernate.db.username=sa
-svydovets.bibernate.db.password=
+svydovets.bibernate.db.url=jdbc:postgresql://localhost:5432/postgres
+svydovets.bibernate.db.username=postgres
+svydovets.bibernate.db.password=password
 ```
 
 #### Mapping entity example:
 
 ```java
+
+import com.bobocode.svydovets.bibernate.annotation.GeneratedValue;
+import com.bobocode.svydovets.bibernate.constant.GenerationType;
 
 @Entity
 @Table("users")
@@ -93,15 +96,16 @@ svydovets.bibernate.db.password=
 @Getter
 @Setter
 public class User {
-    @Id
-    private Integer id;
-    private String name;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  private String name;
 
-    @Column(insertable = false, updatable = false)
-    private LocalDateTime creationTime;
+  @Column(insertable = false, updatable = false)
+  private LocalDateTime creationTime;
 
-    @Column(name = "phone_number")
-    private String phone;
+  @Column(name = "phone_number")
+  private String phone;
 }
 ```
 
@@ -372,6 +376,27 @@ private Long id;
  </details>
 
  <details>
+<summary>@GeneratedValue</summary>
+
+[`@GeneratedValue`](src/main/java/com/bobocode/svydovets/bibernate/annotation/GeneratedValue.java)
+annotation is used to providing specification of generation strategies for the values of primary keys
+
+```java
+import com.bobocode.svydovets.bibernate.annotation.GeneratedValue;
+import com.bobocode.svydovets.bibernate.constant.GenerationType;
+
+@Id
+@GeneratedValue(strategy = GenerationType.SEQUENCE, 
+                sequenceName = "custom_seq", 
+                allocationSize = 50)
+private Long id;
+```
+
+For details see **[Id generation strategies](#Id generation strategies)**
+
+ </details>
+
+ <details>
 <summary>@Column</summary>
 
 [`@Column`](src/main/java/com/bobocode/svydovets/bibernate/annotation/Column.java)
@@ -447,6 +472,71 @@ In Bibernate, entities can exist in different [`states`](src/main/java/com/boboc
   method.
   In this state, the entity is still associated with the Bibernate Session,
   but will be deleted from the database when the transaction is committed.
+
+### Id generation strategies
+
+___
+
+Bibernate provides 3 types of Id management strategies
+
+- **MANUAL**: Default strategy. Applies also if the annotation won't be provided.
+  The whole id management process is the user responsibility. User have to set Id to each entity manually before
+  saving. Bibernate won't let to save an entity with empty Id.
+
+<details>
+<summary>Example</summary>
+
+```java
+import com.bobocode.svydovets.bibernate.annotation.GeneratedValue;
+import com.bobocode.svydovets.bibernate.constant.GenerationType;
+
+@Id
+@GeneratedValue(strategy = GenerationType.MANUAL)
+private Long id;
+```
+
+</details>
+
+- **IDENTITY**: Required to have any of autogenerate types of the id column in database (e.g. serial or bigserial for Posgtresql).
+  The Id will be getting from database for each entity before saving.
+
+<details>
+<summary>Example</summary>
+
+```java
+import com.bobocode.svydovets.bibernate.annotation.GeneratedValue;
+import com.bobocode.svydovets.bibernate.constant.GenerationType;
+
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
+```
+
+</details>
+
+- **SEQUENCE**: Required to create a sequence in the database. Default name will be `{columnName}_seq`.
+  Will select the sequence for the first time and based on the `increment by` value will take the ids from cache for the range.
+
+<details>
+
+```java
+import com.bobocode.svydovets.bibernate.annotation.GeneratedValue;
+import com.bobocode.svydovets.bibernate.constant.GenerationType;
+
+@Id
+@GeneratedValue(strategy = GenerationType.SEQUENCE, 
+                sequenceName = "custom_seq", 
+                allocationSize = 50)
+private Long id;
+```
+
+<summary>Example and details</summary>
+
+`allocationSize`: should be align with `increment by` sequence value
+
+`sequenceName`: could be specify any custom sequence name instead of default
+
+</details>
 
 ### Cache
 
