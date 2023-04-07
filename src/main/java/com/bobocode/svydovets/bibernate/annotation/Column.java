@@ -6,15 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specifies the mapped column for a persistent property or field.
- * If no {@code Column} annotation is specified, the default values apply.
+ * Specifies the mapped column for a persistent property or field. If no {@code Column} annotation
+ * is specified, the default values apply.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Column {
-    /**
-     * The name of the column. Defaults to the property or field name.
-     */
+    /** The name of the column. Defaults to the property or field name. */
     String name() default "";
 
     /**

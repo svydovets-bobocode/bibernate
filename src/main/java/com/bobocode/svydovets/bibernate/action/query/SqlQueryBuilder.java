@@ -17,9 +17,9 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The {@code SqlQueryBuilder} class provides a set of static methods for building SQL queries based on the passed
- * entity type and its properties. This class includes methods for building SELECT, INSERT, UPDATE, and DELETE queries
- * with additional options such as locking and versioning.
+ * The {@code SqlQueryBuilder} class provides a set of static methods for building SQL queries based
+ * on the passed entity type and its properties. This class includes methods for building SELECT,
+ * INSERT, UPDATE, and DELETE queries with additional options such as locking and versioning.
  */
 @Slf4j
 public class SqlQueryBuilder {
@@ -49,11 +49,13 @@ public class SqlQueryBuilder {
     }
 
     /**
-     *  Builds a SELECT query with a WHERE clause that selects an entity by its ID and applies a specified lock mode.
+     * Builds a SELECT query with a WHERE clause that selects an entity by its ID and applies a
+     * specified lock mode.
      *
-     *  @param entityType the entity type to build the query for.
-     *  @param lockModeType the lock mode to apply to the query.
-     *  @return a SELECT query with a WHERE clause that selects an entity by its ID and applies a specified lock mode.
+     * @param entityType the entity type to build the query for.
+     * @param lockModeType the lock mode to apply to the query.
+     * @return a SELECT query with a WHERE clause that selects an entity by its ID and applies a
+     *     specified lock mode.
      */
     public static String createSelectByIdQuery(Class<?> entityType, LockModeType lockModeType) {
         String tableName = resolveTableName(entityType);
@@ -64,6 +66,7 @@ public class SqlQueryBuilder {
 
     /**
      * Builds a SELECT query that retrieves all entities from the specified table.
+     *
      * @param entityType the entity type to build the query for.
      * @return a SELECT query that retrieves all entities from the specified table.
      */
@@ -74,6 +77,7 @@ public class SqlQueryBuilder {
 
     /**
      * Builds a DELETE query with a WHERE clause that deletes an entity by its ID.
+     *
      * @param entityType the entity type to build the query for.
      * @return a DELETE query with a WHERE clause that deletes an entity by its ID.
      */
@@ -85,6 +89,7 @@ public class SqlQueryBuilder {
 
     /**
      * Retrieves a list of column names for fields that are updatable in the specified entity class.
+     *
      * @param entityType The entity class for which to retrieve updatable fields.
      * @return A list of column names for fields that are updatable in the specified entity class.
      */
@@ -100,6 +105,7 @@ public class SqlQueryBuilder {
 
     /**
      * Retrieves a list of column names for fields that are insertable in the specified entity class.
+     *
      * @param entityType The entity class for which to retrieve insertable fields.
      * @return A list of column names for fields that are insertable in the specified entity class.
      */
@@ -115,6 +121,7 @@ public class SqlQueryBuilder {
 
     /**
      * Creates an SQL insert query based on the specified entity class.
+     *
      * @param entityType The entity class for which to create an SQL insert query.
      * @return An SQL insert query based on the specified entity class.
      */
@@ -132,6 +139,7 @@ public class SqlQueryBuilder {
 
     /**
      * Creates an SQL update query based on the specified entity class.
+     *
      * @param entityType The entity class for which to create an SQL update query.
      * @return An SQL update query based on the specified entity class.
      */
@@ -151,6 +159,7 @@ public class SqlQueryBuilder {
 
     /**
      * Adds a version field to the WHERE condition of the specified SQL query if necessary.
+     *
      * @param originSqlQuery The original SQL query.
      * @param entityType The entity class associated with the SQL query.
      * @return The modified SQL query with a version field in the WHERE condition if necessary.

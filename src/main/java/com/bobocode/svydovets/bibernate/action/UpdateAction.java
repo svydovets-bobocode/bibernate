@@ -9,9 +9,9 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 /**
- * A class that represents an update action to be performed on a database entity.
- * The action updates the fields of the entity with the values in the provided actionObject
- * according to the corresponding database table row that has the same ID as the entity.
+ * A class that represents an update action to be performed on a database entity. The action updates
+ * the fields of the entity with the values in the provided actionObject according to the
+ * corresponding database table row that has the same ID as the entity.
  */
 public class UpdateAction<T> extends AbstractAction<T> {
 
@@ -20,13 +20,14 @@ public class UpdateAction<T> extends AbstractAction<T> {
     }
 
     /**
-     * Executes the update action on the database by updating the corresponding row of the provided entity object.
-     * The method creates an SQL update query using the SqlQueryBuilder class and sets the values of the entity's
-     * updatable fields to the corresponding placeholders in the query. If the entity has a version field, the query
-     * is modified to include the version field in the where condition. The method then executes the prepared statement
-     * and throws an exception if the number of updated rows is not exactly one.
+     * Executes the update action on the database by updating the corresponding row of the provided
+     * entity object. The method creates an SQL update query using the SqlQueryBuilder class and sets
+     * the values of the entity's updatable fields to the corresponding placeholders in the query. If
+     * the entity has a version field, the query is modified to include the version field in the where
+     * condition. The method then executes the prepared statement and throws an exception if the
+     * number of updated rows is not exactly one.
      *
-     @throws BibernateException if there is an error executing the update query
+     * @throws BibernateException if there is an error executing the update query
      */
     @Override
     protected void doExecute() {

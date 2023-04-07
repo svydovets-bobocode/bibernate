@@ -5,8 +5,8 @@ import com.bobocode.svydovets.bibernate.session.SessionImpl;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
 
 /**
- * Entity key is used to determine a uniqueness of entities in {@link Session}.
- * Used as a key in {@link SessionImpl#entitiesSnapshotMap} and {@link SessionImpl#entitiesCacheMap}
+ * Entity key is used to determine a uniqueness of entities in {@link Session}. Used as a key in
+ * {@link SessionImpl#entitiesSnapshotMap} and {@link SessionImpl#entitiesCacheMap}
  *
  * @param type entity class
  * @param id primary key

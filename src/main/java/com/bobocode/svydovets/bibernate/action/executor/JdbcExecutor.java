@@ -6,7 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 /**
- * The JdbcExecutor class provides a static method for executing a SQL query and retrieving the result set.
+ * The JdbcExecutor class provides a static method for executing a SQL query and retrieving the
+ * result set.
  */
 public class JdbcExecutor {
 
@@ -15,7 +16,6 @@ public class JdbcExecutor {
      *
      * @param query the SQL query to execute
      * @param connection the connection to use for executing the query
-     *
      * @return the result set obtained by executing the query
      * @throws ConnectionException if there is an error while executing the query
      */

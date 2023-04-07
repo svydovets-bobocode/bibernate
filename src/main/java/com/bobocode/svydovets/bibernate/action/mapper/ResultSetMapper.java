@@ -15,9 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 
-/**
- * The ResultSetMapper class provides methods for mapping a JDBC ResultSet to Java objects.
- */
+/** The ResultSetMapper class provides methods for mapping a JDBC ResultSet to Java objects. */
 @RequiredArgsConstructor
 public class ResultSetMapper {
 
@@ -45,7 +43,8 @@ public class ResultSetMapper {
      * @param resultSet the ResultSet to map to the Java object
      * @param <T> the type of the object to map the ResultSet row to
      * @return the Java object obtained by mapping the ResultSet row
-     * @throws BibernateException if there is an error while mapping the ResultSet row to a Java object
+     * @throws BibernateException if there is an error while mapping the ResultSet row to a Java
+     *     object
      */
     public <T> T mapToObject(Class<T> type, ResultSet resultSet) {
         try {
@@ -56,9 +55,10 @@ public class ResultSetMapper {
     }
 
     /**
-     * Maps a {@link ResultSet} to an object of the given type using the provided {@link EntityUtils} and {@link Session}.
-     * The method iterates over the fields of the given type, mapping simple column fields to their corresponding columns
-     * in the ResultSet, and entity fields to related entities in the database.
+     * Maps a {@link ResultSet} to an object of the given type using the provided {@link EntityUtils}
+     * and {@link Session}. The method iterates over the fields of the given type, mapping simple
+     * column fields to their corresponding columns in the ResultSet, and entity fields to related
+     * entities in the database.
      *
      * @param <T> the type of object to map the ResultSet to
      * @param type the type of object to map the ResultSet to

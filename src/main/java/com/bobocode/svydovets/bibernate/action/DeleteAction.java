@@ -13,7 +13,9 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 /**
- * The DeleteAction class represents a delete action to delete an object from the database. It extends the AbstractAction class.
+ * The DeleteAction class represents a delete action to delete an object from the database. It
+ * extends the AbstractAction class.
+ *
  * @param <T> the type of object being deleted
  */
 public class DeleteAction<T> extends AbstractAction<T> {
@@ -31,8 +33,10 @@ public class DeleteAction<T> extends AbstractAction<T> {
      * Executes the delete action by constructing and executing a SQL DELETE statement for the
      * corresponding entity. If the entity has a version field, the statement will include a WHERE
      * condition for the version field as well.
+     *
      * @throws BibernateException if the SQL DELETE statement fails to delete exactly one row.
-     * @throws ConnectionException if there is an error with the connection while executing the SQL statement.
+     * @throws ConnectionException if there is an error with the connection while executing the SQL
+     *     statement.
      */
     @Override
     protected void doExecute() {

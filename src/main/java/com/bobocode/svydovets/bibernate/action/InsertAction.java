@@ -10,9 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Represents an action to insert an object of type T into the database.
- */
+/** Represents an action to insert an object of type T into the database. */
 @Slf4j
 public class InsertAction<T> extends AbstractAction<T> {
 
@@ -21,8 +19,9 @@ public class InsertAction<T> extends AbstractAction<T> {
     }
 
     /**
-     * Executes the insert action by creating a prepared statement using the insert query built with SqlQueryBuilder.createInsertQuery(),
-     * setting the values of insertable fields in the prepared statement using setFieldsInPreparedStatement(), and executing the statement.
+     * Executes the insert action by creating a prepared statement using the insert query built with
+     * SqlQueryBuilder.createInsertQuery(), setting the values of insertable fields in the prepared
+     * statement using setFieldsInPreparedStatement(), and executing the statement.
      *
      * @throws BibernateException if the SQLException occurs.
      */
