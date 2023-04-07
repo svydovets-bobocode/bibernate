@@ -217,11 +217,9 @@ public class SessionImpl implements Session {
     }
 
     private void detachAllManagedEntities() {
-        entitiesCacheMap
-            .values()
-            .stream()
-            .filter(entity -> entityStateService.getEntityState(entity).equals(MANAGED))
-            .forEach(entity -> entityStateService.setEntityState(entity, DETACHED));
+        entitiesCacheMap.values().stream()
+                .filter(entity -> entityStateService.getEntityState(entity).equals(MANAGED))
+                .forEach(entity -> entityStateService.setEntityState(entity, DETACHED));
     }
 
     private void verifySessionIsOpened() {
