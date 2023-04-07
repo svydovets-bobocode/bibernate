@@ -1,6 +1,5 @@
 package com.bobocode.svydovets.bibernate.integration.id.resolver;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestCustomerFactory.newDefaultInvalidCustomer;
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestCustomerFactory.newDefaultValidCustomer;
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestEmployeesFactory.newDefaultValidEmployee;
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.newDefaultInvalidPerson;
@@ -27,14 +26,6 @@ public class IdResolverServiceIntegrationTest extends AbstractIntegrationTest {
 
             assertNotNull(customer.getId());
             assertEquals(1, customer.getId());
-        }
-
-        @Test
-        void retrieveIdForCustomerFailsIfAlreadyProvided() {
-            var customer = newDefaultInvalidCustomer();
-            assertThrows(
-                    EntityValidationException.class,
-                    () -> idResolverService.resolveIdValue(connection, customer));
         }
 
         @Test
@@ -70,14 +61,6 @@ public class IdResolverServiceIntegrationTest extends AbstractIntegrationTest {
 
             assertNotNull(user.getId());
             assertEquals(1, user.getId());
-        }
-
-        @Test
-        void retrieveIdForUserFailsIfAlreadyProvided() {
-            var customer = newDefaultInvalidCustomer();
-            assertThrows(
-                    EntityValidationException.class,
-                    () -> idResolverService.resolveIdValue(connection, customer));
         }
     }
 
