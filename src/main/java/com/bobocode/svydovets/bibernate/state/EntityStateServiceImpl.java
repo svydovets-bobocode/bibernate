@@ -11,16 +11,29 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EntityStateServiceImpl implements EntityStateService {
-    Map<EntityKey<?>, EntityState> entityStateMap = new ConcurrentHashMap<>();
+    Map<EntityKey<?>, EntityState> entityStateMap;
     EntityStateTransitionValidator entityStateTransitionValidator;
 
-    public EntityStateServiceImpl() {
-        this.entityStateTransitionValidator = new EntityStateTransitionValidatorImpl();
+    private static volatile EntityStateServiceImpl instance;
+
+    public static EntityStateService getInstance() {
+        if (instance == null) {
+            synchronized (EntityStateServiceImpl.class) {
+                if (instance == null) {
+                    instance =
+                            new EntityStateServiceImpl(
+                                    new ConcurrentHashMap<>(), new EntityStateTransitionValidatorImpl());
+                }
+            }
+        }
+        return instance;
     }
 
     @Override

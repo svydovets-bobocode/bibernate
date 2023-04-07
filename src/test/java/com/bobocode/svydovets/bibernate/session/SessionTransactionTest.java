@@ -3,7 +3,6 @@ package com.bobocode.svydovets.bibernate.session;
 import static com.bobocode.svydovets.bibernate.state.EntityState.DETACHED;
 import static com.bobocode.svydovets.bibernate.state.EntityState.MANAGED;
 import static com.bobocode.svydovets.bibernate.state.EntityState.REMOVED;
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -14,7 +13,11 @@ import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.sql.SQLException;
 import java.util.List;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class SessionTransactionTest extends AbstractIntegrationTest {
     private static SessionFactory sessionFactory;
@@ -34,6 +37,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void beforeEach() {
+        sessionFactory = SessionFactoryImpl.getInstance(dataSource);
         session = sessionFactory.openSession();
     }
 
@@ -79,10 +83,49 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisplayName(
+            "State should be DETACHED after open new session after close when the entity was managed in old session before")
+    void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBefore() throws SQLException {
+        Session session1 = sessionFactory.openSession();
+
+        Person personsFromDb = session1.find(Person.class, 1L);
+        personsFromDb.setFirstName("blablabla");
+        EntityState actualEntityState = session1.getEntityState(personsFromDb);
+        assertEquals(MANAGED, actualEntityState);
+        session1.close();
+
+        EntityState actualEntityState3 = session1.getEntityState(personsFromDb);
+        assertEquals(DETACHED, actualEntityState3);
+
+        Session session2 = sessionFactory.openSession();
+        Person merged = session2.merge(personsFromDb);
+        merged.setFirstName("blablablaMerged");
+        EntityState actualEntityState2 = session2.getEntityState(merged);
+        assertEquals(MANAGED, actualEntityState2);
+        session2.close();
+    }
+
+    @Test
+    @DisplayName(
+            "State should be DETACHED after open new session after close when the entity was managed in old session before")
+    void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBeforeTransaction()
+            throws SQLException {
+        session.begin();
+        Person personsFromDb = session.find(Person.class, 1L);
+        personsFromDb.setFirstName("blablabla");
+        EntityState actualEntityState = session.getEntityState(personsFromDb);
+        assertEquals(MANAGED, actualEntityState);
+        session.commit();
+
+        EntityState actualEntityState3 = session.getEntityState(personsFromDb);
+        assertEquals(MANAGED, actualEntityState3);
+    }
+
+    @Test
     @DisplayName("Check if the selected entity is in the MANAGED state")
     void findAndCheckIfAnEntityIsInManagedState() throws SQLException {
         session.begin();
-        Person personsFromDb = session.find(Person.class, 1);
+        Person personsFromDb = session.find(Person.class, 1L);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(MANAGED, actualEntityState);
         session.commit();
@@ -92,7 +135,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @DisplayName("Check if the session detach method set DETACHED state")
     void detachFoundEntityAndCheckIfAnEntityIsInDetachedState() throws SQLException {
         session.begin();
-        Person personsFromDb = session.find(Person.class, 1);
+        Person personsFromDb = session.find(Person.class, 1L);
         session.detach(personsFromDb);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(DETACHED, actualEntityState);
@@ -103,7 +146,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @DisplayName("Check if the entity is in MANAGED state after merge method call")
     void mergeDetachedEntityAndCheckIfAnEntityIsInManagedState() throws SQLException {
         session.begin();
-        Person personsFromDb = session.find(Person.class, 1);
+        Person personsFromDb = session.find(Person.class, 1L);
         session.detach(personsFromDb);
         session.merge(personsFromDb);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
@@ -115,7 +158,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @DisplayName("Check if the entity is in REMOVED state after delete method call")
     void removeEntityAndCheckIfAnEntityIsInRemovedState() throws SQLException {
         session.begin();
-        Person personsFromDb = session.find(Person.class, 1);
+        Person personsFromDb = session.find(Person.class, 1L);
         session.delete(personsFromDb);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(REMOVED, actualEntityState);
@@ -127,7 +170,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     void shouldThrowAnExceptionWhenMergeEntityThatIsInTransientState() throws SQLException {
         session.begin();
 
-        Person personsFromDb = new Person(1L, "Transient person", "Last name");
+        Person personsFromDb = new Person(2L, "Transient person", "Last name");
 
         assertThrows(
                 EntityStateValidationException.class,
@@ -146,7 +189,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
         assertThrows(
                 EntityStateValidationException.class,
                 () -> session.delete(personsFromDb),
-                "an't change entity state from TRANSIENT to REMOVED");
+                "Can't change entity state from TRANSIENT to REMOVED");
         session.commit();
     }
 

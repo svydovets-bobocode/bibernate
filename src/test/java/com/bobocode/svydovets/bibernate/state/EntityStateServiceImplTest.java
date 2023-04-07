@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 @Tag("unit")
 class EntityStateServiceImplTest {
 
-    EntityStateService entityStateService = new EntityStateServiceImpl();
+    EntityStateService entityStateService = EntityStateServiceImpl.getInstance();
 
     @Test
     @DisplayName("Newly created entity should be in TRANSIENT state after creation.")
@@ -29,7 +29,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Newly created entity should pass validation to MANAGED state.")
     void theNewlyCreatedEntityCanBeInManagedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(4L, "reallyFirstName", "justLastName");
         entityStateService.validate(person, MANAGED);
         assertEquals(TRANSIENT, entityStateService.getEntityState(person));
     }
@@ -37,7 +37,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Newly created entity should pass validation to MANAGED state by EntityKey.")
     void theNewlyCreatedEntityCanBeInManagedStateValidateWithEntityKey() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(5L, "reallyFirstName", "justLastName");
         entityStateService.validate(EntityKey.valueOf(person), MANAGED);
         assertEquals(TRANSIENT, entityStateService.getEntityState(person));
     }
@@ -45,7 +45,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Newly created entity should be in MANAGED state after setting the state.")
     void theNewlyCreatedEntityShouldBeInManagedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(6L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         assertEquals(MANAGED, entityStateService.getEntityState(person));
     }
@@ -54,7 +54,7 @@ class EntityStateServiceImplTest {
     @DisplayName(
             "Newly created entity should be in MANAGED state after setting the state with EntityKey.")
     void theNewlyCreatedEntityShouldBeInManagedStateWithEntityKey() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(7L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(EntityKey.valueOf(person), MANAGED);
         assertEquals(MANAGED, entityStateService.getEntityState(person));
     }
@@ -62,7 +62,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Newly created entity should NOT be changed to REMOVED state.")
     void theNewlyCreatedEntityShouldNotBeUpdatedToRemovedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(8L, "reallyFirstName", "justLastName");
         assertEquals(TRANSIENT, entityStateService.getEntityState(person));
         assertThrows(
                 EntityStateValidationException.class,
@@ -73,7 +73,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Newly created entity should NOT be changed to DETACHED state.")
     void theNewlyCreatedEntityShouldNotBeUpdatedToDetachedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(9L, "reallyFirstName", "justLastName");
         assertEquals(TRANSIENT, entityStateService.getEntityState(person));
         assertThrows(
                 EntityStateValidationException.class,
@@ -84,7 +84,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in MANAGED state should be changed to REMOVED state.")
     void theEntityInManagedStateShouldBeChangedToRemovedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(10L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.validate(person, REMOVED);
     }
@@ -92,7 +92,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in MANAGED state should be changed to DETACHED state.")
     void theEntityInManagedStateShouldBeChangedToDetachedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(11L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.validate(person, DETACHED);
     }
@@ -100,7 +100,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in MANAGED state should be changed to MANAGED state.")
     void theEntityInManagedStateShouldBeChangedToManagedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(12L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.validate(person, MANAGED);
     }
@@ -108,7 +108,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in MANAGED state should NOT be MANUALLY changed to TRANSIENT state.")
     void theEntityInManagedStateShouldNotBeChangedToTransientState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(12L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         assertThrows(
                 EntityStateValidationException.class,
@@ -119,7 +119,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in REMOVED state should be changed to MANAGED state.")
     void theEntityInRemovedStateShouldBeChangedToManagedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(14L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.setEntityState(person, REMOVED);
         entityStateService.setEntityState(person, MANAGED);
@@ -128,7 +128,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in REMOVED state should NOT be changed to DETACHED state.")
     void theEntityInRemovedStateShouldNotBeChangedToDetachedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(15L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.setEntityState(person, REMOVED);
         assertThrows(
@@ -140,7 +140,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in REMOVED state should NOT be changed to TRANSIENT state.")
     void theEntityInRemovedStateShouldNotBeChangedToTransientState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(16L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.setEntityState(person, REMOVED);
         assertThrows(
@@ -152,7 +152,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in REMOVED state should NOT be changed to REMOVED state.")
     void theEntityInRemovedStateShouldNotBeChangedToRemovedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(17L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.setEntityState(person, REMOVED);
         assertThrows(
@@ -164,7 +164,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in DETACHED state should be changed to MANAGED state.")
     void theEntityInDetachedStateShouldBeChangedToManagedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(18L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.setEntityState(person, DETACHED);
         entityStateService.setEntityState(person, MANAGED);
@@ -173,7 +173,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in DETACHED state should NOT be changed to REMOVED state.")
     void theEntityInDetachedStateShouldNotBeChangedToRemovedState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(19L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.setEntityState(person, DETACHED);
         assertThrows(
@@ -185,7 +185,7 @@ class EntityStateServiceImplTest {
     @Test
     @DisplayName("Entity in DETACHED state should NOT be changed to TRANSIENT state.")
     void theEntityInDetachedStateShouldNotBeChangedToTransientState() {
-        Person person = new Person(2L, "reallyFirstName", "justLastName");
+        Person person = new Person(20L, "reallyFirstName", "justLastName");
         entityStateService.setEntityState(person, MANAGED);
         entityStateService.setEntityState(person, DETACHED);
         assertThrows(
