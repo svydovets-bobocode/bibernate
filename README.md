@@ -34,6 +34,14 @@ Or follow these steps:
    <version>1.0</version>
 </dependency>
 ```
+5. add db dependency
+```xml
+<dependency>
+   <groupId>org.postgresql</groupId>
+   <artifactId>postgresql</artifactId>
+   <version>42.5.4</version>
+</dependency>
+```
 
 ## Project packages structure
 
@@ -101,11 +109,11 @@ public class User {
   private Long id;
   private String name;
 
-  @Column(insertable = false, updatable = false)
-  private LocalDateTime creationTime;
-
   @Column(name = "phone_number")
   private String phone;
+
+  @Column(insertable = false, updatable = false)
+  private LocalDateTime creationTime;
 }
 ```
 
@@ -120,10 +128,12 @@ public class StartExample {
         Session session = sessionFactory.openSession();
         try {
             session.begin();
-            saveDefaultUserIntoDb();
+            session.save(new User("John", "937992", LocalDateTime.now()));
             session.commit();
         } catch (Exception ex) {
             session.rollback();
+        } finally {
+            session.close();
         }
     }
 }
