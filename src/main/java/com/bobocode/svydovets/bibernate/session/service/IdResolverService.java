@@ -29,13 +29,11 @@ public class IdResolverService {
         } else if (idValue.isEmpty() && generationValueType.equals(MANUAL)) {
             throw new EntityValidationException(
                     "Id value is missing for entity: " + entityType.getSimpleName());
-        } else if (idValue.isPresent()) {
-            throw new EntityValidationException(
-                    "Id should be null for non MANUAL generation type for " + entityType.getSimpleName());
         }
-
-        var idValuePopulator = idValuePopulatorFactory.getIdValuePopulator(generationValueType);
-        idValuePopulator.populateIdValue(connection, entity);
+        if (idValue.isEmpty()) {
+            var idValuePopulator = idValuePopulatorFactory.getIdValuePopulator(generationValueType);
+            idValuePopulator.populateIdValue(connection, entity);
+        }
     }
 
     private GenerationType getGenerationValueType(Field idField) {
