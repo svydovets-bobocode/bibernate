@@ -1,6 +1,5 @@
 package com.bobocode.svydovets.bibernate.integration.id.resolver;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestCustomerFactory.newDefaultInvalidCustomer;
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestCustomerFactory.newDefaultValidCustomer;
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestEmployeesFactory.newDefaultValidEmployee;
 import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.newDefaultInvalidPerson;
