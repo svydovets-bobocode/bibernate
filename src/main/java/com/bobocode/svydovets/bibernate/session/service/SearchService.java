@@ -50,7 +50,7 @@ public class SearchService {
         String selectByIdQuery = SqlQueryBuilder.createSelectByIdQuery(type, lockModeType);
         try (var statement = connection.prepareStatement(selectByIdQuery)) {
             statement.setObject(1, id);
-            ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = JdbcExecutor.executePreparedStatementAndRetrieveResultSet(statement);
             if (ResultSetMapper.moveCursorToNextRow(resultSet)) {
                 T result = resultSetMapper.mapToObject(type, resultSet);
                 log.debug("Mapped result set to object: {}", result);
