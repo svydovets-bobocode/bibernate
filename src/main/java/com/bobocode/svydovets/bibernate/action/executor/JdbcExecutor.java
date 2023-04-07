@@ -1,15 +1,12 @@
 package com.bobocode.svydovets.bibernate.action.executor;
 
 import com.bobocode.svydovets.bibernate.exception.ConnectionException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * JdbcExecutor provides static methods to execute SQL queries and statements using JDBC.
- */
+/** JdbcExecutor provides static methods to execute SQL queries and statements using JDBC. */
 @Slf4j
 public class JdbcExecutor {
 
@@ -37,14 +34,17 @@ public class JdbcExecutor {
      * @return the result set obtained by executing the prepared statement
      * @throws ConnectionException if there is an error while executing the prepared statement
      */
-    public static ResultSet executePreparedStatementAndRetrieveResultSet(PreparedStatement preparedStatement) {
+    public static ResultSet executePreparedStatementAndRetrieveResultSet(
+            PreparedStatement preparedStatement) {
         try {
             var resultSet = preparedStatement.executeQuery();
             log.debug("Executed statement: ".concat(getFormattedPreparedStatement(preparedStatement)));
             return resultSet;
         } catch (Exception e) {
             throw new ConnectionException(
-                    "Error while executing statement %s and collecting the ResultSet".formatted(preparedStatement), e);
+                    "Error while executing statement %s and collecting the ResultSet"
+                            .formatted(preparedStatement),
+                    e);
         }
     }
 
@@ -74,7 +74,11 @@ public class JdbcExecutor {
     public static int executePreparedStatementUpdate(PreparedStatement preparedStatement) {
         try {
             int rows = preparedStatement.executeUpdate();
-            log.debug("Executed statement: ".concat(getFormattedPreparedStatement(preparedStatement).concat("\nUpdated %s rows".formatted(rows))));
+            log.debug(
+                    "Executed statement: "
+                            .concat(
+                                    getFormattedPreparedStatement(preparedStatement)
+                                            .concat("\nUpdated %s rows".formatted(rows))));
             return rows;
         } catch (Exception e) {
             throw new ConnectionException(
