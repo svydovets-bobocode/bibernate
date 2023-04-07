@@ -3,6 +3,7 @@ package com.bobocode.svydovets.bibernate.action;
 import static com.bobocode.svydovets.bibernate.annotation.Version.INITIAL_VERSION_FIELD_VALUE;
 import static com.bobocode.svydovets.bibernate.util.EntityUtils.getInsertableFields;
 
+import com.bobocode.svydovets.bibernate.action.executor.JdbcExecutor;
 import com.bobocode.svydovets.bibernate.action.query.SqlQueryBuilder;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import java.lang.reflect.Field;
@@ -32,7 +33,7 @@ public class InsertAction<T> extends AbstractAction<T> {
                 connection.prepareStatement(SqlQueryBuilder.createInsertQuery(actionObjectType))) {
             Field[] insertableFields = getInsertableFields(actionObjectType);
             setFieldsInPreparedStatement(preparedStatement, insertableFields);
-            preparedStatement.execute();
+            JdbcExecutor.executePreparedStatement(preparedStatement);
         } catch (SQLException ex) {
             throw new BibernateException(
                     "Now able to process insert action for entity " + actionObjectType.getSimpleName(), ex);
