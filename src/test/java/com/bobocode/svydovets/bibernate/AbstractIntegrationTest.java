@@ -56,7 +56,6 @@ public abstract class AbstractIntegrationTest {
         connection.close();
     }
 
-    // Todo: move that to schema or different place
     private void createTables() throws SQLException {
         createPersonTable();
         createUsersTable();
