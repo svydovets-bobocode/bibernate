@@ -1,5 +1,6 @@
 package com.bobocode.svydovets.bibernate.lazy;
 
+import com.bobocode.svydovets.bibernate.annotation.OneToMany;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -14,6 +15,12 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * The implementation of the {@link List} interface, which provides the Lazy access to its elements.
+ * In other words, elements will be retrieved from the DB only on your first access to it.
+ *
+ * @see OneToMany
+ */
 @Slf4j
 public class SvydovetsLazyList<T> implements List<T> {
     private final Supplier<List<T>> collectionSupplier;
