@@ -328,9 +328,9 @@ objects to avoid repeated database access.
 | `detach(entity)`          | remove entity from the persistence context                                                                                                                         |
 | `getEntityState(entity)`  | return entity state from the persistence context                                                                                                                   |
 | `close`                   | close and flush current session                                                                                                                                    |
-| `beginTransaction`                   | start transaction                                                                                                                                                  |
-| `commitTransaction`                  | commit current transaction, writing any unflushed changes to the database                                                                                          |
-| `rollbackTransaction`                | roll back current transaction                                                                                                                                      |
+| `beginTransaction`        | start transaction                                                                                                                                                  |
+| `commitTransaction`       | commit current transaction, writing any unflushed changes to the database                                                                                          |
+| `rollbackTransaction`     | roll back current transaction                                                                                                                                      |
 
 ### Mapping
 
