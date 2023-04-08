@@ -20,6 +20,7 @@ import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.locking.optimistic.OptimisticLockService;
 import com.bobocode.svydovets.bibernate.session.service.IdResolverService;
 import com.bobocode.svydovets.bibernate.session.service.SearchService;
+import com.bobocode.svydovets.bibernate.session.service.model.SearchMetadata;
 import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.state.EntityStateService;
 import com.bobocode.svydovets.bibernate.state.EntityStateServiceImpl;
@@ -33,6 +34,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -132,6 +134,12 @@ public class SessionImpl implements Session {
     }
 
     @Override
+    public <T> List<T> findAllBy(Class<T> entityType, Field field, Object columnValue) {
+        SearchMetadata<T> searchMetadata = new SearchMetadata<>(entityType, field, columnValue);
+        return searchService.findAllBy(searchMetadata, entitiesCacheMap, entitiesSnapshotMap);
+    }
+
+    @Override
     public void close() {
         try {
             flush();
@@ -218,7 +226,7 @@ public class SessionImpl implements Session {
                 .forEach(entity -> entityStateService.setEntityState(entity, DETACHED));
     }
 
-    private void verifySessionIsOpened() {
+    public void verifySessionIsOpened() {
         if (!isOpen.get()) {
             throw new BibernateException(ErrorMessage.SESSION_IS_CLOSED);
         }
