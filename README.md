@@ -470,7 +470,6 @@ public class Employee {
   private Long id;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
   private List<User> user;
   
 }
@@ -482,7 +481,7 @@ public class Employee {
 <summary>@JoinColumn</summary>
 
 [`@JoinColumn`](src/main/java/com/bobocode/svydovets/bibernate/annotation/JoinColumn.java)
-Used among with the **@ManyToOne** mapping in order to provide the ORM with the information
+Used among with the **@OneToMany** mapping in order to provide the ORM with the information
 about the foreign key relation column name.
 
  </details>
@@ -515,6 +514,7 @@ public class Employee {
   private Long id;
 
   @OneToMany
+  @JoinColumn(name = "note_id")
   private List<Note> notes;
 
 }
