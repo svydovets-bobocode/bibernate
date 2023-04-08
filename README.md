@@ -131,11 +131,11 @@ public class StartExample {
         SessionFactory sessionFactory = configuration.buildSessionFactory();
         Session session = sessionFactory.openSession();
         try {
-            session.beginTransaction();
+            session.begin();
             session.save(new User("John", "937992", LocalDateTime.now()));
-            session.commitTransaction();
+            session.commit();
         } catch (Exception ex) {
-            session.rollbackTransaction();
+            session.rollback();
         } finally {
             session.close();
         }
@@ -330,9 +330,9 @@ objects to avoid repeated database access.
 | `detach(entity)`          | remove entity from the persistence context                                                                                                                         |
 | `getEntityState(entity)`  | return entity state from the persistence context                                                                                                                   |
 | `close`                   | close and flush current session                                                                                                                                    |
-| `beginTransaction`        | start transaction                                                                                                                                                  |
-| `commitTransaction`       | commit current transaction, writing any unflushed changes to the database                                                                                          |
-| `rollbackTransaction`     | roll back current transaction                                                                                                                                      |
+| `begin`                   | start transaction                                                                                                                                                  |
+| `commit`                  | commit current transaction, writing any unflushed changes to the database                                                                                          |
+| `rollback`                | roll back current transaction                                                                                                                                      |
 
 ### Mapping
 
@@ -487,6 +487,41 @@ about the foreign key relation column name.
 
  </details>
 
+<details>
+<summary>@OneToMany</summary>
+
+[`@OneToMany`](src/main/java/com/bobocode/svydovets/bibernate/annotation/OneToMany.java)
+Used for One-to-Many DB relation (when parent entity have multiple relations with the child
+entities, child entity stores the reference to the parent via the foreign key column).
+<br>
+This type of the relation does not immediately load from the DB. Also, your provided
+collection will not be used at all. Instead, the Bibernate ORM will create the instance of the
+**SvydovetsLazyList**. It is the implementation of the **java.util.List** interface, but
+it acts as a lazy collection. The entities will be loaded only at the first time that you access
+it.
+
+```java
+import com.bobocode.svydovets.bibernate.annotation.JoinColumn;
+import com.bobocode.svydovets.bibernate.annotation.OneToMany;
+
+@Entity
+@Table(name = "employees")
+public class Employee {
+
+  public Employee() {
+  }
+
+  @Id
+  private Long id;
+
+  @OneToMany
+  private List<Note> notes;
+
+}
+```
+
+ </details>
+
 ### Entity
 
 ---
@@ -638,19 +673,19 @@ represents a unit of work that is performed on a database.
 
 A transaction in Bibernate can be managed using the [Session](#session) interface.
 
-Transaction can be started using the `beginTransaction()` method and can be committed using the `commitTransaction()` method.
-If an error occurs during the transaction, it can be rolled back using the `rollbackTransaction()` method.
+Transaction can be started using the `begin()` method and can be committed using the `commit()` method.
+If an error occurs during the transaction, it can be rolled back using the `rollback()` method.
 
 <details>
 <summary>Example</summary>
 
 ```java
 try {
-    session.beginTransaction();
+    session.begin();
     saveDefaultPersonIntoDb();
-    session.commitTransaction();
+    session.commit();
 } catch (Exception ex) {
-    session.rollbackTransaction();
+    session.rollback();
 }
 ```
 
@@ -690,7 +725,7 @@ Here is an example of using the Action Queue within a transaction:
 
 ```java
 try {
-  session.beginTransaction(); // Start the transaction
+  session.begin(); // Start the transaction
   
   // Perform database operations (these actions will be added to the Action Queue)
   
@@ -700,9 +735,9 @@ try {
   
   session.delete(personsFromDb);
   
-  session.commitTransaction(); // Commit the transaction (this will execute the actions in the Action Queue)
+  session.commit(); // Commit the transaction (this will execute the actions in the Action Queue)
   } catch (Exception ex) {
-  session.rollbackTransaction(); // Rollback the transaction in case of any errors
+  session.rollback(); // Rollback the transaction in case of any errors
 }
 ```
 
