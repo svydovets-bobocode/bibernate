@@ -80,4 +80,16 @@ public class InsertActionIntegrationTest extends AbstractIntegrationTest {
         assertThat(productInDb.getQuantity()).isEqualTo(5);
         assertThat(productInDb.getVersion()).isEqualTo(Version.INITIAL_VERSION_FIELD_VALUE);
     }
+
+    @Test
+    void testInsertWithVersionWhenVersionValueIsNull() throws SQLException {
+        Product product = new Product(1L, 5, null);
+        Action insertAction = new InsertAction<>(dataSource.getConnection(), product);
+
+        insertAction.execute();
+
+        Product productInDb = searchService.findOne(new EntityKey<>(Product.class, 1L));
+        assertThat(productInDb.getQuantity()).isEqualTo(5);
+        assertThat(productInDb.getVersion()).isEqualTo(Version.INITIAL_VERSION_FIELD_VALUE);
+    }
 }

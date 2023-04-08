@@ -44,13 +44,16 @@ public abstract class AbstractAction<T> implements Action {
             Field declaredField = fields[i];
             Optional<Object> optFieldValue =
                     EntityUtils.retrieveValueFromField(actionObject, declaredField);
+
+            boolean versionField =
+                    optVersionField.isPresent()
+                            && declaredField.getName().equals(optVersionField.get().getName());
+            if (versionField) {
+                optFieldValue = Optional.of(resolveVersionField(optFieldValue.orElse(0)));
+            }
+
             if (optFieldValue.isPresent()) {
-                boolean versionField =
-                        optVersionField.isPresent()
-                                && declaredField.getName().equals(optVersionField.get().getName());
-                Object value =
-                        versionField ? resolveVersionField(optFieldValue.get()) : optFieldValue.get();
-                preparedStatement.setObject(i + 1, value);
+                preparedStatement.setObject(i + 1, optFieldValue.get());
             }
         }
     }

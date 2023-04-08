@@ -1,6 +1,7 @@
 package com.bobocode.svydovets.bibernate.locking.optimistic;
 
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
+import com.bobocode.svydovets.bibernate.annotation.Version;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -24,7 +25,11 @@ public class OptimisticLockService {
         versionField.ifPresent(
                 field -> {
                     Map<String, Object> fieldsMap = entitiesSnapshotMap.get(entityKey);
-                    EntityUtils.setValueToField(entity, field, fieldsMap.get(field.getName()));
+                    Object resolvedVersionField =
+                            fieldsMap == null
+                                    ? Version.INITIAL_VERSION_FIELD_VALUE
+                                    : fieldsMap.get(field.getName());
+                    EntityUtils.setValueToField(entity, field, resolvedVersionField);
                 });
     }
 }
