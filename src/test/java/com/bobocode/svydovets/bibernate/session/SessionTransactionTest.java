@@ -51,13 +51,13 @@ class SessionTransactionTest extends AbstractIntegrationTest {
         List<Person> personsFromDb = getPersonsFromDb();
         assertEquals(2, personsFromDb.size());
 
-        session.begin();
+        session.beginTransaction();
 
         savePersonIntoDb();
         personsFromDb = getPersonsFromDb();
         assertEquals(3, personsFromDb.size());
 
-        session.commit();
+        session.commitTransaction();
 
         personsFromDb = getPersonsFromDb();
         assertEquals(3, personsFromDb.size());
@@ -69,13 +69,13 @@ class SessionTransactionTest extends AbstractIntegrationTest {
         List<Person> personsFromDb = getPersonsFromDb();
         assertEquals(2, personsFromDb.size());
 
-        session.begin();
+        session.beginTransaction();
 
         savePersonIntoDb();
         personsFromDb = getPersonsFromDb();
         assertEquals(3, personsFromDb.size());
 
-        session.rollback();
+        session.rollbackTransaction();
 
         personsFromDb = getPersonsFromDb();
         assertEquals(2, personsFromDb.size());
@@ -109,12 +109,12 @@ class SessionTransactionTest extends AbstractIntegrationTest {
             "State should be DETACHED after open new session after close when the entity was managed in old session before")
     void stateShouldBeDetachedInNewSessionAfterCloseWhenWasManagedBeforeTransaction()
             throws SQLException {
-        session.begin();
+        session.beginTransaction();
         Person personsFromDb = session.find(Person.class, 1L);
         personsFromDb.setFirstName("blablabla");
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(MANAGED, actualEntityState);
-        session.commit();
+        session.commitTransaction();
 
         EntityState actualEntityState3 = session.getEntityState(personsFromDb);
         assertEquals(MANAGED, actualEntityState3);
@@ -123,51 +123,51 @@ class SessionTransactionTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("Check if the selected entity is in the MANAGED state")
     void findAndCheckIfAnEntityIsInManagedState() throws SQLException {
-        session.begin();
+        session.beginTransaction();
         Person personsFromDb = session.find(Person.class, 1L);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(MANAGED, actualEntityState);
-        session.commit();
+        session.commitTransaction();
     }
 
     @Test
     @DisplayName("Check if the session detach method set DETACHED state")
     void detachFoundEntityAndCheckIfAnEntityIsInDetachedState() {
-        session.begin();
+        session.beginTransaction();
         Person personsFromDb = session.find(Person.class, 1L);
         session.detach(personsFromDb);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(DETACHED, actualEntityState);
-        session.commit();
+        session.commitTransaction();
     }
 
     @Test
     @DisplayName("Check if the entity is in MANAGED state after merge method call")
     void mergeDetachedEntityAndCheckIfAnEntityIsInManagedState() {
-        session.begin();
+        session.beginTransaction();
         Person personsFromDb = session.find(Person.class, 1L);
         session.detach(personsFromDb);
         session.merge(personsFromDb);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(MANAGED, actualEntityState);
-        session.commit();
+        session.commitTransaction();
     }
 
     @Test
     @DisplayName("Check if the entity is in REMOVED state after delete method call")
     void removeEntityAndCheckIfAnEntityIsInRemovedState() {
-        session.begin();
+        session.beginTransaction();
         Person personsFromDb = session.find(Person.class, 1L);
         session.delete(personsFromDb);
         EntityState actualEntityState = session.getEntityState(personsFromDb);
         assertEquals(REMOVED, actualEntityState);
-        session.commit();
+        session.commitTransaction();
     }
 
     @Test
     @DisplayName("Should throw en exception when merge entity in TRANSIENT state")
     void shouldThrowAnExceptionWhenMergeEntityThatIsInTransientState() {
-        session.begin();
+        session.beginTransaction();
 
         Person personsFromDb = new Person(2L, "Transient person", "Last name");
 
@@ -175,13 +175,13 @@ class SessionTransactionTest extends AbstractIntegrationTest {
                 EntityStateValidationException.class,
                 () -> session.merge(personsFromDb),
                 "Entity state should be in DETACHED, but was in TRANSIENT");
-        session.commit();
+        session.commitTransaction();
     }
 
     @Test
     @DisplayName("Should throw en exception when delete entity in TRANSIENT state")
     void shouldThrowAnExceptionWhenDeleteEntityThatIsInTransientState() {
-        session.begin();
+        session.beginTransaction();
 
         Person personsFromDb = new Person(1L, "Transient person", "Last name");
 
@@ -189,7 +189,7 @@ class SessionTransactionTest extends AbstractIntegrationTest {
                 EntityStateValidationException.class,
                 () -> session.delete(personsFromDb),
                 "Can't change entity state from TRANSIENT to REMOVED");
-        session.commit();
+        session.commitTransaction();
     }
 
     private void savePersonIntoDb() {
