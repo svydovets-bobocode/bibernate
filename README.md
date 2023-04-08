@@ -129,11 +129,11 @@ public class StartExample {
         SessionFactory sessionFactory = configuration.buildSessionFactory();
         Session session = sessionFactory.openSession();
         try {
-            session.begin();
+            session.beginTransaction();
             session.save(new User("John", "937992", LocalDateTime.now()));
-            session.commit();
+            session.commitTransaction();
         } catch (Exception ex) {
-            session.rollback();
+            session.rollbackTransaction();
         } finally {
             session.close();
         }
@@ -328,9 +328,9 @@ objects to avoid repeated database access.
 | `detach(entity)`          | remove entity from the persistence context                                                                                                                         |
 | `getEntityState(entity)`  | return entity state from the persistence context                                                                                                                   |
 | `close`                   | close and flush current session                                                                                                                                    |
-| `begin`                   | start transaction                                                                                                                                                  |
-| `commit`                  | commit current transaction, writing any unflushed changes to the database                                                                                          |
-| `rollback`                | roll back current transaction                                                                                                                                      |
+| `beginTransaction`                   | start transaction                                                                                                                                                  |
+| `commitTransaction`                  | commit current transaction, writing any unflushed changes to the database                                                                                          |
+| `rollbackTransaction`                | roll back current transaction                                                                                                                                      |
 
 ### Mapping
 
@@ -636,19 +636,19 @@ represents a unit of work that is performed on a database.
 
 A transaction in Bibernate can be managed using the [Session](#session) interface.
 
-Transaction can be started using the `begin()` method and can be committed using the `commit()` method.
-If an error occurs during the transaction, it can be rolled back using the `rollback()` method.
+Transaction can be started using the `beginTransaction()` method and can be committed using the `commitTransaction()` method.
+If an error occurs during the transaction, it can be rolled back using the `rollbackTransaction()` method.
 
 <details>
 <summary>Example</summary>
 
 ```java
 try {
-    session.begin();
+    session.beginTransaction();
     saveDefaultPersonIntoDb();
-    session.commit();
+    session.commitTransaction();
 } catch (Exception ex) {
-    session.rollback();
+    session.rollbackTransaction();
 }
 ```
 
@@ -688,7 +688,7 @@ Here is an example of using the Action Queue within a transaction:
 
 ```java
 try {
-  session.begin(); // Start the transaction
+  session.beginTransaction(); // Start the transaction
   
   // Perform database operations (these actions will be added to the Action Queue)
   
@@ -698,9 +698,9 @@ try {
   
   session.delete(personsFromDb);
   
-  session.commit(); // Commit the transaction (this will execute the actions in the Action Queue)
+  session.commitTransaction(); // Commit the transaction (this will execute the actions in the Action Queue)
   } catch (Exception ex) {
-  session.rollback(); // Rollback the transaction in case of any errors
+  session.rollbackTransaction(); // Rollback the transaction in case of any errors
 }
 ```
 
