@@ -85,8 +85,6 @@ public class ResultSetMapper {
                 Object relatedEntity = session.find(field.getType(), relatedEntityId);
                 EntityUtils.setValueToField(instance, field, relatedEntity);
             } else if (EntityUtils.isEntityCollectionField(field)) {
-                //                Collection<T> list = createSvydovetsLazyCollection(entityType,
-                // relatedEntityField, idValue);
                 List<T> list = createSvydovetsLazyCollection(type, field, instance);
                 EntityUtils.setValueToField(instance, field, list);
             }
