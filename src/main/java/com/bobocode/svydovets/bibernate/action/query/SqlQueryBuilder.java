@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class SqlQueryBuilder {
+    private static final String SELECT_ALL_FROM_TABLE_BY_COLUMN_NAME =
+            "SELECT * FROM %S WHERE %S = ?;";
     private static final String SELECT_FROM_TABLE_BY_ID = "SELECT * FROM %s WHERE %s = ? %s;";
     private static final String SELECT_ALL_FROM_TABLE = "SELECT * FROM %s;";
     private static final String INSERT_INTO_TABLE = "INSERT INTO %s(%s) VALUES(%s);";
@@ -171,5 +173,11 @@ public class SqlQueryBuilder {
                                         originSqlQuery.replace(
                                                 ";", String.format(VERSION_WHERE_CONDITION, field.getName()))))
                 .orElse(originSqlQuery);
+    }
+
+    public static <T> String createSelectAllByColumn(Class<T> entityType, Field field) {
+        String tableName = EntityUtils.resolveTableName(entityType);
+        String columnName = EntityUtils.resolveJoinColumnName(field);
+        return String.format(SELECT_ALL_FROM_TABLE_BY_COLUMN_NAME, tableName, columnName);
     }
 }

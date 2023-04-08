@@ -1,17 +1,32 @@
 package com.bobocode.svydovets.bibernate.integration.action;
 
-import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.*;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_CHILD_ENTITY_KEY;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_CHILD_ID;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ENTITY_KEY;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_FIRST_NAME;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_ID;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_LAST_NAME;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.DEFAULT_PARENT_ENTITY_KEY;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.INVALID_ENTITY_KEY;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.OTHER_FIRST_NAME;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.OTHER_ID;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.OTHER_LAST_NAME;
+import static com.bobocode.svydovets.bibernate.testdata.factory.TestPersonFactory.SECOND_CHILD_ID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bobocode.svydovets.bibernate.AbstractIntegrationTest;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.session.SessionImpl;
 import com.bobocode.svydovets.bibernate.testdata.entity.Child;
+import com.bobocode.svydovets.bibernate.testdata.entity.Parent;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class SelectIntegrationTest extends AbstractIntegrationTest {
@@ -36,6 +51,13 @@ class SelectIntegrationTest extends AbstractIntegrationTest {
         assertEquals(DEFAULT_CHILD_ID, child.getId());
         assertEquals("Test1", child.getName());
         assertNotNull(child.getParent());
+    }
+
+    @Test
+    void testFindAllChildForTheParentClass() {
+        Set<Long> expectedChildIds = Set.of(DEFAULT_CHILD_ID, SECOND_CHILD_ID);
+        Parent parent = searchService.findOne(DEFAULT_PARENT_ENTITY_KEY);
+        parent.getChildren().forEach(child -> assertThat(expectedChildIds).contains(child.getId()));
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.bobocode.svydovets.bibernate.testdata.factory;
 
 import com.bobocode.svydovets.bibernate.action.key.EntityKey;
 import com.bobocode.svydovets.bibernate.testdata.entity.Child;
+import com.bobocode.svydovets.bibernate.testdata.entity.Parent;
 import com.bobocode.svydovets.bibernate.testdata.entity.Person;
 
 public class TestPersonFactory {
@@ -16,6 +17,8 @@ public class TestPersonFactory {
     public static final Long INVALID_ID = -1L;
 
     public static final Long DEFAULT_CHILD_ID = 5L;
+    public static final Long SECOND_CHILD_ID = 6L;
+    public static final Long DEFAULT_PARENT_ID = 4L;
 
     public static final EntityKey<Person> DEFAULT_ENTITY_KEY =
             new EntityKey<>(Person.class, DEFAULT_ID);
@@ -25,6 +28,9 @@ public class TestPersonFactory {
 
     public static final EntityKey<Child> DEFAULT_CHILD_ENTITY_KEY =
             new EntityKey<>(Child.class, DEFAULT_CHILD_ID);
+
+    public static final EntityKey<Parent> DEFAULT_PARENT_ENTITY_KEY =
+            new EntityKey<>(Parent.class, DEFAULT_PARENT_ID);
 
     public static Person newDefaultPerson() {
         Person person = new Person();

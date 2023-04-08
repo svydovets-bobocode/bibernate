@@ -4,6 +4,7 @@ import static com.bobocode.svydovets.bibernate.constant.ErrorMessage.ERROR_MAPPI
 
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.ConnectionException;
+import com.bobocode.svydovets.bibernate.lazy.SvydovetsLazyList;
 import com.bobocode.svydovets.bibernate.session.Session;
 import com.bobocode.svydovets.bibernate.util.EntityUtils;
 import java.lang.reflect.Field;
@@ -13,6 +14,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 
 /** The ResultSetMapper class provides methods for mapping a JDBC ResultSet to Java objects. */
@@ -81,9 +84,25 @@ public class ResultSetMapper {
                 Object relatedEntityId = resultSet.getObject(foreignKeyColumnName);
                 Object relatedEntity = session.find(field.getType(), relatedEntityId);
                 EntityUtils.setValueToField(instance, field, relatedEntity);
+            } else if (EntityUtils.isEntityCollectionField(field)) {
+                List<T> list = createSvydovetsLazyCollection(type, field, instance);
+                EntityUtils.setValueToField(instance, field, list);
             }
         }
         return instance;
+    }
+
+    private <T> SvydovetsLazyList<T> createSvydovetsLazyCollection(
+            Class<T> type, Field field, T instance) {
+        var entityType = EntityUtils.getEntityCollectionElementType(field);
+        Field relatedEntityField = EntityUtils.getRelatedEntityField(type, entityType);
+        Object idValue = EntityUtils.getIdValue(instance);
+        Supplier<List<T>> collectionSupplier =
+                () -> {
+                    session.verifySessionIsOpened();
+                    return (List<T>) session.findAllBy(entityType, relatedEntityField, idValue);
+                };
+        return new SvydovetsLazyList<>(collectionSupplier);
     }
 
     /**
