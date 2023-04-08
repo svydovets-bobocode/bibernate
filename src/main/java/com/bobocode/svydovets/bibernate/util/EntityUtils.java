@@ -21,6 +21,8 @@ import com.bobocode.svydovets.bibernate.annotation.Version;
 import com.bobocode.svydovets.bibernate.exception.BibernateException;
 import com.bobocode.svydovets.bibernate.exception.EntityValidationException;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -312,5 +314,23 @@ public class EntityUtils {
     public static <T> Object getVersionValue(T entity, Field versionField) {
         return retrieveValueFromField(entity, versionField)
                 .orElseThrow(() -> new BibernateException("Version is not present in entity"));
+    }
+
+    public static <T> Field getRelatedEntityField(Class<T> fromEntity, Class<?> toEntity) {
+        return Arrays.stream(toEntity.getDeclaredFields())
+                .filter(field -> field.getType().equals(fromEntity))
+                .findAny()
+                .orElseThrow(
+                        () ->
+                                new BibernateException(
+                                        "Can't find related declared field in " + toEntity + " for the " + fromEntity));
+    }
+
+    public static Class<?> getEntityCollectionElementType(Field field) {
+        ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        Type actualTypeArgument = actualTypeArguments[0];
+        Class<?> castedActualTypeArgument = (Class<?>) actualTypeArgument;
+        return castedActualTypeArgument;
     }
 }

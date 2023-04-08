@@ -50,10 +50,12 @@ com.bobocode.svydovets.bibernate
 ├── config            # API for Bibernate configuration
 ├── connectionpool    # Connection pooling API
 ├── exception         # Bibernate exceptions
+├── lazy              # lazy collections
 ├── locking           # Locking API
 │   └── optimistic
 ├── session           # Session API
 │   └── service
+│       └── model
 ├── state             # Entity states managing API
 ├── transaction       # Transaction control management API
 ├── util              # Util classes

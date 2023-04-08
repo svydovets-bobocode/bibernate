@@ -9,7 +9,9 @@ import com.bobocode.svydovets.bibernate.state.EntityState;
 import com.bobocode.svydovets.bibernate.transaction.Transaction;
 import com.bobocode.svydovets.bibernate.validation.Validator;
 import com.bobocode.svydovets.bibernate.validation.state.EntityStateTransition;
+import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * The main abstraction, which represents the power of the ORM. Provides an API to perform basic DB
@@ -113,6 +115,17 @@ public interface Session extends AutoCloseable {
     <T> Collection<T> findAll(Class<T> type);
 
     /**
+     * Find all instances by type, field, column name.
+     *
+     * @param entityType entity type
+     * @param field field to resolve column name to search by in where clause.
+     * @param columnValue column value
+     * @return list of instances.
+     * @param <T> generic elements type.
+     */
+    <T> List<T> findAllBy(Class<T> entityType, Field field, Object columnValue);
+
+    /**
      * End the session by releasing the JDBC connection and cleaning up. Under the hood calls a {@link
      * Session#flush()} and clear cache.
      *
@@ -177,5 +190,14 @@ public interface Session extends AutoCloseable {
      */
     boolean isOpen();
 
+    /** Verify the session is open. throws BibernateException if session closed */
+    void verifySessionIsOpened();
+
+    /**
+     * Get the entity state.
+     *
+     * @param entity entity.
+     * @return EntityState
+     */
     EntityState getEntityState(Object entity);
 }
