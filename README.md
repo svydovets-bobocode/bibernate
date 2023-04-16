@@ -2,6 +2,8 @@
 
 # Svydovets Bibernate
 
+Requirements for the project can be found [here](https://docs.google.com/document/d/1_DSY6ABkkDlmEPQPoheQzob_dR_k--pd-TzVhtH9_xY/edit).
+
 ## Project description
 
 ---
